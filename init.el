@@ -1,10 +1,13 @@
-; melpa package list
+;;; -*- lexical: t -*-
+;; package list 
+(require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 ;Remove UI
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(scroll-bar-mode -1)
+
 
 ;; QOL
 (global-display-line-numbers-mode 1)
@@ -13,6 +16,7 @@
 (setq compilation-ask-about-save nil)
 
 ;; 
+(scroll-bar-mode -1)
 
 ; increase proccess output buffer for LSP
 (setq read-process-output-max (* 4 1024 1024))
@@ -55,47 +59,101 @@
 ; same for dired
 (setq global-auto-revert-non-file-buffers t)
 
+;ido-mode emacs
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
+
+;; Make a whole list of custom keymaps 
+;; TODO - 
+; binds recompile to keymap 
+(keymap-set global-map "C-c r" #'recompile)
+(keymap-set global-map "C-c c" #'compile)
+
+(global-set-key (kbd "<f1>") '5x5)
+
+(defvar com-keymaps
+  (let ((map (make-sparse-keymap)))
+    (define-key map "s" 'shell)
+    (define-key map "g" 'rgrep)
+    map)
+  "my keymap")
+
+;; --- Dashboard --- 
+
 ;; Move Customization Variables To A Separate File And Load It
 ;; (Setqtartup-Hook))
  
 ;; dashboard
 ;;(setq dashboard-banner-logo-title"Emacs")
-(setq set-mark-command-repeat-pop t)
-(setq dashboard-startup-banner "~/Picture/Asci/cat.txt")
-(setq dashboard-center-content t)
-(setq dashboard-vertically-center-content t)
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-startup-banner "~/Picture/Asci/cat.txt")
+  (setq dashboard-center-content t)
+  (setq dashboard-vertically-center-content t)
+  (setq dashboard-navigation-cycle t)
+  (setq dashboard-heading-shorcut-format " [%s]")
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-items '((recents   . 5)
+                          (bookmarks . 5)
+                          (projects  . 5)
+                          (agenda    . 5)
+                          (registers . 5)))
+  (setq dashboard-item-shortcuts '((recents   . "r")
+                                    (bookmarks . "m")
+                                    (projects  . "p")
+                                    (agenda    . "a")
+                                    (registers . "e")))
+  (setq dashboard-startupify-list '(dashboard-insert-banner
+                                    dashboard-insert-newline
+                                    dashboard-insert-newline
+                                    dashboard-insert-banner-title
+                                    dashboard-insert-navigator
+                                    dashboard-insert-newline
+                                    dashboard-insert-init-info
+                                    dashboard-insert-items
+                                    dashboard-insert-newline
+                                    dashboard-insert-footer)))
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq set-mark-command-repeat-pop t)
+  (setq dashboard-startup-banner "~/Picture/Asci/cat.txt")
+  (setq dashboard-center-content t)
+  (setq dashboard-vertically-center-content t)
 
-(setq dashboard-items '((recents   . 5)
-                        (bookmarks . 5)
-                        (projects  . 5)
-                        (agenda    . 5)
-                        (registers . 5)))
+  (setq dashboard-items '((recents   . 5)
+			  (bookmarks . 5)
+			  (projects  . 5)
+			  (agenda    . 5)
+			  (registers . 5)))
 
-(setq dashboard-startupify-list '(dashboard-insert-banner
-                                  dashboard-insert-newline
-                                  dashboard-insert-newline
-                                  dashboard-insert-banner-title
-                                  dashboard-insert-navigator
-                                  dashboard-insert-newline
-                                  dashboard-insert-init-info
-                                  dashboard-insert-items
-                                  dashboard-insert-newline
-                                  dashboard-insert-footer))
+  (setq dashboard-startupify-list '(dashboard-insert-banner
+				    dashboard-insert-newline
+				    dashboard-insert-newline
+				    dashboard-insert-banner-title
+				    dashboard-insert-navigator
+				    dashboard-insert-newline
+				    dashboard-insert-init-info
+				    dashboard-insert-items
+				    dashboard-insert-newline
+				    dashboard-insert-footer))
 
-(setq dashboard-navigation-cycle t)
-(setq dashboard-heading-shorcut-format " [%s]")
+  (setq dashboard-navigation-cycle t)
+  (setq dashboard-heading-shorcut-format " [%s]")
 
-(setq dashboard-item-shortcuts '((recents   . "r")
-                                 (bookmarks . "m")
-                                 (projects  . "p")
-                                 (agenda    . "a")
-                                 (registers . "e")))
+  (setq dashboard-item-shortcuts '((recents   . "r")
+				   (bookmarks . "m")
+				   (projects  . "p")
+				   (agenda    . "a")
+				   (registers . "e")))
 
-(setq dashboard-display-icons-p t)     ; display icons on both GUI and terminal
-(setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
-(add-to-list 'dashboard-items '(agenda) t)
-
-;; Font
+  (setq dashboard-display-icons-p t)     ; display icons on both GUI and terminal
+  (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+  (add-to-list 'dashboard-items '(agenda) t)
 
 (when (member "Roboto Mono" (font-family-list))
   (set-face-attribute 'default nil :font "Roboto Mono" :height 108)
@@ -114,12 +172,6 @@
   :config
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
-(use-package nerd-icons-corfu
-  :ensure t
-  :after corfu
-  :config
-  (Addto-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
 (use-package nerd-icons-dired
   :ensure t
   :hook
@@ -129,7 +181,7 @@
 (use-package corfu
   ;; Optional customizations
   :custom
-  (corfu-auto t)
+      (corfu-auto t)
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto-prefix 2)
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
@@ -202,17 +254,38 @@
   :ensure t
   :init (which-key-mode))
 
-;; For Kanagawa
-(use-package kanagawa-themes
-  :ensure t
-  :config (load-theme 'kanagawa-wave t))
+;;For Kanagawa
+;; (use<>-package kanagawa-themes
+;;   :ensure t
+;;   :config (load-theme 'kanagawa-wave))
 
-(use-package doom-themes
+; ef-themes 
+(use-package ef-themes
   :ensure t
   :config
-  (load-theme 'doom-one t))
+  (modus-themes-load-theme 'ef-dream))
 
-  
+
+ 
+; stop highlight when changing theme
+(dolist (face '(font-lock-keyword-face
+		font-lock-function-name-face
+		font-lock-variable-name-face
+		font-lock-type-face
+		font-lock-constant-face
+		font-lock-builtin-face
+		font-lock-preprocessor-face
+		font-lock-string-face
+		font-lock-comment-face
+		font-lock-doc-face
+		elisp-shorthand-font-lock-face
+		highlight-quoted-symbol
+		highlight-quoted-keyword
+		highlight-numbers-number))
+  (when (facep face)
+    (set-face-attribute face nil :background 'unspecified :box nil)))
+
+
 (use-package exec-path-from-shell
   :ensure t
   :if (memq window-system '(mac ns x))
@@ -230,7 +303,9 @@
          (mhtml-mode  . eglot-ensure)
          (html-ts-mode . eglot-ensure)
          (LaTeX-mode  . eglot-ensure)   ; AUCTeX's mode
-         (latex-mode  . eglot-ensure))  ; built-in tex-mode's LaTeX mode
+         (latex-mode  . eglot-ensure)  ; built-in tex-mode's LaTeX mode
+         (qml-ts-mode . eglot-ensure))
+
   :bind (:map eglot-mode-map
               ("C-c l r" . eglot-rename)
               ("C-c l a" . eglot-code-actions)
@@ -241,7 +316,9 @@
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs
-               '((LaTeX-mode latex-mode) . ("texlab"))))
+               '((LaTeX-mode latex-mode) . ("texlab")))
+  (add-to-list 'eglot-server-programs
+	       '(qml-ts-mode . ("qmlls6" "-E"))))
 
 (use-package treesit-auto
   :ensure t
@@ -253,11 +330,16 @@
 
 (use-package markdown-mode
   :ensure t
-  :mode ("README\\.md\\'" . gfm-mode) ; Use GitHub Flavored Markdown for READMEs
+  :mode ("\\.md\\'" . markdown-mode) ; Use GitHub Flavored Markdown for READMEs
   :init (setq markdown-command "multimarkdown") ; Or "pandoc" / "markdown"
+  :bind (:map markdown-mode-map
+	      ("C-c C-e" . markdown-do))
   :config
   (setq markdown-header-scaling t) ; Make headers larger than body text
   (setq markdown-italic-underscore t)) ; Allow _italic_ as well as *italic*
+
+;; for 
+
 
 (use-package pet
   :ensure t
@@ -285,26 +367,25 @@
 
 (setq dired-listing-switches "-alh")
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
-     "745f8c882e6edae45476e93f7b47c5bd4a4dc98c65494672ddcd291359935a3a"
-     "8899e88d19a37d39c7187f4bcb5bb596fba990728ef963420b93e2aea5d1666a"
-     "3aa51468052c1e3e21dd41a3fa40c0161e07ca600683e3d96f1bca70f36749e2"
-     "3b2ae1d19f5843cdc5833266b76e6367744932d96c5ddd713ede9797a2bd93fe"
-     "daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077"
-     default))
- '(package-selected-packages nil)
- '(warning-suppress-types '((use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package cape
+  :bind ("C-c p" . cape-prefix-map)
+
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+)
+
+;; Quickshell
+(add-to-list 'load-path "~/.emacs.d/site-lisp/qml-ts-mode")
+
+(use-package qml-ts-mode
+  :mode "\\.qml\\'"
+  :hook (qml-ts-mode . (lambda ()
+                         (setq-local electric-indent-chars '(?\n ?\( ?\) ?{ ?} ?\[ ?\] ?\; ?,)))))
+
+(setq treesit-language-source-alist
+      '((qmljs . ("https://github.com/yuja/tree-sitter-qmljs"))))
+
 
 
