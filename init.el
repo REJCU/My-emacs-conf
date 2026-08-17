@@ -68,11 +68,12 @@
 ;; TODO -
 ;; binds recompile to keymap
 
+(unbind-key "C-q")
 (dolist (map (list global-map))
-  (keymap-set global-map "C-c r" #'recompile)
-  (keymap-set global-map "C-c c" #'compile)
-  (keymap-set global-map "C-c n" #'next-error)
-  (keymap-set global-map "C-c e" #'eval-buffer))
+  (keymap-set global-map "C-q r" #'recompile)
+  (keymap-set global-map "C-q c" #'compile)
+  (keymap-set global-map "C-q n" #'next-error)
+  (keymap-set global-map "C-q e" #'eval-buffer))
 
 ;; commenting region
   (global-set-key [f9] 'comment-region)
