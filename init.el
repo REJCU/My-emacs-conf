@@ -47,7 +47,7 @@
 (setq window-combination-resize t)
 
 ; makes popping repeated from c-u c-spc to just c-spc after one
-(dashboard-setup-startup-hook)
+
 
 ; custom-file placement 
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
@@ -65,10 +65,23 @@
 (ido-mode 1)
 
 ;; Make a whole list of custom keymaps 
-;; TODO - 
-; binds recompile to keymap 
-(keymap-set global-map "C-c r" #'recompile)
-(keymap-set global-map "C-c c" #'compile)
+;; TODO -
+;; binds recompile to keymap
+
+(dolist (map (list global-map))
+  (keymap-set global-map "C-c r" #'recompile)
+  (keymap-set global-map "C-c c" #'compile)
+  (keymap-set global-map "C-c n" #'next-error)
+  (keymap-set global-map "C-c e" #'eval-buffer))
+
+;; commenting region
+  (global-set-key [f9] 'comment-region)
+  (global-set-key [f10] 'uncomment-region)
+
+  
+;; recommended structure for if i want different keybinds for different files C vs Rust
+;; compile vs open up term and python - i guess
+
 
 (global-set-key (kbd "<f1>") '5x5)
 
@@ -85,12 +98,11 @@
 ;; (Setqtartup-Hook))
  
 ;; dashboard
-;;(setq dashboard-banner-logo-title"Emacs")
 (use-package dashboard
   :ensure t
   :config
   (dashboard-setup-startup-hook)
-  (setq dashboard-startup-banner "~/Picture/Asci/cat.txt")
+  (setq dashboard-startup-banner "~/.emacs.d/splash/cat.txt")
   (setq dashboard-center-content t)
   (setq dashboard-vertically-center-content t)
   (setq dashboard-navigation-cycle t)
@@ -117,43 +129,7 @@
                                     dashboard-insert-items
                                     dashboard-insert-newline
                                     dashboard-insert-footer)))
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook)
-  (setq set-mark-command-repeat-pop t)
-  (setq dashboard-startup-banner "~/Picture/Asci/cat.txt")
-  (setq dashboard-center-content t)
-  (setq dashboard-vertically-center-content t)
 
-  (setq dashboard-items '((recents   . 5)
-			  (bookmarks . 5)
-			  (projects  . 5)
-			  (agenda    . 5)
-			  (registers . 5)))
-
-  (setq dashboard-startupify-list '(dashboard-insert-banner
-				    dashboard-insert-newline
-				    dashboard-insert-newline
-				    dashboard-insert-banner-title
-				    dashboard-insert-navigator
-				    dashboard-insert-newline
-				    dashboard-insert-init-info
-				    dashboard-insert-items
-				    dashboard-insert-newline
-				    dashboard-insert-footer))
-
-  (setq dashboard-navigation-cycle t)
-  (setq dashboard-heading-shorcut-format " [%s]")
-
-  (setq dashboard-item-shortcuts '((recents   . "r")
-				   (bookmarks . "m")
-				   (projects  . "p")
-				   (agenda    . "a")
-				   (registers . "e")))
-
-  (setq dashboard-display-icons-p t)     ; display icons on both GUI and terminal
-  (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
-  (add-to-list 'dashboard-items '(agenda) t)
 
 (when (member "Roboto Mono" (font-family-list))
   (set-face-attribute 'default nil :font "Roboto Mono" :height 108)
@@ -263,7 +239,7 @@
 (use-package ef-themes
   :ensure t
   :config
-  (modus-themes-load-theme 'ef-dream))
+  (modus-themes-load-theme 'ef-day))
 
 
  
@@ -304,8 +280,10 @@
          (html-ts-mode . eglot-ensure)
          (LaTeX-mode  . eglot-ensure)   ; AUCTeX's mode
          (latex-mode  . eglot-ensure)  ; built-in tex-mode's LaTeX mode
-         (qml-ts-mode . eglot-ensure))
+         (qml-ts-mode . eglot-ensure)
+         (lua-ts-mode . eglot-ensure))
 
+  
   :bind (:map eglot-mode-map
               ("C-c l r" . eglot-rename)
               ("C-c l a" . eglot-code-actions)
@@ -348,7 +326,9 @@
 (projectile-mode +1)
 ;; Recommended keymap prefix on Windows/Linux
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-
+(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/"))
+				       
+				       
 ;; avy movement
 (use-package avy
   :ensure t

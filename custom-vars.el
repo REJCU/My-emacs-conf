@@ -20,6 +20,7 @@
 			nerd-icons-completion nerd-icons-corfu
 			nerd-icons-dired orderless pet projectile
 			treesit-auto vertico-posframe zenburn-theme))
+ '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
