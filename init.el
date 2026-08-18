@@ -132,12 +132,13 @@
                                     dashboard-insert-footer)))
 
 
-(when (member "Roboto Mono" (font-family-list))
-  (set-face-attribute 'default nil :font "Roboto Mono" :height 108)
-  (set-face-attribute 'fixed-pitch nil :family "Roboto Mono"))
+;; fonts 
+(when (member "Iosevka" (font-family-list))
+  (set-face-attribute 'default nil :font "Iosevka" :height 108)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka"))
 
-(when (member "Source Sans Pro" (font-family-list))
-  (set-face-attribute 'variable-pitch nil :family "Source Sans Pro" :height 1.18))
+(when (member "Iosevka" (font-family-list))
+  (set-face-attribute 'variable-pitch nil :family "Iosevka" :height 1.18))
 
 ;; nerd-icons
 (use-package nerd-icons
@@ -327,8 +328,7 @@
 (projectile-mode +1)
 ;; Recommended keymap prefix on Windows/Linux
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/"))
-				       
+(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/"))
 				       
 ;; avy movement
 (use-package avy
