@@ -97,14 +97,15 @@
 
 ;; Move Customization Variables To A Separate File And Load It
 ;; (Setqtartup-Hook))
- 
-;; dashboard
+
+;; Dashboard
 (use-package dashboard
   :ensure t
   :config
   (dashboard-setup-startup-hook)
   (setq dashboard-startup-banner "~/.emacs.d/splash/cat.txt")
   (setq dashboard-center-content t)
+  (setq initial-buffer-choice 'dashboard-open) ;; infernal scratch-pad 
   (setq dashboard-vertically-center-content t)
   (setq dashboard-navigation-cycle t)
   (setq dashboard-heading-shorcut-format " [%s]")
@@ -132,7 +133,7 @@
                                     dashboard-insert-footer)))
 
 
-;; fonts 
+;; fonts
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'default nil :font "Iosevka" :height 108)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka"))
