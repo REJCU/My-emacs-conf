@@ -48,6 +48,8 @@
 
 ; makes popping repeated from c-u c-spc to just c-spc after one
 
+;; Isearch
+(setopt isearch-lazy-count t)
 
 ; custom-file placement 
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
@@ -133,10 +135,14 @@
                                     dashboard-insert-footer)))
 
 
+
 ;; fonts
-(when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil :font "Iosevka" :height 108)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka"))
+(set-frame-font "Iosevka")
+
+(add-to-list 'default-frame-alist '(font ."Iosevka"))
+(set-face-attribute 'default nil :font "Iosevka" :height 108)
+(set-face-attribute 'fixed-pitch nil :family "Iosevka")
+
 
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'variable-pitch nil :family "Iosevka" :height 1.18))
@@ -247,22 +253,22 @@
 
  
 ; stop highlight when changing theme
-(dolist (face '(font-lock-keyword-face
-		font-lock-function-name-face
-		font-lock-variable-name-face
-		font-lock-type-face
-		font-lock-constant-face
-		font-lock-builtin-face
-		font-lock-preprocessor-face
-		font-lock-string-face
-		font-lock-comment-face
-		font-lock-doc-face
-		elisp-shorthand-font-lock-face
-		highlight-quoted-symbol
-		highlight-quoted-keyword
-		highlight-numbers-number))
-  (when (facep face)
-    (set-face-attribute face nil :background 'unspecified :box nil)))
+;; (dolist (face '(font-lock-keyword-face
+;; 		font-lock-function-name-face
+;; 		font-lock-variable-name-face
+;; 		font-lock-type-face
+;; 		font-lock-constant-face
+;; 		font-lock-builtin-face
+;; 		font-lock-preprocessor-face
+;; 		font-lock-string-face
+;; 		font-lock-comment-face
+;; 		font-lock-doc-face
+;; 		elisp-shorthand-font-lock-face
+;; 		highlight-quoted-symbol
+;; 		highlight-quoted-keyword
+;; 		highlight-numbers-number))
+;;   (when (facep face)
+;;     (set-face-attribute face nil :background 'unspecified :box nil)))
 
 
 (use-package exec-path-from-shell
@@ -299,7 +305,7 @@
   (add-to-list 'eglot-server-programs
                '((LaTeX-mode latex-mode) . ("texlab")))
   (add-to-list 'eglot-server-programs
-	       '(qml-ts-mode . ("qmlls6" "-E"))))
+	       '(qml-ts-mode  . ("qmlls6" "-E"))))
 
 (use-package treesit-auto
   :ensure t
@@ -329,7 +335,7 @@
 (projectile-mode +1)
 ;; Recommended keymap prefix on Windows/Linux
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/"))
+(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/" "~/ryquick/"))
 				       
 ;; avy movement
 (use-package avy

@@ -19,7 +19,8 @@
 			melpa-upstream-visit moe-theme
 			nerd-icons-completion nerd-icons-corfu
 			nerd-icons-dired orderless pet projectile
-			treesit-auto vertico-posframe zenburn-theme))
+			ripgrep treesit-auto vertico-posframe
+			zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
