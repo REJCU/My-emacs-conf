@@ -1,0 +1,28 @@
+<html><head></head><body><p>
+For me, one of the most difficult Emacs behaviors—or at least “normal” Emacs behaviors—to understand is scrolling. The default behavior is so unintuitive and jarring that it kept me from embracing Emacs for a long time. It was only after I took the plunge that I discovered that that behavior, like everything else in Emacs, is configurable.
+</p>
+<p>
+That was almost 20 years ago when I was just starting and knew next to nothing about Emacs configuration but I was able find the solution on the Internet. Here’s what I’ve had in my <code>init.el</code> almost from the beginning:
+</p>
+<div class="org-src-container">
+<pre><code>(<span>setq</span>    <span>;</span><span>set reasonable scrolling
+</span> scroll-margin 0
+ scroll-conservatively 100000
+ scroll-preserve-screen-position 1)
+</code></pre>
+</div>
+<p>
+Back then, I had no idea what any of it meant, only that it made Emacs scrolling rational by my standards. It’s been sitting there undisturbed ever since.
+</p>
+<p>
+Now James Cherti has <a href="https://www.jamescherti.com/emacs-scrolling-better-performance-usability/">a really excellent post that expains all the fine points of configuring scrolling</a>. He explains the above lines, which most people probably have in their configuration. If you want Emacs scrolling to behave as it does in every other application, you can leave them as is but you can tweak the behavior a bit if you like. Cherti has all the details.
+</p>
+<p>
+But wait. There’s more. There are similar settings for horizontal scrolling that you might like. I’ve never had any problem with horizontal scrolling—probably because I’ve always wrapped lines in one way or another—but they’re there if you need them.
+</p>
+<p>
+There are some other tweaks that you can apply to delay fontification during scrolling to speed things up a bit. Again, this is not something that I use but if you deal with large files, you may find it useful.
+</p>
+<p>
+In Emacs 29 and later you can set pixel-precise scrolling to make scrolling over images more pleasant. There are a few other tweaks in Cherti’s post so you should definitely take a look at it. There’s a lot of good content and even if you use only a bit of it, you will find his post worthwhile.</p>
+</body></html>

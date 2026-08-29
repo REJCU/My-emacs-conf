@@ -1,0 +1,197 @@
+<html><head></head><body><p>Eglot provides built-in LSP support in modern Emacs, giving developers a native interface for autocompletion, linting, and formatting. When paired with <em>python-lsp-server</em> (<code>pylsp</code>), creating a Python development environment comes down to managing the LSP server configuration properly.</p>
+
+
+
+<p>Historically, setting up this toolchain required wiring together a stack of individual utilities such as <code>flake8</code> and <code>isort</code>. Now, <code>ruff</code> stands entirely apart from that legacy ecosystem by consolidating all of those separate checks into a single, high-performance Rust binary. This article demonstrates how to configure Eglot to detect and use Ruff dynamically when it is present on your system, while retaining a clean fallback to the older stack of tools like Flake8, pycodestyle, and pydocstyle when Ruff is missing.</p>
+
+
+
+<h2>The configuration strategy</h2>
+
+
+
+<p>The configuration provided in this article begins by checking for the presence of <code>ruff</code> and <code>flake8</code> in your system path. Based on these checks:</p>
+
+
+
+<ol>
+<li>If Ruff is installed, the configuration relies on the <code>python-lsp-ruff</code> plugin. Ruff consolidates linting, formatting, and import sorting.</li>
+
+
+
+<li>If Ruff is missing but Flake8 is present, Flake8 takes over linting duties alongside Pylint.</li>
+
+
+
+<li>If neither is installed, the system falls back to the individual pylsp plugins (<code>pyflakes</code>, <code>pycodestyle</code>, <code>mccabe</code>, etc.).</li>
+</ol>
+
+
+
+<h2>Dependencies</h2>
+
+
+
+<ul>
+<li>Core: <a href="https://github.com/python-lsp/python-lsp-server">python-lsp-server</a>.</li>
+
+
+
+<li>Primary: <a href="https://github.com/astral-sh/ruff">ruff</a>, <a href="https://github.com/python-lsp/python-lsp-ruff">python-lsp-ruff</a>, and <a href="https://github.com/pylint-dev/pylint">pylint</a>.</li>
+
+
+
+<li>Fallback: <a href="https://github.com/PyCQA/flake8">flake8</a>, <a href="https://github.com/pycqa/flake8-docstrings">flake8-docstrings</a> (Integration of pydocstyle and flake8), <a href="https://github.com/PyCQA/isort">isort</a>, and <a href="https://github.com/chantera/python-lsp-isort">python-lsp-isort</a>.</li>
+</ul>
+
+
+
+<p>The dependencies can be installed locally <em><code>pip</code> </em>or directly via your system's package manager.</p>
+
+
+
+<h2>The complete configuration</h2>
+
+
+
+<p>Below is the complete Emacs Lisp code to achieve this dynamic configuration. You can place this snippet in one of your init files:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Use ruff when it is available because it is fast (written in Rust). When ruff</span>
+<span class="hljs-comment">;; is not available, fall back to flake8 and its individual underlying tools.</span>
+<span class="hljs-comment">;;</span>
+<span class="hljs-comment">;; URL: https://www.jamescherti.com/emacs-python-dev-using-eglot-pylsp-ruff-pylint-flake8/</span>
+<span class="hljs-comment">;;</span>
+<span class="hljs-comment">;; To sup up:</span>
+<span class="hljs-comment">;; - When ruff is available: Ruff, and Pylint.</span>
+<span class="hljs-comment">;; - When Ruff is not available: Flake8, isort, and Pylint.</span>
+<span class="hljs-comment">;;</span>
+<span class="hljs-comment">;; Documentation:</span>
+<span class="hljs-comment">;; https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md</span>
+<span class="hljs-comment">;; https://github.com/python-lsp/python-lsp-ruff</span>
+<span class="hljs-comment">;; https://github.com/chantera/python-lsp-isort</span>
+(<span class="hljs-name">let*</span> ((<span class="hljs-name">has-ruff</span> (<span class="hljs-name">executable-find</span> <span class="hljs-string">"ruff"</span>))
+       (<span class="hljs-name">has-flake8</span> (<span class="hljs-name">executable-find</span> <span class="hljs-string">"flake8"</span>)))
+  <span class="hljs-comment">;; Target ONLY the 'pylsp key in the global configuration alist safely</span>
+  (<span class="hljs-name">setf</span> (<span class="hljs-name">alist-get</span> 'pylsp (<span class="hljs-name">default-value</span> 'eglot-workspace-configuration))
+        `(<span class="hljs-symbol">:pylsp</span>
+          (:plugins
+           (;; Plugin: https://github.com/python-lsp/python-lsp-ruff
+            :ruff (;; Ruff configuration
+                   :enabled ,(if has-ruff <span class="hljs-literal">t</span> :json-false)
+
+                   :formatEnabled ,(if has-ruff <span class="hljs-literal">t</span> :json-false)
+
+                   ;; Add 'W' (pycodestyle warnings), 'UP' (pyupgrade),
+                   ;; and 'D' (pydocstyle).
+                   :extendSelect [<span class="hljs-string">"W"</span> <span class="hljs-string">"UP"</span> <span class="hljs-string">"D"</span>]
+
+                   ;; Ignore specific rules
+                   ;;   D213: Multi-line docstring summary should start on
+                   ;;         the second line.
+                   ;;   D202: No blank lines allowed after function
+                   ;;         docstring.
+                   ;; :ignore [<span class="hljs-string">"D213"</span> <span class="hljs-string">"D202"</span>]
+                   )
+
+            ;; Pylint remains enabled regardless of whether Ruff
+            ;; or Flake8 is active because it serves
+            ;; complementary role.
+            :pylint (:enabled <span class="hljs-literal">t</span>)
+
+            ;; Flake8 is a wrapper tool that bundles pyflakes,
+            ;; pycodestyle, and mccabe.
+            :flake8 (:enabled ,(if (and (not has-ruff) has-flake8)
+                                   <span class="hljs-literal">t</span>
+                                 :json-false))
+
+            ;; When Flake8 or Ruff runs, they execute these under
+            ;; the hood. If we enable either, we must explicitly
+            ;; disable the individual pylsp plugins for them,
+            ;; otherwise the language server will run the exact
+            ;; same checks twice and duplicate all editor
+            ;; diagnostics.
+            :mccabe (:enabled ,(if (or has-ruff has-flake8)
+                                   :json-false
+                                 <span class="hljs-literal">t</span>))
+            :pyflakes (;; pyflakes catches logical errors
+                       ;; (unused imports, undefined names...)
+                       :enabled ,(if (or has-ruff has-flake8)
+                                     :json-false
+                                   <span class="hljs-literal">t</span>))
+
+            :pycodestyle (;; pycodestyle catches style/formatting
+                          ;; violations (PEP <span class="hljs-number">8</span>)
+                          :enabled ,(if (or has-ruff has-flake8)
+                                        :json-false
+                                      <span class="hljs-literal">t</span>)
+
+                          ;; Ignore specific rules
+                          ;; :ignore [<span class="hljs-string">"W293"</span>]
+                          )
+
+            :pydocstyle (;; pydocstyle enforces PEP <span class="hljs-number">257</span> docstring
+                         ;; conventions
+                         :enabled ,(if (or has-ruff has-flake8)
+                                       ;; Use flake8-docstrings
+                                       ;; https://github.com/pycqa/flake8-docstrings
+                                       :json-false
+                                     <span class="hljs-literal">t</span>)
+
+                         ;; Ignore specific rules
+                         ;;   D213 Multi-line docstring summary should start on
+                         ;;        the second line.
+                         ;;   D202 No blank lines allowed after function
+                         ;;        docstring.
+                         ;; :ignore [<span class="hljs-string">"D213"</span> <span class="hljs-string">"D202"</span>]
+                         )
+
+            ;; Formatting: isort
+            ;; https://github.com/chantera/python-lsp-isort
+            :isort (:enabled ,(if has-ruff :json-false <span class="hljs-literal">t</span>))
+
+            ;; Formatting: autopep8
+            :autopep8 (:enabled ,(if has-ruff :json-false <span class="hljs-literal">t</span>))
+            :yapf (:enabled :json-false)
+
+            ;; Code completion
+            :jedi_completion (;; jedi configuration
+                              :enabled <span class="hljs-literal">t</span>
+
+                              ;; Disable resolving documentation details eagerly
+                              ;; :eager <span class="hljs-literal">t</span>
+
+                              ;; Add class objects as a separate completion item
+                              ;; :include_class_objects <span class="hljs-literal">t</span>
+
+                              ;; Add function objects as a separate completion item
+                              ;; :include_function_objects <span class="hljs-literal">t</span>
+
+                              ;; Auto-complete methods and classes for each parameter
+                              ;; :include_params <span class="hljs-literal">t</span>
+
+                              ;; Fuzzy matching for typos/abbreviations
+                              ;; :fuzzy <span class="hljs-literal">t</span>
+
+                              ;; Modules for which labels and snippets should be cached.
+                              ;; :cache_for [<span class="hljs-string">"pandas"</span>, <span class="hljs-string">"numpy"</span>, <span class="hljs-string">"tensorflow"</span>, <span class="hljs-string">"matplotlib"</span>]
+
+                              ;; How many labels and snippets should be resolved?
+                              ;; :resolve_at_most <span class="hljs-number">25</span>
+                              ))))))</code></span></pre>
+
+
+<p>This Eglot configuration prioritizes Ruff to handle linting and formatting when it is available in the environment. If Ruff is missing, it falls back to Flake8 and the default pylsp plugins. This keeps Emacs Eglot adaptable across different machines, guaranteeing consistent diagnostics and autocompletion without demanding a strict set of dependencies on every system you use.</p>
+<div class="yarpp yarpp-related yarpp-related-rss yarpp-template-list">
+
+<h3>Related posts:</h3><ol>
+<li><a href="https://www.jamescherti.com/emacs-fix-org-mode-copy-paste-yank-bleed/">Copy-paste without Emacs org-mode or markdown-mode Formatting Bleeding Into Other Buffers</a></li>
+<li><a href="https://www.jamescherti.com/emacs-eglot-performance/">Configuring Emacs Eglot for Better Performance and Latency</a></li>
+<li><a href="https://www.jamescherti.com/emacs-scrolling-better-performance-usability/">Configuring Emacs Scrolling for Better Usability</a></li>
+<li><a href="https://www.jamescherti.com/emacs-persist-restore-text-scale/">persist-text-scale.el - Persist and Restore the Text Scale</a></li>
+<li><a href="https://www.jamescherti.com/emacs-why-use-setq-instead-setopt/">Emacs startup - Why setq beats setopt, customize-set-variable, and use-package :custom?</a></li>
+<li><a href="https://www.jamescherti.com/emacs-flymake-ansible-lint/">flymake-ansible-lint.el - An Emacs Emacs Flymake backend for ansible-lint</a></li>
+<li><a href="https://www.jamescherti.com/emacs-flymake-bashate-bash/">flymake-bashate.el - An Emacs Flymake backend for bashate</a></li>
+</ol>
+</div>
+</body></html>

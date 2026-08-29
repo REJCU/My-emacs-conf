@@ -1,0 +1,44 @@
+<html><head></head><body><p>Elpher is the <a href="http://en.andros.dev/blog/c105e9db/introduction-to-the-gemini-protocol/">Gemini</a> browser for Emacs. It works wonderfully and its integration with GNU's editor is sublime. You don't just move between capsules: you can also write your own scripts or build automated flows. It's Emacs, after all. Everything bends to your will.</p>
+<p>If you still don't know what Gemini is, it's a minimalist protocol, halfway between the web and Gopher, with no JavaScript and no trackers. I cover it in depth in <a href="http://en.andros.dev/blog/c105e9db/introduction-to-the-gemini-protocol/">Introduction to the Gemini protocol</a>.</p>
+<p>Today I want to share a minimal configuration I use to browse more comfortably. Nothing exotic, just a few shortcuts and a couple of tweaks that make a difference day to day.</p>
+<p>Elpher is on MELPA. I declare it with <code>use-package</code>, so everything stays in a single block: <code>:ensure t</code> installs it the first time, <code>:config</code> defines the function and sets the protocol, and <code>:bind</code> keeps the shortcuts encapsulated. Paste this into your <code>init.el</code>.</p>
+<pre><code class="language-elisp">;; ===
+;; elpher - Gemini and Gopher client
+;; https://thelambdalab.xyz/elpher/
+;; ===
+(use-package elpher
+  :ensure t
+  :config
+  ;; Smart link following that handles emojis
+  (defun elpher-smart-follow ()
+    "Smart link following that handles emojis."
+    (interactive)
+    (let ((current-pos (point)))
+      (beginning-of-line)
+      (if (re-search-forward "=&gt;" (line-end-position) t)
+          (elpher-follow-current-link)
+        (goto-char current-pos)
+        (elpher-follow-current-link))))
+
+  ;; Gemini as the default protocol instead of Gopher
+  (setq elpher-default-url-type "gemini")
+
+  :bind
+  (:map elpher-mode-map
+        ("RET" . elpher-smart-follow)      ; follow link, emoji-aware
+        ("l" . elpher-back)                ; back, same as eww
+        ("n" . elpher-next-link)           ; next link
+        ("p" . elpher-prev-link)           ; previous link
+        ("b" . elpher-bookmark-current)))  ; bookmark, same as eww</code></pre>
+<p>What does all this give you? A few improvements you notice right away:</p>
+<ul>
+<li><code>n</code> to jump to the next link.</li>
+<li><code>p</code> to go back to the previous one.</li>
+<li><code>l</code> to return to the previous page, just like in eww.</li>
+<li><code>b</code> to save the current page as a bookmark, just like in eww.</li>
+<li>It widens the clickable area of each link, so you can click on the emojis and not only on the text.</li>
+<li>It sets Gemini as the default protocol instead of Gopher.</li>
+</ul>
+<p>Watch out with <code>elpher-smart-follow</code>: it reassigns <code>RET</code>. If you already had that key mapped to something else inside <code>elpher-mode</code>, this overrides it.</p>
+<p>That last note about emojis seems trivial, but it changes the experience a lot. Many capsules decorate their links with an emoji in front, and if you try to follow them from there, Elpher just sits still. With <code>elpher-smart-follow</code> it no longer matters where the cursor is on the line: if there is a <code>=&gt;</code>, it takes you there.</p>
+<p>And this is only the beginning. Elpher is Lisp, and Lisp bends to whatever you need: today it is four shortcuts, tomorrow a flow that opens your favorite capsules when Emacs starts. Tinker with it, break it, make it yours.</p><hr><p>Help me keep writing Every coffee gives me a push toward the next article. <a href="https://ko-fi.com/W7W02LB83">Sure, it's on me!</a></p><p>Send an email to <a href="mailto:comment+article-b18ae804@andros.dev">comment+article-b18ae804@andros.dev</a> to leave a comment. The subject will be ignored.</p></body></html>

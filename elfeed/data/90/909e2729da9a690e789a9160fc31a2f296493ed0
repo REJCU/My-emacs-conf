@@ -1,0 +1,33 @@
+<html><head></head><body><p>
+My go to Emacs in-line dictionary is abo-abo’s <a href="https://github.com/abo-abo/define-word">define-word</a>. It pops up a definition of the word at point in the minibuffer. I use it several times a day. Lately, though, it has been returning “zero definitions found” on every invocation. This problem predated my update to Emacs 31.1 so it’s not related to the version of Emacs.
+</p>
+<p>
+Today (Tuesday) I finally got fed up and decided to track down the problem. It wasn’t too hard. It turns out that the problem is that <code>define-word</code> calls the on-line dictionaries with HTTP rather than HTTPS and the sites are rejecting the connections. There’s already a <a href="https://github.com/abo-abo/define-word/pull/34/commits/7b8dda4f559d78a3f5e1421bfd48db193994727a">pull request</a> (2026-08-22) for the fix but as of today (2026-08-25) it hasn’t been merged or uploaded to MELPA.
+</p>
+<p>
+I messed around for a while but couldn’t get any of the obvious solutions to work so I gave up and added
+</p>
+<div class="org-src-container">
+<pre><code>  <span>:init</span>
+  <span>;; </span><span>Until define-word is updated in MELPA
+</span>  (<span>defcustom</span> <span>define-word-services</span>
+    '((wordnik <span>"https://wordnik.com/words/%s"</span> define-word--parse-wordnik)
+      (openthesaurus <span>"https://www.openthesaurus.de/synonyme/%s"</span> define-word--parse-openthesaurus)
+      (webster <span>"https://webstersdictionary1828.com/Dictionary/%s"</span> define-word--parse-webster)
+      (offline-wikitionary define-word--get-offline-wikitionary nil))
+    <span>"Services for define-word, A list of lists of the
+  format (symbol url function-for-parsing).
+Instead of an url string, url can be a custom function for retrieving results."</span>
+    <span>:type</span> '(alist
+            <span>:key-type</span> (symbol <span>:tag</span> <span>"Name of service"</span>)
+            <span>:value-type</span> (group
+                         (string <span>:tag</span> <span>"Url (%s denotes search word)"</span>)
+                         (<span>function</span> <span>:tag</span> <span>"Parsing function"</span>))))
+</code></pre>
+</div>
+<p>
+to the <code>use-package</code> for <code>define-word</code>. That’s just a copy of the definition of <code>define-word-services</code> from the <code>define-word</code> source. Note that it’s important that it goes in the <code>:init</code> section so that the definition gets established before <code>define-word</code> is loaded.
+</p>
+<p>
+It’s a messy solution but it will do until the fix is merged and percolates up to MELPA.</p>
+</body></html>

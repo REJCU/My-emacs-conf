@@ -1,0 +1,380 @@
+<html><head></head><body><div class="outline-2">
+<h2><span class="section-number-2">1.</span> TLDR</h2>
+<div class="outline-text-2">
+
+<div class="figure">
+<p><img src="https://www.chiply.dev/images/hyperbole-hyrolo-banner.webp" alt="hyperbole-hyrolo-banner.webp" width="350">
+</p>
+</div>
+
+<p>
+<a href="https://www.gnu.org/software/hyperbole/man/hyperbole.html#HyRolo">HyRolo</a>, the full-text search layer of <a href="https://www.gnu.org/software/hyperbole/">GNU Hyperbole</a>, is a grep-like retrieval tool for <i>records</i> in your knowledge base instead of <i>lines</i>.  Rather than retrieving single lines, it retrieves the full hierarchical record surrounding your match, descendants included.
+</p>
+
+<p>
+HyRolo can search your existing knowledge bases in place (org-roam, Denote, Obsidian, Logseq, etc.), even if you use more than one of these.  You can point <code>hyrolo-file-list</code> at any container of files (directories and wildcards) containing text in any of the following formats: Org, Markdown, Koutline (Hyperbole's own outline format), or Emacs outline format.  Commands like <code>hyrolo-grep</code> will then display every matching record for your search query in a single navigable <code>*HyRolo*</code> buffer, which you can treat like an outline.
+</p>
+
+<p>
+HyRolo uses full-text search to find any matching terms across your whole knowledge graph, largely eliminating the need for any graphical views of the connections.  Similarly, it eliminates or reduces the need for backlink commands since it finds all references in each search.
+</p>
+
+<p>
+In this post we give a better idea of what HyRolo really is and explain why it is a uniquely powerful search and retrieval tool in Emacs.  We then demonstrate its use on my own highly fragmented, format-agnostic knowledge base.  You will see Hyperbole's philosophy in action throughout this post: HyRolo adheres to the same principles of incremental adoption and in-place data management that make its implicit buttons and HyWiki so useful.
+</p>
+
+<p>
+</p><div class="youtube-container">
+
+
+</div>
+<p></p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">2.</span> About&nbsp;&nbsp;&nbsp;<span class="tag"><span class="emacs">emacs</span>&nbsp;<span class="hyperbole">hyperbole</span>&nbsp;<span class="hyrolo">hyrolo</span>&nbsp;<span class="knowledgeManagement">knowledgeManagement</span></span></h2>
+<div class="outline-text-2">
+<p>
+This is the third post in my series on Hyperbole.  The <a href="https://www.chiply.dev/post-hyperbole-hywiki">first post</a> introduced HyWiki, the zero-markup personal wiki, and the <a href="https://www.chiply.dev/post-hyperbole-implicit-buttons">second</a> covered implicit buttons, the pattern recognizers that turn your Emacs into a navigable hyperverse.
+</p>
+
+<p>
+Those two posts were about <i>traversal</i>, using Hyperbole to navigate the connective tissue that already exists in your free text.  This post is about <i>retrieval</i>, the complementary capability of a knowledge/information management system.
+</p>
+
+<p>
+I should contextualize my requirements for a retrieval system with an explanation of what my knowledge base looks like:
+</p>
+
+<ul>
+<li><b>My notes are highly fragmented</b>.  My idea of a 'knowledge base' is more abstract than most, as I don't have a <i>single</i> directory into which I deposit my notes. Instead, I consider any information-bearing piece of text on my file system as a potential component of my overall knowledge base.  In that way, my notes are spread across local files, a synced notes directory, Dropbox directories, my blog, and the various READMEs within repositories and projects that I might install on my machine.  A knowledge management system must be able to search, edit and retrieve information from all of these sources.</li>
+<li><b>The notes I write myself and the notes I read from others are ubiquitously organized in hierarchical outline format</b>, and oftentimes, the length of a line in these documents is quite small (typically &lt;80 characters) as most writers wrap their text for ergonomics.  Oftentimes, the 'thing' I'm searching for appears in an awkward place in these ~80 character chunks.  A knowledge management system needs to analyze the associated context here to retrieve the proper records.</li>
+<li><b>My notes are also written in a variety of file formats</b>, including Org, Markdown, and Koutline.  Based on the above requirement, I can't control the format in which the 'records' in my notes get stored.  I mostly use Org, but most people write README documents in Markdown form, and I share files with folks who like to use Koutline.  I need a largely file-format agnostic retrieval mechanism that recognizes the hierarchical structure across all these outline formats.</li>
+<li><b>I don't manually link notes together</b>, with extremely rare exceptions.  I mostly write in free text, and I avoid the bookkeeping of connecting notes that other PKMSs (like org-roam, Logseq, Obsidian, etc.) typically prescribe.  A good knowledge management system should let me <i>dynamically</i> see the associations I want.</li>
+</ul>
+
+<p>
+So when I'm searching and retrieving information for a given 'thing' from this multi-format, fragmented expanse of hierarchical notes files, how can I collect everything my system knows about it into one navigable place?  This is what I use HyRolo for; it satisfies the search and retrieval requirements of my PKMS-agnostic setup: there is no notes silo, no prescribed file or data format, and no bookkeeping asked of me to enable traversal, or in HyRolo's case, retrieval.
+</p>
+
+<p>
+Before HyRolo, I was using <code>consult-ripgrep</code> and <code>embark-export</code> to accomplish some form of record retrieval, but in this Consult+Embark use case the 'records' lack context.  They are too fragmented, given the <i>line-matching</i> nature of <code>grep</code>.  HyRolo goes one step further and retrieves the <i>tree context</i> around the text I'm searching for, and can retrieve from any location <i>in-place</i> that I specify in my <code>hyrolo-file-list</code>.  That's the special trick for me.  In this way, HyRolo lets me see the forest for the trees.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">3.</span> Point It at Anything&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span>&nbsp;<span class="knowledgeManagement">knowledgeManagement</span></span></h2>
+<div class="outline-text-2">
+<p>
+Like <a href="https://www.chiply.dev/post-hyperbole-hywiki">HyWiki</a>, <code>HyRolo</code> refuses to lock you into a siloed notes vault or directory.
+</p>
+
+<p>
+Retrieval scope is defined by one variable, <code>hyrolo-file-list</code>, which accepts individual files, whole directories, and wildcard patterns:
+</p>
+
+<div class="org-src-container">
+<pre><code><span>(</span><span>setq</span> hyrolo-file-list
+      '<span>(</span><span>"~/.rolo.org"</span>             <span>;; </span><span>the classic: personal contacts
+</span>        <span>"~/org/"</span>                  <span>;; </span><span>all standard Org files
+</span>        <span>"~/org-roam/"</span>             <span>;; </span><span>all standard org-roam files
+</span>        <span>"~/Documents/notes/"</span>      <span>;; </span><span>all standard denote files
+</span>        <span>"~/vault/*.md"</span>            <span>;; </span><span>an Obsidian vault, via wildcard
+</span>        <span>"~/projects/*.kotl"</span><span>)</span><span>)</span>     <span>;; </span><span>Koutliner project files</span>
+</code></pre>
+</div>
+
+<p>
+Although this list seems simple, I hope you recognize HyRolo's two game-changers:
+</p>
+<ol>
+<li>Look at the middle entries: those are the <i>stock</i> locations for org-roam, Denote, and an Obsidian vault, and each of those tools ships its own <i>siloed</i> search over <i>its own directory</i>.  You can continue using those if you like, and <code>HyRolo</code> gives you <i>a single, unified retrieval scope</i> across <i>all of them</i>.  That is a major deal for me, as I not only use multiple PKMSs, but also want to include the READMEs scattered through my file system in my retrieval scope.</li>
+<li><code>HyRolo</code> does <i>not</i> prescribe a file type.  It searches any hierarchically organized text it recognizes, currently the four formats: <b>Org</b>, <b>Markdown</b><sup><a href="https://www.chiply.dev/#fn.markdown-suffixes">1</a></sup>, Hyperbole's own <b>Koutline</b>, and classic <b>Emacs outline</b> files (<code>.otl</code>).</li>
+</ol>
+
+<p>
+Beyond files, <code>HyRolo</code> can also fold your Google Contacts and BBDB records into the same searches<sup><a href="https://www.chiply.dev/#fn.other-sources">2</a></sup>.  There is also a standalone Python-based command-line version, <code>hyrolo.py</code>, that lets you specify both the search term and the paths to search on the command line.  It ships with Hyperbole for retrieval outside Emacs<sup><a href="https://www.chiply.dev/#fn.hyrolopy">3</a></sup>.
+</p>
+
+<p>
+I want to belabor the point here because it is really important.  Your Obsidian vault, your org-roam directory, a Denote folder, and a stray project README are <i>already</i> valid <code>HyRolo</code> sources, simultaneously, with zero migration or symlinking required to unify them under a search and retrieval interface.  Where other tools ask you to migrate your notes into their containers before they will search them, <code>HyRolo</code> adds a retrieval layer <i>over</i> the containers you <i>already</i> have.  This is the same philosophy that makes HyWiki a tool for sharing and traversing knowledge, applied here to the search and retrieval use case.  There is an 'anywhere, anything' mindset to these tools that makes them unique in the knowledge management space.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">4.</span> Records as Trees, Not Lines&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span>&nbsp;<span class="retrieval">retrieval</span></span></h2>
+<div class="outline-text-2">
+<p>
+<code>HyRolo</code>'s retrieval features are unique in their treatment of what your query matches.
+</p>
+
+<p>
+Think about a plain <code>grep</code>.  When <code>grep</code> (or <code>consult-grep</code>, or any of their descendants) finds a match for your query, it outputs the matching <i>line</i>, perhaps with a few lines of mechanical context via <code>-A</code> and <code>-B</code> flags.  That context is measured in lines, but lines are <i>not the unit in which you store meaning</i>.
+</p>
+
+<p>
+<code>HyRolo</code> instead matches on the entity that <i>does</i> store the meaning, treating your files as sets of <i>hierarchical records</i> when it retrieves them.  As the HyRolo documentation mentions:
+</p>
+
+<blockquote>
+<p>
+Any search done on a [HyRolo file] scans the full text of each entry.  Whenever an entry matches, it and all of its descendant entries are retrieved.
+</p>
+</blockquote>
+
+<p>
+This Hyperbole manual example makes the consequence clear.  Given these entries:
+</p>
+
+<div class="org-src-container">
+<pre><code>*    Company
+**     Manager
+***      Staffer
+</code></pre>
+</div>
+
+<p>
+searching for <code>Company</code> retrieves all listed employees, and searching for <code>Manager</code> turns up all Staffer entries.  Context is important, and the hierarchy of data beneath the record <i>is</i> the context.  When your query matches data in a record, it displays the record's heading, its body, and its descendants in the <code>*HyRolo*</code> match buffer with each match term highlighted.
+</p>
+
+<p>
+Here's a clear distinction between the line-matching and tree-matching approaches.  With simple grep (here <code>consult-ripgrep</code> for "mitochondria" followed by <code>embark-collect</code>), we get single line matches for each term.
+</p>
+
+
+<div class="figure">
+<p><img src="https://www.chiply.dev/images/hyrolo-fig1-records-vs-lines1.webp" alt="hyrolo-fig1-records-vs-lines1.webp">
+</p>
+<p><span class="figure-number">Figure 1: </span>grep returns matching lines</p>
+</div>
+
+<p>
+With HyRolo, we see the full context (the tree) around each match.
+</p>
+
+
+<div class="figure">
+<p><img src="https://www.chiply.dev/images/hyrolo-fig1-records-vs-lines2.webp" alt="hyrolo-fig1-records-vs-lines2.webp">
+</p>
+<p><span class="figure-number">Figure 2: </span><code>hyrolo-grep</code> returns the full hierarchical records around each match</p>
+</div>
+
+<p>
+The <code>*HyRolo*</code> match buffer is itself a first-class, navigable outline.  You can jump between matches, fold and unfold entries, and get an overview of just the headings.  And because this is Hyperbole, the <a href="https://www.chiply.dev/post-hyperbole-implicit-buttons">Action Key</a> works in the <code>*HyRolo*</code> buffer.  Press <code>M-RET</code> on any retrieved entry and it is displayed for editing in its source file buffer.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">5.</span> The Search Commands&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span>&nbsp;<span class="retrieval">retrieval</span></span></h2>
+<div class="outline-text-2">
+<p>
+All of the retrieval commands live on the Rolo menu (<code>C-h h r</code>), or can be called directly:
+</p>
+
+<table>
+
+
+<colgroup>
+<col>
+
+<col>
+
+<col>
+</colgroup>
+<thead>
+<tr>
+<th>Command</th>
+<th>Key</th>
+<th>Finds entries containing…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hyrolo-fgrep</code></td>
+<td><code>C-h h r s</code></td>
+<td>a string, or a boolean match expression</td>
+</tr>
+
+<tr>
+<td><code>hyrolo-grep</code></td>
+<td><code>C-h h r r</code></td>
+<td>a regular expression</td>
+</tr>
+
+<tr>
+<td><code>hyrolo-word</code></td>
+<td><code>C-h h r w</code></td>
+<td>whole-word matches only</td>
+</tr>
+
+<tr>
+<td><code>hyrolo-tags-view</code></td>
+<td><code>C-h h r t</code></td>
+<td>matching Org tags across your rolo files</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The last letter of each key selects the item from the Rolo menu by its label's initial: <b>S</b>​tringFind, <b>R</b>​egexFind, <b>W</b>​ordFind, and <b>T</b>​agFind.
+</p>
+
+<p>
+<code>hyrolo-word</code> matches whole words, so searching for <code>product</code> won't drown you in mentions of <code>production</code>.  And <code>hyrolo-fgrep</code> accepts full Lisp-like boolean expressions with <code>and</code>, <code>or</code>, <code>xor</code>, and <code>not</code>:
+</p>
+
+<div class="org-src-container">
+<pre><code>(and postgres (not migration))
+</code></pre>
+</div>
+
+<p>
+The above query with <code>hyrolo-fgrep</code> retrieves every record that mentions postgres but not migration, across every file in your list.  This can be a useful query language over your entire note corpus.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">6.</span> A Knowledge Graph Without the Graph&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span>&nbsp;<span class="knowledgeManagement">knowledgeManagement</span></span></h2>
+<div class="outline-text-2">
+<p>
+This is how I use <code>HyRolo</code> most.  This is also how I think about <code>HyRolo</code> abstractly: as a more practical alternative for knowledge-graph-style tasks.
+</p>
+
+<p>
+Some quick terminology first: knowledge graphs are graphs in the data-structure sense, and they show up as ball-and-stick models.  The balls are the 'nodes' and the sticks are the 'edges'.  It's a simple yet powerful model, and most PKMSs use it.
+</p>
+
+<p>
+The canonical knowledge-graph <b>question</b>: <i>"show me everything connected to X"</i>.  What's the answer?
+</p>
+
+<p>
+Graph-oriented PKMSs provide this answer with a backlinks pane or a graph view, but <i>only</i> if you did the up-front manual labor of hand-authoring every 'node' as a hard-coded link, inside the tool's own vault.  This answer is also quite sparse, usually just a list of node names or file names, stripped of the surrounding prose that actually defines the connection.  I think of that surrounding prose as the 'edge type', an indispensable part of the knowledge graph.
+</p>
+
+<p>
+<code>hyrolo-grep</code> answers the question with more detail and fewer requirements.  Searching for a term retrieves every record it occurs in, across every file in <code>hyrolo-file-list</code>, into one <code>*HyRolo*</code> buffer, with the meaningful surrounding context <i>right there</i>.  In this way, I get every piece of the knowledge graph I need (the <code>node</code> is the ad hoc input query, the connected nodes are the records in the <code>*HyRolo*</code> buffer, and the <code>edge type</code> is the surrounding prose in the record).
+</p>
+
+<p>
+You can think of the <code>*HyRolo*</code> buffer as a sophisticated (but more practical) backlinks buffer, with the added benefit that you never need to hardcode the nodes or edges, as <code>HyRolo</code> displays these on the fly based on your input query.  To emphasize, <code>HyRolo</code> can materialize "backlinks" for anything that can be matched with a regular expression.
+</p>
+
+<p>
+This is the Hyperbole philosophy showing up again with <code>HyRolo</code>, and I'm glad to keep highlighting it in this series.  Other systems make you <i>author</i> relationships before you can use them, whereas Hyperbole <i>infers</i> relationships when you ask for them.  Implicit buttons infer them at the point of <i>traversal</i>, and <code>HyRolo</code> infers them at the point of <i>retrieval</i>.  With <code>HyRolo</code>, <i>mentioning</i> a term in a note <i>is</i> the linking.
+</p>
+
+
+<div class="figure">
+<p><img src="https://www.chiply.dev/images/hyrolo-fig4-buffer.webp" alt="hyrolo-fig4-buffer.webp">
+</p>
+<p><span class="figure-number">Figure 3: </span>The <code>*HyRolo*</code> buffer behaves like a knowledge graph</p>
+</div>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">7.</span> Yes, the Name Means <b>Rolodex</b>&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span></span></h2>
+<div class="outline-text-2">
+<p>
+The name <code>HyRolo</code> is important to address because it can be somewhat misleading.
+</p>
+
+<p>
+<code>HyRolo</code> was originally written as a digital Rolodex™ for managing contact records, and it still supports that quite well.  The default <code>~/.rolo.org</code> file, automatic datestamps, alphabetized insertion, and a <code>hyrolo-mail-to</code> command all remain as features from when <code>HyRolo</code> functioned primarily as a digital contact management tool.
+</p>
+
+<p>
+But it's important to emphasize here that contact management is <i>just one</i> application of <code>HyRolo</code>.  It is a generic tool.  The Hyperbole manual makes this clear:
+</p>
+
+<blockquote>
+<p>
+Hyperbole includes HyRolo, a complete, advanced system for convenient management of hierarchical, record-oriented information.  Most often this is used for contact management but it can quickly be adapted to most any record-oriented lookup task requiring fast retrieval.  For example, you can look up glossary entries listed in Org file headlines or legal-numbered requirements from a Koutline file.
+</p>
+</blockquote>
+
+<p>
+If you replace the word "contact" with "record", you get a better sense of <code>HyRolo</code>'s reach.  It is a <b>generic hierarchical record retriever</b> for any <b>outline-structured text</b>.  A record is simply a heading plus its descendants (body text and recursive subsections).
+</p>
+
+<p>
+Consider what instances of data can fit into this flexible type 'record':
+</p>
+<ul>
+<li>Notes</li>
+<li>READMEs</li>
+<li>Project logs</li>
+<li>Architecture Decision Records (ADRs)</li>
+<li>Glossary entries</li>
+<li>Recipes</li>
+<li>And, of course, contacts</li>
+</ul>
+
+<p>
+These are all naturally hierarchical records.  The vast majority of the Emacs community uses org-mode, and so the culture of writing everything down in record form is baked deeply into the philosophy of the modern Emacs user.  You may use Markdown over org-mode, and <code>HyRolo</code> supports that as well.  In a flexible, generic way, it can retrieve records from <i>any</i> hierarchical format.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">8.</span> Consult Previews, Embark Comparisons&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyrolo">hyrolo</span>&nbsp;<span class="consult">consult</span></span></h2>
+<div class="outline-text-2">
+<p>
+Usefully, <code>HyRolo</code> integrates with <a href="https://github.com/minad/consult">consult</a>.  <code>hyrolo-consult-grep</code> (and <code>hyrolo-consult-fgrep</code>) run your search through consult's live-updating minibuffer, so you can preview matches in place and refine your query <i>before</i> displaying a <code>*HyRolo*</code> buffer.  Although the consult buffer highlights one selected candidate, all remaining candidates and their associated records show up in the Hyperbole <code>*HyRolo*</code> match buffer when you press <code>RET</code>.
+</p>
+
+
+<div class="figure">
+<p><img src="https://www.chiply.dev/images/hyrolo-fig3-consult.webp" alt="hyrolo-fig3-consult.webp">
+</p>
+<p><span class="figure-number">Figure 4: </span><code>hyrolo-consult-grep</code>: previewing matches through consult's live minibuffer before committing to a materialized <code>*HyRolo*</code> buffer</p>
+</div>
+
+<p>
+For <a href="https://github.com/oantolin/embark">embark</a> users, here is the mental model I'd offer: <code>hyrolo-grep</code> feels like a <code>consult-grep</code> followed by an <code>embark-export</code>, giving you a persistent, navigable buffer of results.  The key difference is that <code>HyRolo</code> is <i>aware of hierarchical context</i>.  An embark export gives you a grep-mode buffer of matching <i>lines</i>, while <code>HyRolo</code> materializes the full records around the matches, nested structure intact, foldable as an outline, in their original formats.  This doesn't obviate <code>embark-export</code> or <code>embark-collect</code>, by the way.  I still use both frequently (for example, I use Embark for interactive 'find and replace' via <code>consult-ripgrep</code> -&gt; <code>embark-export</code> -&gt; <code>wgrep-change-to-wgrep-mode</code>).
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">9.</span> Try It&nbsp;&nbsp;&nbsp;<span class="tag"><span class="hyperbole">hyperbole</span></span></h2>
+<div class="outline-text-2">
+<p>
+The install snippet from the <a href="https://www.chiply.dev/post-hyperbole-hywiki#getting-started">first post</a> is all the setup you need.  Then tell <code>HyRolo</code> where your records live:
+</p>
+
+<div class="org-src-container">
+<pre><code><span>(</span><span>setq</span> hyrolo-file-list '<span>(</span><span>"~/.rolo.org"</span> <span>"~/notes/"</span> <span>"~/org/*.org"</span><span>)</span><span>)</span>
+</code></pre>
+</div>
+
+<p>
+Run <code>M-x hyrolo-grep</code> (or explore the Rolo menu with <code>C-h h r ?</code>) and search for a term you know is scattered across your notes (I bet "Emacs" would turn up a ton of matching records!).  Fold the results, jump to a source with <code>M-RET</code>, then try a boolean query with <code>hyrolo-fgrep</code>.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">10.</span> Further Reading</h2>
+<div class="outline-text-2">
+<p>
+The <a href="https://www.gnu.org/software/hyperbole/man/hyperbole.html#HyRolo">HyRolo chapter</a> of the Hyperbole manual covers the concepts, menu, search commands, keys, and settings in full.  The first two posts in this series, on <a href="https://www.chiply.dev/post-hyperbole-hywiki">HyWiki</a> and <a href="https://www.chiply.dev/post-hyperbole-implicit-buttons">implicit buttons</a>, cover the traversal side of the hyperverse that <code>HyRolo</code>'s retrieval completes.
+</p>
+</div>
+</div>
+<div>
+<h2>Footnotes: </h2>
+<div>
+
+<div class="footdef"><sup><a href="https://www.chiply.dev/#fnr.markdown-suffixes">1</a></sup> <div class="footpara"><p>
+HyRolo recognizes the full family of Markdown suffixes: <code>.md</code>, <code>.markdown</code>, <code>.mkd</code>, <code>.mdown</code>, <code>.mkdn</code>, and <code>.mdwn</code> (see <code>hyrolo-file-suffix-regexp</code> in <code>hyrolo.el</code>).
+</p></div></div>
+
+<div class="footdef"><sup><a href="https://www.chiply.dev/#fnr.other-sources">2</a></sup> <div class="footpara"><p>
+Google Contacts are searched on each query when the <code>google-contacts</code> package is loaded (controlled by <code>hyrolo-google-contacts-flag</code>), and BBDB databases are searchable via <code>hyrolo-bbdb-grep</code> and <code>hyrolo-bbdb-fgrep</code>.
+</p></div></div>
+
+<div class="footdef"><sup><a href="https://www.chiply.dev/#fnr.hyrolopy">3</a></sup> <div class="footpara"><p>
+<code>hyrolo.py</code> ships in the Hyperbole package directory and provides a command-line version of HyRolo search, useful for scripting retrieval outside of Emacs.
+</p></div></div>
+
+
+</div>
+</div></body></html>

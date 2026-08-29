@@ -1,0 +1,43 @@
+;; Emacs-W3 HTTP cookies file  -*- lexical-binding: t -*-
+;; Automatically generated file!!! DO NOT EDIT!!!
+
+(setq url-cookie-storage
+ '((".google.com"
+    [url-cookie "NID"
+		"534=qrVEYeB4qHsS9m6kP4Ha-O2B8H8ZJS84GPIIt-G4cRiIXsTAJ7e6pQSnlysr-KsGtSc3VF2Oq_M53aRu_xrJTD5-l442C_tVaUfrl05RnfHe15tzck84OZ93ZdMSHn-3RJF5JJDX9vFhvnAZM5DJcb0denJsGvwyFCluQZGpkOZam8IuS33ktHbr-xC5ZI5isPFwXz1AlgOcdxxuvLGf7wk"
+		"Tue, 16-Feb-2027 08:40:01 GMT" "/" ".google.com" nil]))
+)
+(setq url-cookie-secure-storage
+ '(("en.wikipedia.org"
+    [url-cookie "WMF-Last-Access" "17-Aug-2026"
+		"Fri, 18 Sep 2026 00:00:00 GMT" "/" "en.wikipedia.org" t])
+   ("substack.com"
+    [url-cookie "ab_testing_id"
+		"%22666a004d-05af-4526-9534-2f9ae1d36f46%22"
+		"Mon Aug 23 23:25:07 2027 GMT" "/" "substack.com" t]
+    [url-cookie "ab_experiment_sampled" "%22false%22"
+		"Mon Aug 23 23:25:07 2027 GMT" "/" "substack.com" t])
+   (".wikipedia.org"
+    [url-cookie "WMF-Last-Access-Global" "17-Aug-2026"
+		"Fri, 18 Sep 2026 00:00:00 GMT" "/" ".wikipedia.org" t]
+    [url-cookie "WMF-Uniq"
+		"smn9FYYO6YtDYKI_JZVZJwO_AAEBAFvdTmfKCL2-31oGrYtRYkyw9EjqOldYXptq"
+		"Tue, 17 Aug 2027 00:00:00 GMT" "/" ".wikipedia.org" t])
+   (".github.com"
+    [url-cookie "_octo" "GH1.1.1933552302.1787542108"
+		"Tue, 24 Aug 2027 03:28:28 GMT" "/" ".github.com" t]
+    [url-cookie "logged_in" "no" "Tue, 24 Aug 2027 03:28:28 GMT" "/"
+		".github.com" t])
+   (".google.com"
+    [url-cookie "AEC"
+		"AdJVEasmF6qtJdpmYEJhbeieU2SjP0LDujMEvBDuo4KXuByTEO0ZqKrlzfg"
+		"Sat, 13-Feb-2027 08:40:14 GMT" "/" ".google.com" t]))
+)
+
+;; Local Variables:
+;; version-control: never
+;; no-byte-compile: t
+;; coding: utf-8-emacs-unix
+;; End:
+
+;;; cookies ends here

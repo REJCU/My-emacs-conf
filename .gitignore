@@ -1,0 +1,33 @@
+# Temporary & Backup Files
+*~
+\#*\#
+.#*
+auto-save-list/
+
+# Internal Caches & State Files
+history
+places
+recentf
+projectile-bookmarks
+projects
+bookmarks
+*.elc
+
+# Package Managers & Build Artifacts
+elpa/
+eln-cache/
+straight/
+tree-sitter/
+
+# Built-in Modes State
+transient/
+eshell/
+tramp
+tutorial/
+.extension-sound/
+
+# LSP, Completion, & Org Caches
+.cache/
+.lsp-session*
+org-roam.db
+

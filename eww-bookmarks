@@ -1,0 +1,7 @@
+;; Auto-generated file; don't edit -*- mode: lisp-data -*-
+((:url "https://news.ycombinator.com/" :title "Hacker News" :time
+       "Mon Aug 24 09:23:58 2026")
+ (:url
+  "https://embedjournal.com/implementing-circular-buffer-embedded-c/"
+  :title "Implementing Circular Buffer in C - EmbedJournal" :time
+  "Mon Aug 17 19:20:39 2026"))

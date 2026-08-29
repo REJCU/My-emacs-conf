@@ -1,22 +1,16 @@
-;;; -*- lexical: t -*-
+;;; ...  -*- lexical-binding: t -*-
 ;; package list 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;Remove UI
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-
-
 ;; QOL
 (global-display-line-numbers-mode 1)
+(setq display-line-numbers-type 'relative)
 (recentf-mode 1)
 (save-place-mode 1)
 (setq compilation-ask-about-save nil)
 
-;; 
-(scroll-bar-mode -1)
 
 ; increase proccess output buffer for LSP
 (setq read-process-output-max (* 4 1024 1024))
@@ -47,6 +41,10 @@
 (setq window-combination-resize t)
 
 ; makes popping repeated from c-u c-spc to just c-spc after one
+
+;; imenu-confs
+(setq use-package-enable-imenu-support t)
+
 
 ;; Isearch
 (setopt isearch-lazy-count t)
@@ -248,10 +246,8 @@
 (use-package ef-themes
   :ensure t
   :config
-  (modus-themes-load-theme 'ef-day))
+  (modus-themes-load-theme 'ef-cyprus))
 
-
- 
 ; stop highlight when changing theme
 ;; (dolist (face '(font-lock-keyword-face
 ;; 		font-lock-function-name-face
@@ -277,7 +273,7 @@
   :config
   (exec-path-from-shell-initialize))
 
-(use-package eglot
+ (use-package eglot
   :ensure nil
   :hook ((c-mode      . eglot-ensure)
          (c-ts-mode   . eglot-ensure)
@@ -286,10 +282,19 @@
          (python-mode    . eglot-ensure)
          (python-ts-mode . eglot-ensure)
          (mhtml-mode  . eglot-ensure)
+	 (js-mode . subword-mode)
+         (js-mode . electric-pair-mode)
+         (js-mode . eglot-ensure)
+         (js-mode . completion-preview-mode)
+	 (typescript-mode . eglot-ensure)
+	 (typescript-ts-mode . eglot-ensure)
+	 (js-ts-mode .eglot-ensure)
          (html-ts-mode . eglot-ensure)
-         (LaTeX-mode  . eglot-ensure)   ; AUCTeX's mode
-         (latex-mode  . eglot-ensure)  ; built-in tex-mode's LaTeX mode
+         (LaTeX-mode  . eglot-ensure)   
+         (latex-mode  . eglot-ensure) 
          (qml-ts-mode . eglot-ensure)
+	 (rust-mode . eglot-ensure)
+	 (rust-ts-mode . eglot-ensure)
          (lua-ts-mode . eglot-ensure))
 
   
@@ -305,7 +310,14 @@
   (add-to-list 'eglot-server-programs
                '((LaTeX-mode latex-mode) . ("texlab")))
   (add-to-list 'eglot-server-programs
-	       '(qml-ts-mode  . ("qmlls6" "-E"))))
+	       '(qml-ts-mode  . ("qmlls6" "-E")))
+(add-to-list 'eglot-server-programs
+             '((html-ts-mode mhtml-mode) . ("superhtml" "lsp")))  
+  (add-to-list 'eglot-server-programs
+               '((rust-mode rust-ts-mode) . ("rust-analyzer" :initializationOptions
+                                             (:checkOnSave (:command "clippy")
+                                              :cargo (:buildScripts (:enable t)))))))
+
 
 (use-package treesit-auto
   :ensure t
@@ -315,18 +327,31 @@
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
+;; Rust mode - might consider moving to treesit mode for slightly faster performance
+(add-hook 'rust-mode-hook
+          (lambda () (setq indent-tabs-mode nil)))
+(setq rust-format-on-save t)
+(add-hook 'rust-mode-hook
+          (lambda () (prettify-symbols-mode)))
+
+(use-package rust-mode
+  :ensure t
+  :mode "\\.rs\\'"
+  :custom
+  (rust-format-on-save t)        ;; Format with rustfmt automatically
+  :hook
+  (rust-mode . eglot-ensure))
+
+
 (use-package markdown-mode
   :ensure t
-  :mode ("\\.md\\'" . markdown-mode) ; Use GitHub Flavored Markdown for READMEs
-  :init (setq markdown-command "multimarkdown") ; Or "pandoc" / "markdown"
+  :mode ("\\.md\\'" . markdown-mode) 
+  :init (setq markdown-command "multimarkdown") 
   :bind (:map markdown-mode-map
 	      ("C-c C-e" . markdown-do))
   :config
-  (setq markdown-header-scaling t) ; Make headers larger than body text
-  (setq markdown-italic-underscore t)) ; Allow _italic_ as well as *italic*
-
-;; for 
-
+  (setq markdown-header-scaling t) 
+  (setq markdown-italic-underscore t)) 
 
 (use-package pet
   :ensure t
@@ -375,5 +400,53 @@
 (setq treesit-language-source-alist
       '((qmljs . ("https://github.com/yuja/tree-sitter-qmljs"))))
 
+;; repeats keys
+;; examples - C-x ooo , C-x uuu
+(repeat-mode 1)
+(setq repeat-exit-timeout 5)
 
+;; can define own keymaps - maybe later
 
+;; eww default browser
+(setq browse-url-browser-function 'eww-browse-url
+      shr-use-colors nil
+      shr-bullet "• "
+      shr-folding-mode t
+      eww-search-prefix "https://duckduckgo.com/html?q="
+      url-privacy-level '(email agent cookies lastloc))
+
+;; org-mode - as large, could export to another file
+(use-package org
+  :mode (("\\.org" . org-mode))
+  :init
+  (setq org-return-follows-link t))
+
+;; elfeed
+(keymap-global-set "C-x w" #'elfeed)
+
+(setq elfeed-feeds
+      '("https://nullprogram.com/feed/"
+        "https://planet.emacslife.com/atom.xml"
+       	"https://www.abc.net.au/news/feed/1948/rss.xml"))
+
+;; eradio emacs - for main pc, dont forget to change the audio channel to my headphones 
+(use-package eradio
+  :ensure t)
+
+(global-set-key (kbd "C-c r p") 'eradio-play)
+(global-set-key (kbd "C-c r s") 'eradio-stop)
+(global-set-key (kbd "C-c r t") 'eradio-toggle)
+
+(setq eradio-channels '(("def con - soma fm" . "https://somafm.com/defcon256.pls")          ;; electronica with defcon-speaker bumpers
+                        ("metal - soma fm"   . "https://somafm.com/metal130.pls")           ;; \m/
+                        ("cyberia - lainon"  . "https://lainon.life/radio/cyberia.ogg.m3u") ;; cyberpunk-esque electronica / currently does not work
+                        ("cafe - lainon"     . "https://lainon.life/radio/cafe.ogg.m3u")))  ;; boring ambient, but with lain / cureently does not work
+;; radio 
+(customize-set-variable
+ 'radio-command
+ '("mpv" "--terminal=no" "--video=no" :url))
+
+(customize-set-variable
+ 'radio-stations-alist
+ '(("First station" . "https://example.com/first.aac")
+   ("Second station" . "https://example.com/second.aac")))

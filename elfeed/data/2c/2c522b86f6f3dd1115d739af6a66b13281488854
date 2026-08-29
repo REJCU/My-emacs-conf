@@ -1,0 +1,183 @@
+<html><head></head><body><p>The <code>ispell</code> package serves as the underlying interface in Emacs for communicating with external spell checking programs. Building upon this, the <code>flyspell</code> package is a built-in minor mode that provides on-the-fly spell checking. It highlights misspelled words as you type and offers interactive corrections. This article presents a practical configuration for Emacs that sets up <code>ispell</code> to use Aspell for both programming and standard text editing.</p>
+
+
+
+<p>Additionally, it addresses a common issue for developers. While writing code, variables such as <code>filepath</code> or <code>buffername</code> in comments or docstrings are often flagged as errors, generating visual noise in your programming buffers. This article contains a specific configuration to reduce these false positives.</p>
+
+
+
+<h2>Setting the backend and dictionary</h2>
+
+
+
+<p>The first step is to configure Emacs to use Aspell as the spell-checking engine, set the default dictionary, and reduce unnecessary messages when checking individual words:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Set the ispell program name to aspell</span>
+<span class="hljs-comment">;; (switching to aspell will generally offer better performance than ispell.)</span>
+(<span class="hljs-name">setq</span> ispell-program-name <span class="hljs-string">"aspell"</span>)
+
+<span class="hljs-comment">;; Set the global default dictionary for the Ispell process.</span>
+(<span class="hljs-name">setq</span> ispell-dictionary <span class="hljs-string">"en_US"</span>)
+
+<span class="hljs-comment">;; Reduce unnecessary messages when checking individual words.</span>
+(<span class="hljs-name">setq</span> ispell-quietly <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>Note that this configuration explicitly targets the US English dictionary "en_US". If you write in a different language or require a different regional dialect, such as "en_GB" or "fr_FR", replace "en_US" with your preferred language code.</p>
+
+
+
+<h2>Configuring aspell flags</h2>
+
+
+
+<p>The following configures Aspell's suggestion mode to "ultra", which favors very close spelling and phonetic matches when generating suggestions:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Configure Aspell's suggestion mode to "ultra", which favors very close</span>
+<span class="hljs-comment">;; spelling and phonetic matches when generating suggestions.</span>
+(<span class="hljs-name">setq</span> ispell-extra-args '(<span class="hljs-string">"--sug-mode=ultra"</span>))</code></span></pre>
+
+
+<h2>Handling compound words in source code</h2>
+
+
+
+<p>Comments and string literals in source code are heavily populated with compound variable names and technical terms, such as <code>filepath</code>, <code>buffername</code>, or <code>checkbox</code>. Aspell may flag these as errors, generating visual noise in programming buffers.</p>
+
+
+
+<p>To resolve this, we pass the <code>--run-together</code> flag to Aspell. This flag allows Aspell to recognize words formed by combining valid dictionary words without spaces. (It only affects words in the comments and strings that Flyspell checks; it does not cause Flyspell to check arbitrary identifiers elsewhere in the source buffer.)</p>
+
+
+
+<p>To apply this cleanly, we can define a custom wrapper function that we will later attach to our programming modes using <code>add-hook</code>. This function activates <code>flyspell-prog-mode</code> and then safely appends the required flags buffer-locally using <code>add-to-list</code>, which inherently prevents duplicate arguments if the mode is toggled off and on:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">defun</span> my-flyspell-prog-mode (<span class="hljs-name">&amp;rest</span> _args)
+  <span class="hljs-string">"Enable `flyspell-prog-mode' with buffer-local Aspell arguments."</span>
+  <span class="hljs-comment">;; The --run-together flag instructs Aspell to accept words formed by</span>
+  <span class="hljs-comment">;; combining two or more valid dictionary words without spaces, treating the</span>
+  <span class="hljs-comment">;; resulting string as valid.</span>
+  <span class="hljs-comment">;;</span>
+  <span class="hljs-comment">;; This is excellent for source code. Code is heavily populated with</span>
+  <span class="hljs-comment">;; compound variable names and technical terms (e.g., filepath, buffername,</span>
+  <span class="hljs-comment">;; checkbox).</span>
+  <span class="hljs-comment">;; URL: https://www.jamescherti.com/emacs-spell-checker-flyspell-ispell-aspell/</span>
+  (<span class="hljs-name">make-local-variable</span> 'ispell-extra-args)
+  (<span class="hljs-name">dolist</span> (<span class="hljs-name">item</span> '(<span class="hljs-string">"--run-together"</span>
+                  ;; <span class="hljs-string">"--ignore=2"</span>
+                  ;; <span class="hljs-string">"--run-together-min=3"</span>
+                  ;; <span class="hljs-string">"--run-together-limit=4"</span>
+                  ;; <span class="hljs-string">"--camel-case"</span>
+                  ))
+    (<span class="hljs-name">add-to-list</span> 'ispell-extra-args item))
+  (<span class="hljs-name">flyspell-prog-mode</span>))</code></span></pre>
+
+
+<p>Here are four additional flags worth uncommenting in the <code>my-flyspell-prog-mode</code> function above. Each provides specific advantages for programming workflows, along with some tradeoffs to consider:</p>
+
+
+
+<ul>
+<li><code>--run-together-limit=4</code>: Increases the maximum number of combined words allowed in a single string from the default limit of two up to 4. (A higher limit increases the probability that a genuine typo will be silently ignored because Aspell manages to break the misspelling down into a sequence of several shorter valid words. It also adds a slight processing overhead.)</li>
+
+
+
+<li><code>--run-together-min=3</code> sets the minimum length of the individual words that Aspell is allowed to use when recognizing a run-together compound. For example, with a value of <code>3</code>, Aspell can recognize <code>filepath</code> as <code>file</code> + <code>path</code>, but it is less likely to accept a compound that depends on very short components such as <code>a</code> or <code>in</code>. Increasing this value can therefore reduce false positives in source code by preventing Aspell from accepting suspicious compounds made up of short, common words.</li>
+
+
+
+<li><code>--ignore=2</code>: Configures Aspell to completely skip words containing two characters or fewer. Tradeoff: You lose spell checking for actual two-letter English words (such as "is", "an", "to", "of").</li>
+
+
+
+<li><code>--camel-case</code>: Enables Aspell's camel-case word handling, allowing camelCase identifiers to be checked more appropriately. It can reduce false positives for identifiers such as <code>myHttpRequest</code> that appear in docstrings and comments. Tradeoff: It can occasionally mask a typo if its components are individually recognized as valid words.</li>
+</ul>
+
+
+
+<h2>Initializing the Packages</h2>
+
+
+
+<p>Finally, we use <code>add-hook</code> to bind the spell checking functions to the appropriate Emacs hooks:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; The flyspell package is a built-in Emacs minor mode that provides on-the-fly</span>
+<span class="hljs-comment">;; spell checking. It highlights misspelled words as you type, offering</span>
+<span class="hljs-comment">;; interactive corrections.</span>
+<span class="hljs-comment">;; URL: https://www.jamescherti.com/emacs-spell-checker-flyspell-ispell-aspell/</span>
+(<span class="hljs-name">defun</span> my-flyspell-enable-appropriate-mode ()
+  <span class="hljs-string">"Enable the appropriate Flyspell mode based on the current major mode."</span>
+  (<span class="hljs-name">if</span> (<span class="hljs-name">or</span> (<span class="hljs-name">derived-mode-p</span> 'conf-mode)
+          (<span class="hljs-name">derived-mode-p</span> 'yaml-mode)
+          (<span class="hljs-name">derived-mode-p</span> 'yaml-ts-mode)
+          (<span class="hljs-name">derived-mode-p</span> 'ansible-mode)
+          (<span class="hljs-name">derived-mode-p</span> 'nxml-mode)
+          (<span class="hljs-name">derived-mode-p</span> 'sgml-mode))
+      (<span class="hljs-name">my-flyspell-prog-mode</span>)
+    (<span class="hljs-name">flyspell-mode</span> <span class="hljs-number">1</span>)))
+
+(<span class="hljs-name">add-hook</span> 'prog-mode-hook #'my-flyspell-prog-mode)
+(<span class="hljs-name">add-hook</span> 'conf-mode-hook #'my-flyspell-enable-appropriate-mode)
+(<span class="hljs-name">add-hook</span> 'text-mode-hook #'my-flyspell-enable-appropriate-mode)</code></span></pre>
+
+
+<p>Note: Configuration files such as YAML and Ansible playbooks can present an edge case because some source-like modes are based on <code>text-mode</code> rather than <code>prog-mode</code>. Without an explicit override, such modes may receive ordinary Flyspell behavior rather than programming-mode behavior. Since these files behave more like source code, we use a custom dispatcher function to apply <code>my-flyspell-prog-mode</code> to them instead.</p>
+
+
+
+<h2>A few additional interesting options</h2>
+
+
+
+<p>Several lesser-known variables can be adjusted to change Flyspell's behavior and, in some cases, reduce the amount of work it performs. These options involve tradeoffs: reducing spell-checking activity can improve responsiveness, but may also reduce the amount of text that is checked or the feedback that Flyspell provides.</p>
+
+
+
+<ul>
+<li>Setting <code>flyspell-issue-message-flag</code> and <code>flyspell-issue-welcome-flag</code> to <code>nil</code> suppresses Flyspell's checking messages and its startup welcome message. This removes minibuffer messages generated by Flyspell without changing the actual spell-checking operation.</li>
+
+
+
+<li>Setting <code>flyspell-check-changes</code> to a non-nil value causes Flyspell to check only words that have been typed or edited, instead of also checking words that point moves across. This can reduce spell-checking activity when navigating through existing text. The tradeoff is that existing misspellings are not checked because point moves across them, so they may remain undetected until the text is edited or checked explicitly.</li>
+
+
+
+<li>Setting <code>flyspell-delay-use-timer</code> to a non-nil value makes Flyspell use a timer instead of <code>sit-for</code> when waiting after delayed commands. This allows idle timers and other Emacs code to run during the delay. The option therefore changes how Flyspell waits before performing a check rather than disabling the delay itself.</li>
+
+
+
+<li>Setting <code>flyspell-mark-duplications-flag</code> to nil prevents Flyspell from reporting repeated words as errors. This eliminates duplicate-word detection, so accidental repetitions such as "the the" are no longer reported.</li>
+
+
+
+<li>Setting <code>ispell-silently-savep</code> to a non-nil value causes new words added to the personal dictionary to be saved without an interactive confirmation prompt. This avoids the prompt when saving personal-dictionary additions, but also removes that opportunity to review each addition before it is saved.</li>
+
+
+
+<li>Setting <code>flyspell-highlight-properties</code> to nil prevents Flyspell from highlighting incorrect words when the relevant text already has text properties. The spelling check can still identify the word as incorrect, but Flyspell will not add its normal misspelling highlight when an applicable text property is present. This can be useful when existing text properties should take precedence over Flyspell's visual indication.</li>
+
+
+
+<li>Lowering <code>flyspell-large-region</code> tells Flyspell to use its faster bulk-checking method for smaller sections of text. Instead of checking each word individually, Flyspell sends the larger section to the external Ispell/Aspell program to check it in one operation. For example, changing the value from <code>1000</code> to <code>200</code> makes Flyspell use this method for regions containing 200 or more characters. This can improve performance when checking larger sections, but repeated words such as "the the" are not detected when this bulk-checking method is used.</li>
+
+
+
+<li>Increasing <code>flyspell-delay</code> increases the number of seconds Flyspell waits before checking after a command classified as delayed. This can reduce how frequently spell checking is triggered during rapid editing, at the cost of delaying the appearance of misspelling highlights.</li>
+</ul>
+<div class="yarpp yarpp-related yarpp-related-rss yarpp-template-list">
+
+<h3>Related posts:</h3><ol>
+<li><a href="https://www.jamescherti.com/buffer-guardian-el-automatically-save-emacs-buffers/">buffer-guardian.el - Automatically Save Emacs Buffers Without Manual Intervention (When Buffers Lose Focus, Regularly, or After Emacs is Idle)</a></li>
+<li><a href="https://www.jamescherti.com/emacs-native-compilation-config-jobs/">Enabling Emacs Native Compilation and Dynamically Adjusting the Number of Elisp Files Compiled in Parallel</a></li>
+<li><a href="https://www.jamescherti.com/emacs-evil-disable-automatic-removal-of-spaces-after-leaving-insert-mode/">Emacs Evil Mode: Disabling the automatic removal of spaces after leaving Insert mode</a></li>
+<li><a href="https://www.jamescherti.com/emacs-add-todo-keyword-to-new-org-mode-headings/">Configure Emacs org-mode to automatically add the TODO keyword to new Org Mode headings</a></li>
+<li><a href="https://www.jamescherti.com/outline-mode-enhance-move-subtree-up-down/">Emacs: Enhancing up and down subtree movement in outline-mode and outline-minor-mode</a></li>
+<li><a href="https://www.jamescherti.com/vim-quickly-replace-word-under-cursor/">Vim: Quickly replace the word that is under the cursor</a></li>
+<li><a href="https://www.jamescherti.com/emacs-compile-angel-byte-native-compile/">The compile-angel Emacs package: Byte-compile and Native-compile Emacs Lisp libraries Automatically</a></li>
+</ol>
+</div>
+</body></html>

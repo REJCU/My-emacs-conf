@@ -1,0 +1,8 @@
+<html><head></head><body><p>
+First melpa release evah \o/</p>
+<p>
+Thanks to many for patience and coaching, and <a href="https://melpa.org/#/card-games">card-games.el 1.0.92</a> (pre-release #2, MELPA) is available from <code>package-install</code> for users of <a href="https://melpa.org">MELPA</a>.  Release announcement after the cut..</p>
+<p>
+<img src="https://code.bru.st/corwin/card-game.el/media/branch/master/doc/images/klondike.png" alt="https://code.bru.st/corwin/card-game.el/media/branch/master/doc/images/klondike.png" title="https://code.bru.st/corwin/card-game.el/media/branch/master/doc/images/klondike.png"></p>
+<p>
+Grown from experimentation within Dungeon, thank you to contribs there, and for review comments from ricsy putting toward MELPA got rid of some advices forcing very interesting better ways. The hooks approach makes the registered card-games-bid-submit a generic semaphore, for example to interlink with a process, CRDT via an adaptor, or … in present v1.0.92 (unstable): <a href="https://melpa.org/#/card-games">https://melpa.org/#/card-games</a></p></body></html>

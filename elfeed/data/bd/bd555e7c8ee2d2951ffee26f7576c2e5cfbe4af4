@@ -1,0 +1,116 @@
+<html><head></head><body><p>Another month, another <a href="https://github.com/xenodium/agent-shell">agent-shell</a> update. If you missed the last one, have a look at the <a href="https://xenodium.com/agent-shell-0-63-updates">0.63 update</a>. While this post showcases the latest highlights, the <a href="https://github.com/xenodium/agent-shell/compare/v0.63.3...v0.73.2">full list of changes</a> is far chunkier than what we'll cover.</p>
+<h2>What's <code>agent-shell</code>?</h2>
+<p><a href="https://github.com/xenodium/agent-shell">agent-shell</a> is a native <a href="https://www.gnu.org/software/emacs/">Emacs</a> mode to interact with AI agents powered by ACP (<a href="https://agentclientprotocol.com/">Agent Client Protocol</a>).</p>
+<h2>agent-shell enters the chat</h2>
+<p>Since inception in September last year (yikes nearly a year), <code>agent-shell</code> has featured a shell-like experience, powered by <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Prompts.html">comint mode</a>. There's also <a href="https://xenodium.com/agent-shell-0-25-updates#viewport%2Fcompose-(experimental)">viewport mode</a> (via <code>agent-shell-prefer-viewport-interaction</code>), if you prefer a more focused experience, and now we have <code>chat mode</code>.</p>
+<p>Chat mode fuses <code>comint</code> mode with a more traditional chat-like labelling experience.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/chat-mode.png" alt=""></p>
+<p>We're living on the edge here, so chat mode is now enabled by default. Ok not really that edgy, it's fairly safe (powered <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html">overlays</a>) and can be disabled entirely via <code>(setq agent-shell-chat-mode-enabled nil)</code>. Chat mode itself is a minor mode, so you can always toggle it on and off via <code>M-x agent-shell-chat-mode</code>.</p>
+<h2>A little more chatter</h2>
+<p>In the last post, we talked about making <code>agent-shell</code> less chatty with more grouping for the likes of tool calls and agent thinking, all collapsed by default. If that's far too quiet, you can expand by default via <code>(setq agent-shell-activity-group-expand-by-default t)</code>. If you found these two settings either too quiet or too chatty, we now have a third alternative via <code>(setq agent-shell-activity-group-expand-by-default 'latest)</code>. When set, only the latest grouped activity is expanded by default, and automatically collapsed when the agent moves on to something else.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/latest-activity.png" alt=""></p>
+<p>I've become quite fond of this feature (thank you <a href="https://github.com/nhojb">@nhojb</a> for the <a href="https://github.com/xenodium/agent-shell/pull/740">PR</a>), so yes. It's also enabled by default.</p>
+<h2>Prompt queueing</h2>
+<p>Queuing received some improvements. The related commands have been consolidated under <code>agent-shell-prompt-queue.el</code>. You can queue prompts while the agent is busy, then view, resume, or drop pending prompts via <code>M-x agent-shell-prompt-queue</code>, <code>M-x agent-shell-prompt-queue-resume</code>, and <code>M-x agent-shell-prompt-queue-remove</code>. The pending queue is now shown after each new submission.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/queue-display.png" alt=""></p>
+<h2>Compose from anywhere</h2>
+<p><code>M-x agent-shell-prompt-compose</code> opens a dedicated buffer for crafting a prompt, and it's now more independent of the shell. You can invoke it from any buffer (it resolves to the right shell), <code>C-c C-c</code> sends and returns you to whatever you were doing (fire and forget), and <code>C-u C-c C-c</code> submits the prompt and immediately lets you craft another queued prompt.</p>
+<h2>Start typing sooner</h2>
+<p>Shell initialization may take a second or two, depending on what agent you're using, which meant you had to wait for initialization before you could start typing into your new shell. Unnecessary, so that's no longer the case. Shell prompts are now offered as soon as possible, so one can get typing.</p>
+<h2>Markdown lists</h2>
+<p>While Markdown lists are easily digestible without special rendering, we can do better than that, so we now give them a better treatment with normalized padding, indentation, and of course, civilized bullets.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/list.png" alt=""></p>
+<h2>TAB navigation improvements + hints</h2>
+<p>TAB navigation made it into <code>agent-shell</code> fairly early on. I love being able to TAB my way into any section in the buffer and press RET to toggle folding. That's great and all, but we can make the navigation experience richer by welcoming the likes of Markdown source blocks, links, and images to the navigation party. Why these in particular? They are all actionable by RET too, of course.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/tab.gif" alt=""></p>
+<p>While you'd rightly assume RET opens links to local text files in Emacs and delegates to browsers when needed, Markdown source blocks and images get a similar treatment. While their respective RET actions may not be as obvious, we can certainly make them much more discoverable, so we now add hints. Landing point on an actionable item now echoes a hint of what you can do and which key does it (say, "Press RET to copy" on a source block, "Press + to enlarge" on an image, and so on). Hints are also shown on mouse over events.</p>
+<h2>Image size hints</h2>
+<p>While <code>agent-shell</code> offers <code>agent-shell-markdown-image-max-width</code> for customizing image sizes, it's fairly restrictive. Not all images are the same, so why force them all to fit within the same constraint? <code>agent-shell-markdown-image-max-width</code> continues to offer a preferred default, but you can now scale images differently by getting the agent to annotate Markdown images with <a href="https://pandoc.org/MANUAL.html#extension-link_attributes">Pandoc-style link attributes</a>.</p>
+<p>The attribute block goes right after the image, taking a <code>width</code> and/or <code>height</code> in pixels or percentages:</p>
+<pre><code class="language-markdown">![alt](image.png){width=300}
+![alt](image.png){width=50% height=200}
+</code></pre>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/image-annotation.png" alt=""></p>
+<h2>Auto resize</h2>
+<p>I may be sweating the small stuff here, but this was really grinding my gears. We have lovely Markdown table rendering, which I'm glad we do as LLMs aren't always great at producing perfectly aligned tables. In the best of cases, the LLMs align the table perfectly, but it's just too wide for our Emacs window. Luckily, our lovely rendering also wraps cells to make them fit into our window. The thing is, all that lovely rendering goes out the door the moment you either resize your Emacs frame or merely split your window, resulting in a monstrosity like this:</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/catastrophe.png" alt=""></p>
+<p>I know. I'm sweating the small stuff here, but hey we don't have to live like this. Emacs has all the hooks in the world, so let's track window changes and rejoin the civilized world.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/auto-resize-table.gif" alt=""></p>
+<p>On a much smaller scale, I also wanted auto resize for images, so here you have it…</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/auto-resize-image.gif" alt=""></p>
+<h2>Manual resize</h2>
+<p>While we can influence image size at render time, this can still generate undesirable image dimensions, so we can now rescale all images in buffer on demand.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/resize-all-images.gif" alt=""></p>
+<p>Sometimes a hammer really isn't the right tool, so we can now also rescale an image at point.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/manual-resize.gif" alt=""></p>
+<h2>Open file links as you please</h2>
+<p>Opening a local file (from a link, image, or <code>@file</code> mention) now routes through <code>agent-shell-file-display-action</code>, a standard <code>display-buffer</code> action you can customize. The default reuses a window already showing the file, or takes over the current one.</p>
+<p>If you'd like a different window arrangement, you could do something like:</p>
+<pre><code class="language-{.commonlisp">(setq agent-shell-file-display-action
+      '(display-buffer-pop-up-window))
+</code></pre>
+<h2>Xref support</h2>
+<p>Following a local file link now pushes your origin onto <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html">xref</a>'s marker stack, so <code>xref-go-back</code> (<code>M-,</code>) brings you right back to where you were in your <code>agent-shell</code>, just like other Emacs jumps.</p>
+<h2>Use your favorite folding key binding</h2>
+<p>Foldable fragments now use <code>agent-shell-ui-fragment-map</code> and bind <code>agent-shell-ui-toggle-fragment</code>. If you're not a fan of the RET binding to toggle folding, you can now use your preferred binding.</p>
+<p>If <code>TAB</code> is your jam, you can do something like:</p>
+<pre><code class="language-{.commonlisp">(with-eval-after-load 'agent-shell-ui
+  (define-key agent-shell-ui-fragment-map
+              (kbd "TAB") #'agent-shell-ui-toggle-fragment))
+</code></pre>
+<h2>Styling thoughts</h2>
+<p>If you prefer styling agent thoughts differently, a new <code>agent-shell-thought-body</code> face lets you do just that.</p>
+<h2>Streaming performance</h2>
+<p>Streaming performance also received some love. Thanks to <a href="https://github.com/suhail-singh">@suhail-singh</a> for the <a href="https://github.com/xenodium/agent-shell/issues/744">profiling and improvements</a>, and to <a href="https://github.com/Scott-Guest">@Scott-Guest</a> and <a href="https://github.com/claytharrison">@claytharrison</a> for the trace analysis and benchmarking in <a href="https://github.com/xenodium/agent-shell/issues/757">#757</a>.</p>
+<h2>Richer display of options</h2>
+<p>The "Available config options" section now displays possible values.</p>
+<p><img src="https://xenodium.github.io/images/agent-shell-0-73-updates/config-options.png" alt=""></p>
+<h2>Public functions</h2>
+<h3>Dynamic agent configs</h3>
+<p><code>agent-shell-agent-configs</code> can now be set to a function, letting you compute the available agent configurations dynamically rather than hard-coding a static list. The function is called on every access, so it stays current across code reloads.</p>
+<p>Maybe you'd like to list only available agents. Here's a rough snippet.</p>
+<pre><code class="language-{.commonlisp">(setq agent-shell-agent-configs
+      (lambda ()
+        (seq-filter
+         (lambda (maker)
+           (when-let* ((client (ignore-errors
+                                 (funcall (map-elt (funcall maker) :client-maker)
+                                          (current-buffer))))
+                       (command (map-elt client :command)))
+             (executable-find command)))
+         (agent-shell-default-agent-config-makers))))
+</code></pre>
+<h3>Subscribe to agent message chunks</h3>
+<p><code>agent-shell-subscribe-to</code> now broadcasts an <code>agent-message-chunk</code> event, handy for external integrations that want to observe streamed output.</p>
+<h2>Remote agents</h2>
+<p><code>executable-find</code> now works correctly on remote hosts (<a href="https://github.com/xenodium/agent-shell/pull/742">#742</a> by <a href="https://github.com/CeleritasCelery">@CeleritasCelery</a>), smoothing out TRAMP-driven remote agents.</p>
+<h2>New third-party packages</h2>
+<p><a href="https://github.com/SreenivasVRao/agent-shell-hq">agent-shell-hq</a> joins the family, offering an interface for managing multiple <code>agent-shell</code> sessions.</p>
+<h2>Maintenance and housekeeping</h2>
+<p>If you peeked at the <a href="https://github.com/xenodium/agent-shell/compare/v0.63.3...v0.73.2">commit logs</a>, you'll notice I've been working daily on <code>agent-shell</code>, keeping up with project inflow. Since last month, 27 issues have been closed and 13 pull requests merged. As of today, the backlog sits at 11 open issues and 5 open PRs (versus 13 and 4 last time around). If there's something you'd like me to prioritize, feel free to ping.</p>
+<h2>agent-shell needs your support</h2>
+<p>Vendor-neutral tooling matters more than ever, and there are a couple of ways to help keep <code>agent-shell</code> going. Some cost money, others just a click. All are appreciated ;)</p>
+<h3>Sponsorships for agent-shell longevity</h3>
+<p><code>agent-shell</code> is just me, an indie dev, while the tools it competes with have well-funded teams behind them. Time spent on <code>agent-shell</code> is time away from work that pays the bills, so if it's useful to you, please consider <a href="https://github.com/sponsors/xenodium">sponsoring</a> the project. And if your employer benefits from your <code>agent-shell</code> use, nudge them to chip in too, they can typically contribute at a scale individuals can't.</p>
+<h3>GitHub stars for exposure</h3>
+<p>GitHub stars help with exposure, attracting new users and potential sponsors. <a href="https://github.com/xenodium/agent-shell/">Starring agent-shell</a> costs nothing and can potentially help bring in more funding, so if you don't mind a couple of clicks, the project can really use <a href="https://github.com/xenodium/agent-shell/">another GitHub star</a>.</p>
+<h2>Pull requests</h2>
+<p>Thank you to all contributors for these improvements!</p>
+<ul>
+<li><a href="https://github.com/xenodium/agent-shell/pull/730">#730</a>: Queue requests sent during session/push and submit them when it ends (<a href="https://github.com/catern">@catern</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/737">#737</a>: Add a workaround for goose (<a href="https://github.com/bergmannf">@bergmannf</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/740">#740</a>: Add a <code>when-active</code> option to <code>agent-shell-activity-group-expand-by-default</code> (<a href="https://github.com/nhojb">@nhojb</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/742">#742</a>: Fix executable-find on remote host (<a href="https://github.com/CeleritasCelery">@CeleritasCelery</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/743">#743</a>: Preserve "claimed" regions when rendering bold / italic / strikethrough (<a href="https://github.com/alberti42">@alberti42</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/746">#746</a>: Avoid repeated system-sleep load attempts (<a href="https://github.com/liaowang11">@liaowang11</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/748">#748</a>: Preserve properties on escaped Markdown punctuation (<a href="https://github.com/Scott-Guest">@Scott-Guest</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/752">#752</a>: Guard group member walk against non-advancing block range (<a href="https://github.com/hamza-m-masood">@hamza-m-masood</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/756">#756</a>: Preserve point during table rendering (<a href="https://github.com/Lenbok">@Lenbok</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/762">#762</a>: Document viewport workflow (<a href="https://github.com/KarimAziev">@KarimAziev</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/763">#763</a>: Render raw tool output (<a href="https://github.com/mrychlik">@mrychlik</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/765">#765</a>: Prevent syntax highlighting from delaying other buffers' mode hooks (<a href="https://github.com/Scott-Guest">@Scott-Guest</a>)</li>
+<li><a href="https://github.com/xenodium/agent-shell/pull/766">#766</a>: Refresh viewport header even with nil agent-shell-prefer-viewport-interaction (<a href="https://github.com/catern">@catern</a>)</li>
+</ul>
+<h2>Make it sustainable, sponsor the <code>agent-shell</code></h2>
+<p>Liking <code>agent-shell</code>? Would like to see it evolve? Consider <a href="https://github.com/sponsors/xenodium">sponsoring</a> the effort.</p>
+</body></html>

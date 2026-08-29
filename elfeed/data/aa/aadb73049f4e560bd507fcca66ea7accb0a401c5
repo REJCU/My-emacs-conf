@@ -1,0 +1,100 @@
+<html><head></head><body><p>When text is copied from an <code>org-mode</code> or <code>markdown-mode</code> buffer and pasted into another Emacs buffer, its visual formatting can sometimes follow it. For instance, text displayed with a particular color, background, or font weight in an Org or Markdown buffer can retain that appearance after being inserted into a Python buffer.</p>
+
+
+
+<p>This can be undesirable because the inserted text may then display with the source buffer's <code>face</code> text property instead of relying on the destination buffer's normal font-lock or syntax highlighting.</p>
+
+
+
+<h2>Understanding the face text property</h2>
+
+
+
+<p>In Emacs, visual formatting can be represented by the <code>face</code> text property. Some major modes, including <code>org-mode</code> and <code>markdown-mode</code>, make extensive use of text properties, including <code>face</code>, to control how text is displayed. When text containing these properties is yanked (pasted), Emacs can preserve them unless they are explicitly excluded.</p>
+
+
+
+<h2>Solution 1: Strip faces universally on paste</h2>
+
+
+
+<p>Emacs provides the <code>yank-excluded-properties</code> variable for specifying text properties that should not be retained when text is yanked (pasted) into a buffer. To prevent <code>face</code> properties from being carried into the destination buffer, add the following to your configuration:</p>
+
+
+<pre><span><code class="hljs language-php">(add-to-<span class="hljs-keyword">list</span> <span class="hljs-string">'yank-excluded-properties '</span>face)</code></span></pre>
+
+
+<p>With this configuration, the <code>face</code> property is removed from the inserted yanked text. The inserted text can therefore be displayed according to the destination buffer's own font-lock and other display rules.</p>
+
+
+
+<p>Tradeoff: Once <code>face</code> is included in <code>yank-excluded-properties</code>, yanked text does not retain its <code>face</code> text property. This is generally desirable when the intention is for inserted text to adopt the appearance of its destination buffer, but it may be undesirable for workflows that intentionally use rich text. Examples of workflows and modes where you might want to preserve rich text include <code>enriched-mode</code>, <code>mu4e</code>, or <code>gnus</code>.</p>
+
+
+
+<p>For the majority of users, adding <code>'face</code> to <code>yank-excluded-properties</code> is a worthwhile configuration change. This makes copy and paste more predictable and prevents formatting from leaking into unrelated buffers.</p>
+
+
+
+<h2>Solution 2: Strip faces per mode on copy</h2>
+
+
+
+<p>While appending <code>face</code> to the global <code>yank-excluded-properties</code> variable sanitizes pasted text, it applies universally across Emacs. For workflows that require rich text in specific applications like <code>mu4e</code> or <code>gnus</code>, a global configuration is too aggressive.</p>
+
+
+
+<p>An alternative way is to strip the visual formatting at the source during the copy operation, rather than at the destination during the paste operation. This can be achieved by applying buffer-local advice to <code>filter-buffer-substring-function</code>:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Copy-paste without org-mode or markdown-mode formatting bleeding into other</span>
+<span class="hljs-comment">;; buffers. Alternative to: (push 'face yank-excluded-properties)</span>
+<span class="hljs-comment">;; URL: https://www.jamescherti.com/emacs-fix-org-mode-copy-paste-yank-bleed/</span>
+(<span class="hljs-name">defun</span> my-strip-face-properties-from-string (<span class="hljs-name">string</span>)
+  <span class="hljs-string">"Remove visual face properties from STRING."</span>
+  (<span class="hljs-name">remove-text-properties</span> <span class="hljs-number">0</span> (<span class="hljs-name">length</span> string)
+                          '(face nil font-lock-face nil)
+                          string)
+  string)
+
+(<span class="hljs-name">defun</span> my-enable-plain-text-copy ()
+  <span class="hljs-string">"Strip visual face properties from copied text in the current buffer."</span>
+  (<span class="hljs-name">add-function</span> <span class="hljs-symbol">:filter-return</span>
+                (<span class="hljs-name">local</span> 'filter-buffer-substring-function)
+                #'my-strip-face-properties-from-string))
+
+(<span class="hljs-name">add-hook</span> 'markdown-mode-hook #'my-enable-plain-text-copy)
+(<span class="hljs-name">add-hook</span> 'markdown-ts-mode-hook #'my-enable-plain-text-copy)
+(<span class="hljs-name">add-hook</span> 'org-mode-hook #'my-enable-plain-text-copy)
+
+<span class="hljs-comment">;; Other modes</span>
+<span class="hljs-comment">;; (add-hook 'prog-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'text-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'conf-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'diff-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'help-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'info-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'compilation-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'shell-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'eshell-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'magit-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'dired-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'term-mode-hook #'my-enable-plain-text-copy)</span>
+<span class="hljs-comment">;; (add-hook 'vterm-mode-hook #'my-enable-plain-text-copy)</span>
+</code></span></pre>
+
+
+<p>Instead of filtering the text when it is pasted, this solution cleans the text as it is copied, making sure only plain text enters the Emacs clipboard history (the kill ring).</p>
+<div class="yarpp yarpp-related yarpp-related-rss yarpp-template-list">
+
+<h3>Related posts:</h3><ol>
+<li><a href="https://www.jamescherti.com/emacs-persist-restore-text-scale/">persist-text-scale.el - Persist and Restore the Text Scale</a></li>
+<li><a href="https://www.jamescherti.com/fold-outline-indentation-emacs-package/">outline-indent.el - A modern indentation-based folding mode for Emacs</a></li>
+<li><a href="https://www.jamescherti.com/bufferfile-el-delete-or-rename-buffer-file-names-with-their-associated-buffers/">bufferfile: Rename, delete, or copy files and update their associated Emacs buffers (including clones and indirect buffers), buffer-local variables, and features that reference the file path, such as Eglot, Dired buffers, and the recentf list</a></li>
+<li><a href="https://www.jamescherti.com/emacs-add-todo-keyword-to-new-org-mode-headings/">Configure Emacs org-mode to automatically add the TODO keyword to new Org Mode headings</a></li>
+<li><a href="https://www.jamescherti.com/emacs-customize-ellipsis-outline-minor-mode/">Emacs: Customizing the Ellipsis "…" in outline-mode and outline-minor-mode to Use a More Visually Appealing Indicator for Folded Sections, Such as " ▼"</a></li>
+<li><a href="https://www.jamescherti.com/emacs-compile-angel-byte-native-compile/">The compile-angel Emacs package: Byte-compile and Native-compile Emacs Lisp libraries Automatically</a></li>
+<li><a href="https://www.jamescherti.com/outline-yaml-el-code-folding-outlining-yaml-files/">Emacs: YAML file code Folding and Outlining</a></li>
+</ol>
+</div>
+</body></html>

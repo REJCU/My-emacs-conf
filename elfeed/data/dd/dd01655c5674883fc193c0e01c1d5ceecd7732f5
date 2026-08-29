@@ -1,0 +1,65 @@
+<html><head></head><body><p><img alt="img" src="http://yummymelon.com/devnull/images/announcing-shazam/shazam-screenshot.png"></p>
+<p>Continuing my explorations on malleable computing with Emacs is examining access to OS/Platform-specific resources, in this case with macOS. macOS provides a number of mechanisms for high-level <a href="https://en.wikipedia.org/wiki/Inter-process_communication">inter-process communication</a>, among them AppleScript &amp; Automator Actions (now considered legacy but still maintained) and App Intents, Entities &amp; Shortcuts (introduced in macOS 13 and considered by Apple a replacement for the former).</p>
+<p>This post both announces and covers the implementation of an Emacs integration with the Shazam music recognition service that is packaged with macOS. This Emacs integration is called <code>shazam.el</code> (<a href="https://github.com/kickingvegas/shazam">https://github.com/kickingvegas/shazam</a>) and is now available for installation via <a href="https://melpa.org/#/shazam">MELPA</a>.</p>
+<p>To understand the <code>shazam.el</code> implementation, the following background information is provided.</p>
+<h1>Background</h1>
+<p>Shazam is a music recognition service that is implemented across Apple's different platforms (macOS, iOS/iPadOS, watchOS, tvOS). This service provides a shortcut action (<em>Recognize Music</em>) which is implemented using the following APIs:</p>
+<ul>
+<li>
+<p><strong>App Intent:</strong> An expression of an app’s capabilities to the system (in this case the ecosystem of Cocoa-based applications), and contains code to perform that action (<a href="https://developer.apple.com/documentation/appintents/app-intents">App intents | Apple Developer Documentation</a>).</p>
+</li>
+<li>
+<p><strong>App Entity:</strong> Information provided to the system about your app’s data, or about concepts related to your app’s data (<a href="https://developer.apple.com/documentation/appintents/app-entities">App entities | Apple Developer Documentation</a>).</p>
+</li>
+<li>
+<p><strong>App Shortcut:</strong> A workflow (including UI) for orchestrating <em>App Intents</em> and <em>Entities</em> (<a href="https://developer.apple.com/documentation/appintents/app-shortcuts">App Shortcuts | Apple Developer Documentation</a>). There are a number of ways to access a Shortcut, among them via the Shortcuts app or Siri.</p>
+</li>
+</ul>
+<p>With the <em>Recognize Music</em> shortcut action we can realize the Elisp package <code>shazam.el</code>.</p>
+<h1>Implementation</h1>
+<p>A Shortcut (aka workflow) defined in the Shortcuts app can be invoked via command line as follows:</p>
+<div class="highlight"><table><tbody><tr><td><div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td><div><pre><span></span><code>shortcuts<span class="w"> </span>run<span class="w"> </span><span class="s2">"&lt;shortcut name&gt;"</span>
+</code></pre></div></td></tr></tbody></table></div>
+
+<p>where “shortcut name” is the name given to a Shortcut enclosed by double-quotes.</p>
+<p>If the Shortcut is intended to write to <code>stdout</code>, then the <code>shortcuts</code> command line utility must be run into a pipe.</p>
+<div class="highlight"><table><tbody><tr><td><div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td><div><pre><span></span><code>shortcuts<span class="w"> </span>run<span class="w"> </span><span class="s2">"&lt;shortcut name&gt;"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cat
+</code></pre></div></td></tr></tbody></table></div>
+
+<p>The above incantation lets Emacs run a Shortcut.</p>
+<p>The Shortcut used by <code>shazam.el</code> invokes the <em>Recognize Music</em> action and does some work to transform the Shazam search result into a JSON dictionary. The JSON dictionary is written to <code>stdout</code> (<a href="https://www.icloud.com/shortcuts/bba3dd21146c4ba78dff1d7d0c0b1092">iCloud Shortcut: “Identify Music JSON”</a>) which can be read by Emacs and processed.</p>
+<p>The sequence diagram below shows the overall integration workflow between Emacs and Shortcuts for <code>shazam.el</code>.</p>
+<p><img alt="img" src="http://yummymelon.com/devnull/images/announcing-shazam/shazam-arch.svg"></p>
+<h1>Features</h1>
+<p>Details on all the features provided by <code>shazam.el</code> can be found in its <a href="https://kickingvegas.github.io/shazam/">User Guide</a>. Of note is that once the Shazam search result is deserialized, its content can be processed into a variety of formats. <code>shazam.el</code> takes advantage of this by storing recognized search results into an Org file, using Org markup and properties to store metadata provided by each result. Users can subsequently peruse this history file at their convenience.</p>
+<h1>Closing Thoughts</h1>
+<p>This work builds off the explorations in malleable computing with Emacs described in my prior posts:</p>
+<ul>
+<li><a href="http://yummymelon.com/devnull/in-emacs-everything-looks-like-a-service.html">nfdn: In Emacs, Everything Looks Like a Service</a></li>
+<li><a href="http://yummymelon.com/devnull/malleable-computing-emacs-and-you.html">nfdn: Malleable Computing, Emacs, and You</a></li>
+<li><a href="http://yummymelon.com/devnull/announcing-now-playing-el.html">nfdn: Announcing now-playing.el, an Emacs interface for the macOS Music app</a></li>
+</ul>
+<p>There is not a lot of Elisp to <a href="https://github.com/kickingvegas/shazam/blob/0e5a97c59b5972a728138fc06b2ff371d42c8b55/lisp/shazam.el">shazam.el</a> as shown in the <code>cloc</code> result for it:</p>
+<div class="highlight"><table><tbody><tr><td><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td><div><pre><span></span><code><span class="c">github</span><span class="nt">.</span><span class="c">com/AlDanial/cloc v 2</span><span class="nt">.</span><span class="c">10  T=0</span><span class="nt">.</span><span class="c">01 s (143</span><span class="nt">.</span><span class="c">3 files/s</span><span class="nt">,</span><span class="c"> 35402</span><span class="nt">.</span><span class="c">8 lines/s)</span>
+<span class="nb">-------------------------------------------------------------------------------</span>
+<span class="c">Language                     files          blank        comment           code</span>
+<span class="nb">-------------------------------------------------------------------------------</span>
+<span class="c">Lisp                             1             50             38            159</span>
+<span class="nb">-------------------------------------------------------------------------------</span>
+</code></pre></div></td></tr></tbody></table></div>
+
+<p>Most of the challenge in building <code>shazam.el</code> was understanding how <code>start-process</code> worked to asynchronously run the <code>shortcuts</code> command line utility.</p>
+<p>A downside to using a Shortcut (workflow) is the requirement to use a binary code-signed representation that is accessed via the Shortcuts app. This makes it less flexible than AppleScript where declaring behavior can be done in plain text. For example, the <code>now-playing.el</code> package can remote-control the Music app via AppleScript that is directly invoked from Emacs built with support for <code>ns-do-applescript</code>. In contrast, accessing contemporary macOS app behavior that is exposed via Intents and Entities requires installing (or creating) a binary code-signed representation (the Shortcut). This adds an extra step (or steps for installing multiple shortcuts) to build an integration with Emacs or any other orchestration tool.</p>
+<h1>References</h1>
+<ul>
+<li><a href="https://github.com/kickingvegas/shazam">shazam.el Repository</a></li>
+<li><a href="https://developer.apple.com/documentation/automator">Automator | Apple Developer Documentation</a></li>
+<li><a href="https://developer.apple.com/documentation/AppIntents">App Intents | Apple Developer Documentation</a></li>
+<li><a href="https://developer.apple.com/documentation/appintents/app-entities">App Entities | Apple Developer Documentation</a></li>
+<li><a href="https://developer.apple.com/documentation/appintents/app-shortcuts">App Shortcuts | Apple Developer Documentation</a></li>
+</ul></body></html>

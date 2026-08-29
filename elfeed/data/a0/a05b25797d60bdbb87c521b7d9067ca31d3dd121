@@ -1,0 +1,299 @@
+<html><head></head><body><p>
+In the <a href="https://amitp.blogspot.com/2025/03/emacs-tree-sitter-custom-highlighting-2.html">part 2</a> I described how, for a particular project with certain
+naming conventions, I wanted to use emacs tree-sitter font-locking to
+highlight variables that might be used in the wrong context:
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-color-indexing-1.png" alt="Screenshot showing two subscript expressions, one that seems suspect because it's an array indexed by t values that has an index that is named r">
+</figure>
+
+<p>
+I found a way to make it work for simple expressions but it was relying on
+regular expression matching rather than tree-sitter parse trees. I set a
+goal of handling these types of expressions:
+</p>
+
+<div class="org-src-container">
+<pre>elevation_t[t]           <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[r]           <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[t_from_r[r]] <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[r_from_t[t]] <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[obj.t]       <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[obj.r]       <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[t_from_r(r)] <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[r_from_t(t)] <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[x.t_fn(x)]   <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[x.r_fn(x)]   <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[x.t_arr[i]]  <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[x.r_arr[i]]  <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[(t)]         <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[(r)]         <span class="comment-delimiter">// </span><span class="comment">bug</span>
+</pre>
+</div>
+
+<a name="more"></a>
+
+<p>
+What are my options for using tree-sitter to handle more cases? I decided to try
+the <code>:pred</code> feature of tree-sitter font lock. Using <kbd>M-x treesit-explore-mode</kbd>,
+I learned that the subscript expression looks like:
+</p>
+
+<div class="org-src-container">
+<pre>(subscript_expression 
+   object: (_) 
+   [
+   index: (_)
+   ]
+)
+</pre>
+</div>
+
+<p>
+That means I can match it with a rule that captures both the array and
+index as separate nodes:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defun</span> <span class="function-name">amitp-check-subscript</span> (array index)
+  (message <span class="string">"debug: %S %S"</span> array index))
+
+(<span class="keyword">defvar</span> <span class="variable-name">amitp/treesit-font-lock-typescript-indexing</span>
+  (treesit-font-lock-rules
+   <span class="builtin">:language</span> 'typescript
+   <span class="builtin">:feature</span> 'semantic-identifier
+   <span class="builtin">:override</span> t
+   `(((subscript_expression
+       object: (identifier) @array 
+       index: (expression_statement) @index 
+       (<span class="builtin">:pred</span> amitp-check-subscript @array @index))))))
+</pre>
+</div>
+
+<p>
+Those two arguments are <em>treesit parse nodes</em>. What can I do with them? The
+emacs manual has a page about <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Retrieving-Nodes.html#index-treesit_002dnode_002dparent">how to navigate the parse tree</a> and <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern-Matching.html#index-treesit_002dquery_002dcapture">another
+page about querying the parse tree</a>. In the docs found a function
+<code>treesit-query-capture</code> that can pattern match on a node and extract the
+parts. 
+</p>
+
+<p>
+I used that function to look for the identifier that most likely tells me
+ what geometry type is being returned (<code>r</code> for region, <code>s</code> for side, <code>t</code> for
+ triangle). Examples:
+</p>
+
+<ul>
+<li>in <code>t_foo_r(r)</code>, the identifier <code>t_foo_r</code> tells me this is likely a <code>t</code> (triangle)</li>
+<li>in <code>t_obj[i].r_elevation</code>, the identifier <code>r_elevation</code> tells me this is likely an <code>r</code> (region)</li>
+<li>in <code>map[i].s_inner_t(t_queue[0])</code>, the identifier <code>s_inner_t</code> tells me this is likely an <code>s</code> (side)</li>
+</ul>
+
+<p>
+I think this is where tree-sitter can do better than regular expression
+based matching. I wrote a function to find the key identifier:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defun</span> <span class="function-name">amitp/treesit-top-typescript-node</span> (node)
+  <span class="doc">"Try to find the identifier that represents a node's return value"</span>
+  (<span class="keyword">let</span> ((results
+         (treesit-query-capture
+          node
+          '(((identifier) @identifier)
+            ((member_expression property: (property_identifier) @property))
+            ((subscript_expression object: (_) @expr))
+            ((call_expression function: (_) @expr))
+            ((parenthesized_expression (_) @expr))))))
+    (<span class="keyword">if</span> (assoc 'expr results)
+        (amitp/treesit-top-typescript-node (cdr (assoc 'expr results)))
+      <span class="comment-delimiter">;; </span><span class="comment">prefer the property if tree-sitter matches both</span>
+      (<span class="keyword">or</span> (cdr (assoc 'property results)) (cdr (assoc 'identifier results))))))
+</pre>
+</div>
+
+<p>
+I wrote a function detect a mismatch:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defun</span> <span class="function-name">amitp-check-subscript-mismatch</span> (array index)
+  <span class="comment-delimiter">;; </span><span class="comment">note: my usual naming convention is amitp/foo but tree-sitter won't accept that</span>
+  (<span class="keyword">let*</span> ((array-name (buffer-substring (treesit-node-start array) (treesit-node-end array)))
+         (top (amitp/treesit-top-typescript-node index))
+         (index-name (buffer-substring (treesit-node-start top) (treesit-node-end top))))
+    (<span class="keyword">and</span>
+     (<span class="keyword">or</span> (= (length array-name) 1) (equal <span class="string">"_"</span> (substring array-name -2 -1)))
+     (<span class="keyword">or</span> (= (length index-name) 1) (equal <span class="string">"_"</span> (substring index-name 1 2)))
+     (not (equal (substring array-name -1) (substring index-name 0 1))))))
+</pre>
+</div>
+
+<p>
+Then I used the tree-sitter <code>:pred</code> feature to only highlight if there's a mismatch:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defface</span> <span class="variable-name">array-error</span>)
+(<span class="keyword">defface</span> <span class="variable-name">index-error</span>)
+
+(<span class="keyword">defvar</span> <span class="variable-name">amitp/treesit-font-lock-typescript-indexing</span>
+  (treesit-font-lock-rules
+   <span class="builtin">:language</span> 'typescript
+   <span class="builtin">:feature</span> 'semantic-identifier
+   <span class="builtin">:override</span> t
+   '(((subscript_expression
+       object: (_) @array-error
+       index: (_) @index-error
+       (<span class="builtin">:pred</span> amitp-check-subscript-mismatch @array-error @index-error))))))
+     <span class="comment-delimiter">;; </span><span class="comment">todo: add call_expression</span>
+</pre>
+</div>
+
+<p>
+Does it work? Yes!
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-subscript-mismatch-1.png" alt="Screenshot showing subscript expressions flagged if they seem like they might have a bug">
+</figure>
+
+<p>
+But there's something a little weird here. Why do <code>r+1</code> and <code>1+r</code> get flagged
+even though I never actually handle binary operators in my
+<code>amitp/treesit-top-typescript-node</code> function? Something to investigate later.
+</p>
+
+<p>
+The next feature I wanted was to highlight <em>only</em> the "type" character
+instead of the entire identifier. I couldn't figure out how, so I asked on
+Reddit, where <code>/u/eleven_cupfuls</code> <a href="https://old.reddit.com/r/emacs/comments/1iymh4t/biweekly_tips_tricks_etc_thread_20250226_week_08/mewx3jl/">gave me a solution</a>: the <kbd>@face-name</kbd> can be a
+<kbd>@function-name</kbd> instead. Thank you!
+</p>
+
+<p>
+Instead of using <code>:pred</code> to tell font-lock <em>whether</em> to highlight something, I
+need to highlight it myself. I changed the treesit font lock rules to call
+my function instead of applying a face:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defvar</span> <span class="variable-name">amitp/treesit-font-lock-typescript-indexing</span>
+  (treesit-font-lock-rules
+   <span class="builtin">:language</span> 'typescript
+   <span class="builtin">:feature</span> 'semantic-identifier
+   <span class="builtin">:override</span> t
+   '(((subscript_expression) @amitp-highlight-subscript-mismatch)
+     ((call_expression) @amitp-highlight-subscript-mismatch))))
+</pre>
+</div>
+
+<p>
+My function now receives the entire expression instead of receiving
+the array and index parts separately like the <code>:pred</code> version. So I need to
+find a way to extract the right information. I can use
+<code>treesit-query-capture</code> like before, right?
+</p>
+
+<p>
+It was at this point that I learned <code>treesit-query-capture</code> pattern matches
+against the <em>entire</em> tree and not only the top node. That explains why it was
+finding <code>r+1</code> and <code>1+r</code>. It was looking for any identifier anywhere in the
+subtree. Oops.
+</p>
+
+<p>
+I rewrote <code>amitp/treesit-top-typescript-node</code> to use <code>treesit-node-type</code>
+instead of <code>treesit-query-capture</code>:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defun</span> <span class="function-name">amitp/treesit-top-typescript-node</span> (node)
+  <span class="doc">"Try to find the identifier that represents a node's return value"</span>
+  (<span class="keyword">pcase</span> (treesit-node-type node)
+    (<span class="string">"identifier"</span> node)
+    (<span class="string">"member_expression"</span> (treesit-node-child-by-field-name node <span class="string">"property"</span>))
+    (<span class="string">"subscript_expression"</span> (amitp/treesit-top-typescript-node (treesit-node-child-by-field-name node <span class="string">"object"</span>)))
+    (<span class="string">"call_expression"</span> (amitp/treesit-top-typescript-node (treesit-node-child-by-field-name node <span class="string">"function"</span>)))
+    (<span class="string">"parenthesized_expression"</span> (amitp/treesit-top-typescript-node (treesit-node-child node 1)))
+    (_ nil)))
+</pre>
+</div>
+
+<p>
+It would've been cleaner if pcase could pattern match against these nodes,
+but it's not too bad.
+</p>
+
+<p>
+And then I wrote a new <code>amitp-highlight-subscript-mismatch</code> function to
+analyze subscript nodes (and function calls too) to make sure the names
+match:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defun</span> <span class="function-name">amitp-highlight-subscript-mismatch</span> (node override start end <span class="type">&amp;rest</span> _)
+  <span class="doc">"Highlight mismatching variable names in amitp's geometry mesh code"</span>
+  (<span class="keyword">let*</span> ((parts (<span class="keyword">pcase</span> (treesit-node-type node)
+                  (<span class="string">"subscript_expression"</span> (list (treesit-node-child-by-field-name node <span class="string">"object"</span>)
+                                               (treesit-node-child-by-field-name node <span class="string">"index"</span>)))
+                  (<span class="string">"call_expression"</span> (list (treesit-node-child-by-field-name node <span class="string">"function"</span>)
+                                           (treesit-node-child
+                                            (treesit-node-child-by-field-name node <span class="string">"arguments"</span>)
+                                            1))))))
+    (<span class="keyword">when</span> parts
+      (<span class="keyword">let*</span> ((array (nth 0 parts))
+             (index (nth 1 parts))
+             (array-name (treesit-node-text array))
+             (top (amitp/treesit-top-typescript-node index))
+             (index-name (<span class="keyword">or</span> (treesit-node-text array) <span class="string">""</span>))
+             (face (<span class="keyword">if</span> (<span class="keyword">and</span> ;; todo also check (&gt;= (length index-name) 1)
+                        (<span class="keyword">or</span> (= (length array-name) 1) (equal <span class="string">"_"</span> (substring array-name -2 -1)))
+                        (<span class="keyword">or</span> (= (length index-name) 1) (s-match <span class="string">"[_0-9]"</span> (substring index-name 1 2))))
+                       (<span class="keyword">if</span> (equal (substring array-name -1) (substring index-name 0 1))
+                           'index-good
+                         'index-bad)
+                     nil)))
+        (<span class="keyword">when</span> face
+          (treesit-fontify-with-override (- (treesit-node-end array) 2) (treesit-node-end array) face override)
+          (treesit-fontify-with-override (treesit-node-start top) (min (treesit-node-end top) (+ 2 (treesit-node-start top))) face override))))))
+</pre>
+</div>
+
+<p>
+It's a little bit long but it seems to work:
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-subscript-mismatch-2.png" alt="Screenshot showing subscript expressions in green or red depending on whether the names match">
+</figure>
+
+<p>
+However, there are things I haven't figured out, like why certain expressions don't trigger the <code>(subscript_expression)</code> font lock rule:
+</p>
+
+<div class="org-src-container">
+<pre>r =&gt; mesh.foo_r[r]);     <span class="comment-delimiter">// </span><span class="comment">matches</span>
+(r =&gt; mesh.foo_r[r]);    <span class="comment-delimiter">// </span><span class="comment">matches</span>
+foo(mesh.foo_r[r]);      <span class="comment-delimiter">// </span><span class="comment">matches</span>
+foo(r =&gt; mesh.foo_r[r]); <span class="comment-delimiter">// </span><span class="comment">doesn't match</span>
+</pre>
+</div>
+
+<p>
+That's a problem for another day. I also want to:
+</p>
+
+<ol>
+<li>apply these rules only to files in which I use that naming convention</li>
+<li>tighten the matching to apply only to the letters <code>r</code>, <code>s</code>, <code>t</code></li>
+<li>remove the green "it's ok" color and only leave the red "warning" color</li>
+</ol>
+
+<p>
+This was a fun adventure. I'm not sure this is the best approach but it was
+a nice excuse to play with emacs tree-sitter.
+</p>
+</body></html>

@@ -1,0 +1,9 @@
+<html><head></head><body><p>
+Randy Ridenour  has an <a href="https://randyridenour.net/posts/2026-08-17-html-preview-for-org-files.html">interesting post about previewing an Org file in your browser</a>. If you’re like me your first thought is probably, “That’s easy. Just export the Org file to HTML and display it right from the Org export dispatcher.” I do exactly that to preview my blog posts. I simply type <kbd>Ctrl</kbd>+<kbd>c</kbd> <kbd>Ctrl</kbd>+<kbd>e</kbd> <kbd>h</kbd> <kbd>o</kbd> and my post appears in my browser. Of course, it doesn’t look exactly like the final product because it uses the default Org CSS instead of the WordPress theme that you see on the Irreal site.
+</p>
+<p>
+And that’s exactly the point. Ridenour has his own opinion on how his markup should be formatted. Five years ago, <a href="https://irreal.org/blog/?p=9492">I wrote about how to to add your own CSS formatting to an Org file when you export it to HTML</a> but those methods all required adding some text to the Org file. Ridenour’s method does all that in a function that he can call to export his Org file to the browser. The process is pretty much the same as using the export dispatcher except that he gets to have his preferred CSS applied to the output.
+</p>
+<p>
+The other advantage of his method is the he arranges for the automatic removal of the generated HTML file. The export dispatcher method requires that you delete the files manually. I do that periodically using <a href="https://github.com/oantolin/embark">Embark</a>, which makes it easy but I still have to remember to do it. If you’re looking for a fast and easy way to preview an Org file in your browser, take a look at Ridenour’s post.</p>
+</body></html>

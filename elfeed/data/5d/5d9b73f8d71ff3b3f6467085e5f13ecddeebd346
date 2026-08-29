@@ -1,0 +1,1902 @@
+<html><head></head><body><div class="author">by Divya</div><div class="org-org-date">2026 August 23</div><div class="tags"> <a href="https://monadicsheep.org/blog/tag.html#emacs">emacs</a> <a href="https://monadicsheep.org/blog/tag.html#canvas">canvas</a></div><video><p>Bad apple playing on the top right, a 2d rainbow growing box on the left. The bottom contains: dots 3d demo, pendulum, a bouncing ball.</p></video>
+
+<nav>
+<h2>Table of Contents</h2>
+<div>
+<ul>
+<li><a href="https://monadicsheep.org/blog/#Frequently%20Asked%20Questions">1. Frequently Asked Questions</a></li>
+<li><a href="https://monadicsheep.org/blog/#What%20Is%20a%20Canvas%3F">2. What Is a Canvas?</a></li>
+<li><a href="https://monadicsheep.org/blog/#Creating%20and%20Using%20A%20Canvas">3. Creating and Using A Canvas</a>
+<ul>
+<li><a href="https://monadicsheep.org/blog/#Canvas%20via%20Emacs%20Lisp%20Only">3.1. Canvas via Emacs Lisp Only</a></li>
+<li><a href="https://monadicsheep.org/blog/#Canvas%20via%20Dynamic%20Modules">3.2. Canvas via Dynamic Modules</a></li>
+</ul>
+</li>
+<li><a href="https://monadicsheep.org/blog/#Demonstrations">4. Demonstrations</a>
+<ul>
+<li><a href="https://monadicsheep.org/blog/#A%20Bouncing%20Ball">4.1. A Bouncing Ball</a></li>
+<li><a href="https://monadicsheep.org/blog/#Chaotic%20Double%20Pendulum">4.2. Chaotic Double Pendulum</a></li>
+<li><a href="https://monadicsheep.org/blog/#Points%20in%203D%20Space">4.3. Points in 3D Space</a></li>
+</ul>
+</li>
+<li><a href="https://monadicsheep.org/blog/#Conclusion%20%26%20Further%20Work">5. Conclusion &amp; Further Work</a></li>
+<li><a href="https://monadicsheep.org/blog/#Canvas%20Applications%20%26%20Resources">6. Canvas Applications &amp; Resources</a></li>
+</ul>
+</div>
+</nav>
+
+<p>
+The canvas patch has been finally <a href="https://cgit.git.savannah.gnu.org/cgit/emacs.git/commit/?id=d5f515e4a3350079330c2e80f3681d140d649c88">merged</a> to upstream GNU Emacs. If you have been following my <a href="https://mathstodon.xyz/@divyaranjan">Mastodon</a>, this was a journey that took us ~8 months. But finally we have, in core Emacs, a feature that I desperately desired in early 2025 when I was starting the <a href="https://codeberg.org/monadicsheep/emacs-reader">Emacs Reader</a> project: a way to update and manipulate images in Emacs without choking Emacs by putting the image data in strings. I went through a series of different hacks to overcome these limitations, some more successful than others, but thanks to the magnificent <a href="https://mastodon.world/@minad">Daniel</a> (aka minad) who <a href="https://www.reddit.com/r/emacs/comments/1qq2t41/comment/o2eae4i/">suggested the idea</a> of exposing a pixel buffer from within Emacs via the dynamic module API. That idea is now a feature in Emacs, and will be part of Emacs 32 release cycle. A more detailed history about this will be written later, for now this article is an introduction to the new feature, its API and what you can do using it. I will try to keep it as self-contained as I can, so that beginners are able to understand it. But first, we need to clarify certain misconceptions that people might have about this feature.
+</p>
+<div class="outline-2">
+<h2><span class="section-number-2">1.</span> Frequently Asked Questions</h2>
+<div class="outline-text-2">
+<ol>
+<li><p>
+<b>“Is this related to <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">HTML5 Canvas</a>?”</b>
+</p>
+
+<p>
+No. It has nothing to do with any web framework or technology. We call it “canvas” because it allows the user to draw arbitrarily on to a surface in an Emacs buffer. So at a high-level, both the HTML5 and Emacs canvas do the same thing, but they have zero relation in their implementation or how they work. HTML5 Canvas also has a more rich API with drawing functions and such, right now Emacs’ canvas API integrates with the existing image API and just provides access to the underlying pixel buffer via dynamic module API. See <a href="https://monadicsheep.org/blog/#Canvas%20via%20Dynamic%20Modules">Canvas via Dynamic Modules</a>.
+</p></li>
+
+<li><p>
+<b>“How is this different from SVG that Emacs has support for since a long time?”</b>
+</p>
+
+<p>
+Good question! So, at the level of an Emacs buffer the canvas looks and behaves just like any other Emacs image, including SVGs. Where it differs from SVG and other images is:
+</p>
+<ul>
+<li>a canvas’ <code>:data</code> is just ARGB32 pixel data (in strings or vectors), so no specific compressed format.</li>
+<li>the ability to access an Emacs Lisp image object from a lower level and be able to manipulate it</li>
+<li>update the image without having to call a full redisplay</li>
+</ul></li>
+
+<li><p>
+<b>“Isn’t this still limited by Emacs’ redisplay engine?”</b>
+</p>
+
+<p>
+Not entirely. We have a function called <code>canvas-refresh</code> that is to be called every time you wish to update the canvas, and this function doesn’t use/call Emacs’ <code>redisplay</code>, it has its own redrawing path that only updates the specific glyphs in the buffer that pertain to that canvas. Thus, whereas a <i>full</i> redisplay would cost more because it will try to update all the glyphs that changed, <code>canvas-refresh</code> only updates what needs to be. Since Emacs 25 we have <a href="https://lists.gnu.org/archive/html/emacs-diffs/2016-10/msg00307.html">double-buffering</a> so if that’s enabled in the frame you’d still need to call <code>redisplay</code> to flip the buffers, but that won’t slow down your canvas. If you’re not convinced, see the demos below that run smooth at 25, 30, and 60FPS without causing any lag to the rest of the Emacs session. Or, look at <a href="https://mathstodon.xyz/deck/@divyaranjan/116680642325816467">this</a> where I display a 2K60 FPS and a 720p 30FPS video side by side without Emacs missing a beat!
+</p></li>
+
+<li><p>
+<b>“Is this hardware-accelerated? If not, why are you not using the GPU for this?”</b>
+</p>
+
+<p>
+Because we simply don’t need it :D! A canvas simply exposes a pixel buffer, and Emacs simply redisplays it as it changes. You can get your pixels hardware accelerated outside of Emacs if you wish to, and then put them in canvas’ pixel buffer. This will give you hardware acceleration where you need it the most, pixel calculation, texture math, etc. Ideally, an introduction of a GPU powered redisplay within Emacs itself would be great and certainly help but one can still reap much of the benefits of HW acceleration from current Emacs via canvas.
+</p></li>
+</ol>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">2.</span> What Is a Canvas?</h2>
+<div class="outline-text-2">
+<p>
+Before answering that question, we should ask: “what is an image in GNU Emacs?” Everybody has seen Emacs display dazzling images since decades, and of varying formats. How does Emacs do that? Well, at the level of an Emacs buffer we have something called <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html">Text Properties</a> (also see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html">Overlay Properties</a>), as its name suggests it is a property list (aka plist) for a character position or a string within a buffer. Among the many properties a text can have, there’s a special one called the <code>display</code> <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Property.html">property</a>. This special property is responsible for how the text gets displayed. This is exactly what we use to display images! You use <code>create-image</code> to create an image object, which is exactly a plist, and then you set this image object (called an <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Defining-Images.html">image specification</a>) to be the <code>display</code> property of some text or <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html">overlay</a> (which are like text properties but without the "text", it’s an object that belongs to a particular buffer with specific beginning and end and along with properties just like for usual text).
+</p>
+
+<p>
+This is briefly how the API of how images work in GNU Emacs. The new canvas feature works in full compatibility with this API. In short, at the level of an Emacs buffer, a canvas <i>is</i> just another image type! Indeed, compiling the latest GNU Emacs from source and evaluating: <code class="src src-elisp">(image-type-available-p 'canvas)</code> should return a <code>t</code>.
+</p>
+
+<p>
+The immediate question then is: if Emacs already supported images, and if canvas just follows the same API, then what was the point of it? Why have a new image type, when we have XBM, PPM, PNG, GIF, SVG, etc.? Well, the two-fold short answer is:
+</p>
+
+<ol>
+<li>You need to pass image data via strings to create these objects and for most of the above formats it’s expensive to do so (except SVGs)</li>
+<li>Any arbitrary external image data cannot be directly displayed without throttling Emacs strings or objects, etc. (i.e., there’s no low-level access to the image data)</li>
+</ol>
+
+<p>
+With SVGs you can mostly do really good things as long as they are simple enough, the moment you lead to have complex graphics at high refresh rate, Emacs starts throttling.  I wanted in 2025 was exactly a way around this, a way to access the image Emacs is displaying at pixel-level so that I can update it in-place by fiddling with the pixels without having to pass strings or Emacs Lisp objects through the garbage collector. And this is what a canvas provides.
+</p>
+
+<p>
+So, there are two levels at which a canvas can be viewed and used:
+</p>
+
+<ol>
+<li>purely from Emacs Lisp as an image object</li>
+<li>as an ARGB32 pixel buffer via <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html">dynamic module API</a></li>
+</ol>
+
+<p>
+This allows for full integration with the existing Image API of Emacs while not sacrificing on low-level efficiency of being able to manipulate the pixel buffer directly. Now I will demonstrate how one can use the canvas in these two ways separately and/or simultaneously.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">3.</span> Creating and Using A Canvas</h2>
+<div class="outline-text-2">
+</div>
+<div class="outline-3">
+<h3><span class="section-number-3">3.1.</span> Canvas via Emacs Lisp Only</h3>
+<div class="outline-text-3">
+<p>
+Like usual Emacs images, one can create images either by using <code>create-image</code> or manually building the image spec plist. For a canvas, the latter approach would look like this:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> test-canvas `(image <span class="org-builtin">:type</span> canvas
+                          <span class="org-builtin">:id</span> test
+                          <span class="org-builtin">:data-width</span> 10
+                          <span class="org-builtin">:data-height</span> 10
+                          <span class="org-builtin">:data</span> nil))
+</pre>
+</div>
+
+<p>
+This is what a canvas image’s specification looks like, the only difference between this and other images (other than the obvious <code>:type canvas</code>) is that canvas images <i>need</i> an <code>:id</code> property, this is used to uniquely identify each canvas.
+</p>
+
+<p>
+If you used instead: <code class="src src-elisp">(<span class="org-keyword">setq</span> test-canvas (create-image nil 'canvas t))</code> to create the canvas, it would look almost the same:
+</p>
+
+<div class="org-src-container">
+<pre>(image <span class="org-builtin">:type</span> canvas <span class="org-builtin">:data</span> nil <span class="org-builtin">:scale</span> default <span class="org-builtin">:id</span> g138)
+</pre>
+</div>
+
+<p>
+Since, of course, we didn’t provide any <code>data</code> in either of the cases, they are not technically valid canvas images, but that is how it looks like. To make things more interesting, remember that the "data" that a canvas accepts is ARGB32 pixel arrays. This can be done via Emacs Lisp through either <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Converting-Representations.html">unibyte</a> strings or vectors. The latter is a bit easier to showcase, so I will go continue with that.
+</p>
+
+<p>
+First, let’s create our array of pixels. We use <code>make-vector</code>:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">A red square of 10x0 size
+</span>(<span class="org-keyword">setq</span> rect-vec (make-vector (* 10 10) #xFFFF0000))
+</pre>
+</div>
+
+<p>
+This creates a vector of 10x10 size containing each element as <code>#xFFFF0000</code> (red) 32-bit ARGB pixel. It’s literally an pixel by pixel array vector that contains the color red. This is valid data for our canvas, we can now create it manually:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> rect-canvas `(image <span class="org-builtin">:type</span> canvas
+                          <span class="org-builtin">:id</span> rect
+                          <span class="org-builtin">:data-width</span> 10
+                          <span class="org-builtin">:data-height</span> 10
+                          <span class="org-builtin">:data</span> ,rect-vec))
+</pre>
+</div>
+
+<p>
+Now we can simply display this:
+</p>
+
+<div class="org-src-container">
+<pre>(insert (propertize <span class="org-string">"#"</span> 'display rect-canvas))
+</pre>
+</div>
+
+<p>
+After evaluating the above, you’ll see a tiny red square in your buffer! Voila, we now have a small canvas!
+</p>
+</div>
+<div class="outline-4">
+<h4><span class="section-number-4">3.1.1.</span> Note on Canvas Refresh</h4>
+<div class="outline-text-4">
+<p>
+This might not seem too useful, because you can make a small rectangle via SVGs much quickly. The real value of canvas arises with the use of <code>canvas-refresh</code> function using which you can update the canvas without requiring a full redisplay. It only touches the glyphs which cover the particular canvas and updates them immediately. This is <i>significantly</i> cheaper than calling a <i>full</i> <code>redisplay</code> that will try to update <i>all</i> the changes.
+</p>
+
+<p>
+Also, <code>canvas-refresh</code> has an additional optional argument <code>RELOAD-DATA</code> which if non-<code>nil</code> will reload any new updated data (either via the <code>:data</code> property or change in <code>:file</code>) from the canvas. It will be demonstrated later how to use this function properly.
+</p>
+</div>
+</div>
+</div>
+<div class="outline-3">
+<h3><span class="section-number-3">3.2.</span> Canvas via Dynamic Modules</h3>
+<div class="outline-text-3">
+<p>
+As suggested in the introduction, canvases can be used either via Emacs Lisp and/or via dynamic modules. To know more about dynamic modules in Emacs and how to use them effectively, please consult my <a href="https://www.phimulambda.org/blog/emacs-dynamic-module.html">previous article</a> on it. Emacs 32 provides a simple API for dealing with canvases from dynamic modules. The idea is simple, once a canvas has been created you can simply call the <code>canavs_data</code> function on it and it will provide you with the pixel buffer associated with the canvas. Once again, this buffer is only valid for ARGB32 pixel data.
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-keyword">static</span> <span class="org-type">emacs_value</span>
+<span class="org-function-name">Fcanvas_update</span>(<span class="org-type">emacs_env</span>* <span class="org-variable-name">env</span>, <span class="org-type">ptrdiff_t</span> <span class="org-variable-name">nargs</span>, <span class="org-type">emacs_value</span> <span class="org-variable-name">args</span>[], <span class="org-type">void</span>* <span class="org-variable-name">data</span>) {
+  <span class="org-type">emacs_value</span> <span class="org-variable-name">canvas</span> = env-&gt;args[0];
+  <span class="org-type">uint32_t</span> *<span class="org-variable-name">canvas_pixel</span> = env-&gt;canvas_data(env, canvas); <span class="org-comment-delimiter">// </span><span class="org-comment">accessing canvas' pixel buffer
+</span>  <span class="org-keyword">if</span> (canvas_pixel)
+    {
+      <span class="org-comment-delimiter">// </span><span class="org-comment">do some pixel manipulation to the canvas pixel
+</span>    }
+}
+
+env-&gt;funcall(env, env-&gt;intern(env, <span class="org-string">"canvas-refresh"</span>), (emacs_value[])[rect_canvas, Qnil]);
+</pre>
+</div>
+
+<p>
+The above dynamic module function, when embedded in a legitimate dynamic module, compiled and loaded via <code>module-load</code>, would result in updating the canvas repeatedly by changing the colors (or whatever the pixel manipulation code does). This is how we can surpass Emacs Lisp’s limitations by accessing a low-level representation of the canvas we can manipulate directly. And since <code>canvas-refresh</code> avoids throttling Emacs’ full <code>redisplay</code> we do not encounter any slowness at all! And since we don’t use <code>:data</code> via Emacs Lisp image spec, whenever canvas is used via dynamic modules the <code>RELOAD-DATA</code> argument of <code>canvas-refresh</code> is to be <code>nil</code>.
+</p>
+</div>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">4.</span> Demonstrations</h2>
+<div class="outline-text-2">
+<p>
+Here we showcase a few neat graphical animations you can do with canvas, both in Emacs Lisp and dynamic modules. For our previous demonstrations, consult <a href="https://tusharhero.codeberg.page/emacs-pale-canvas-and-stuff-demos.html">Tushar’s blog post</a> where he collects all of the experiments I did with and without Emacs. Also, look at the <a href="https://github.com/minad/emacs-canvas-patch">Minad's emacs-canvas-patch</a> which has some basic demos (including a fancy mode-line one!). The first two of the demos below would be purely in Emacs Lisp and the last one would be in C via a dynamic module.
+</p>
+</div>
+<div class="outline-3">
+<h3><span class="section-number-3">4.1.</span> A Bouncing Ball</h3>
+<div class="outline-text-3">
+<p>
+Let’s start with creating and setting up our canvas. We’ll go with dark violet (<code>#xFF8B00FF</code>) for the background:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> W 250
+      H 250
+      BG #xFF8B00FF)
+(<span class="org-keyword">setq</span> ball-canvas-vec (make-vector (* W H) BG))
+(<span class="org-keyword">setq</span> ball-canvas `(image <span class="org-builtin">:type</span> canvas
+                          <span class="org-builtin">:id</span> rect
+                          <span class="org-builtin">:data-width</span> ,W
+                          <span class="org-builtin">:data-height</span> ,H
+                          <span class="org-builtin">:data</span> ,ball-canvas-vec))
+(insert (propertize <span class="org-string">"#"</span> 'display ball-canvas))
+</pre>
+</div>
+
+<p>
+This is exactly what we did in the previous section, just in violet! Now is the interesting part, we want this 250x250 pixel canvas to have a ball bouncing. Well, first we prepare the ball, it will have some radius, an initial position and some initial velocity (and color!):
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> ball-radius 10)
+(<span class="org-keyword">setq</span> bx (/ W 2)
+      by (/ H 2)) <span class="org-comment-delimiter">; </span><span class="org-comment">start from the center
+</span>(<span class="org-keyword">setq</span> dx 4
+      dy 3) <span class="org-comment-delimiter">; </span><span class="org-comment">initial velocity
+</span>(<span class="org-keyword">setq</span> ball-color #xFFFFFF00) <span class="org-comment-delimiter">; </span><span class="org-comment">yellow</span>
+</pre>
+</div>
+
+<p>
+Now we need to actually draw the ball, now I will ask you to remind yourself of some analytical geometry for this! The way we draw the ball is we take a point to be the center of the circle and check if we can build a circle around a certain bounding box. If <code>ball-radius</code> is 15, thus the diameter is 30, so we need at least a 30x30 square to fit the circle. Now to draw the actual circle, we’ll use the equation for a circle:
+</p>
+
+<p>
+
+  
+    
+      
+        
+          x
+          2
+        
+        +
+        
+          y
+          2
+        
+      
+      ≤
+      
+        r
+        2
+      
+    
+    
+      
+        
+        
+          
+          
+            superscript
+            𝑥
+            2
+          
+          
+            superscript
+            𝑦
+            2
+          
+        
+        
+          superscript
+          𝑟
+          2
+        
+      
+    
+    x^{2}+y^{2}\leq r^{2}
+  
+
+</p>
+
+<p>
+Putting this in Emacs Lisp, we get:
+</p>
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">draw-ball</span> (cx cy color)
+  (<span class="org-keyword">let</span> ((r2 (* ball-radius ball-radius))) <span class="org-comment-delimiter">; </span><span class="org-comment">Radius squared
+</span>    <span class="org-comment-delimiter">;; </span><span class="org-comment">the nested loop checks for the circle within the square
+</span>    (<span class="org-keyword">dotimes</span> (y-off (1+ (* 2 ball-radius)))
+      (<span class="org-keyword">dotimes</span> (x-off (1+ (* 2 ball-radius)))
+        (<span class="org-keyword">let*</span> ((px (+ cx (- x-off ball-radius)))
+               (py (+ cy (- y-off ball-radius)))
+               (dx-local (- px cx)) <span class="org-comment-delimiter">; </span><span class="org-comment">Horizontal distance from center
+</span>               (dy-local (- py cy)) <span class="org-comment-delimiter">; </span><span class="org-comment">Vertical distance from center
+</span>               (dist2 (+ (* dx-local dx-local) (* dy-local dy-local)))) <span class="org-comment-delimiter">; </span><span class="org-comment">squared distance using pythagorean theorem
+</span>          <span class="org-comment-delimiter">;; </span><span class="org-comment">check if pixel is inside the circle AND inside the canvas bounds
+</span>          (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> (&gt;= px 0) (&lt; px W) (&gt;= py 0) (&lt; py H) (&lt;= dist2 r2))
+            (aset ball-canvas-vec (+ (* py W) px) color)))))))
+</pre>
+</div>
+
+<p>
+The above function should make sense, while it is not the most efficient way to draw a ball, it’s relatively simple enough for the demonstration. Now we simply need to check the physics for making sure it stays within the canvas:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">ball-bounce</span> ()
+  (<span class="org-keyword">setq</span> bx (+ bx dx) by (+ by dy))
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">compare with ball-radius so the *edge* of the circle bounces, not the center.
+</span>  (<span class="org-keyword">when</span> (&lt;= bx ball-radius) (<span class="org-keyword">setq</span> dx (abs dx)) (<span class="org-keyword">setq</span> bx ball-radius))
+  (<span class="org-keyword">when</span> (&gt;= bx (- W ball-radius)) (<span class="org-keyword">setq</span> dx (- (abs dx))) (<span class="org-keyword">setq</span> bx (- W ball-radius)))
+  (<span class="org-keyword">when</span> (&lt;= by ball-radius) (<span class="org-keyword">setq</span> dy (abs dy)) (<span class="org-keyword">setq</span> by ball-radius))
+  (<span class="org-keyword">when</span> (&gt;= by (- H ball-radius)) (<span class="org-keyword">setq</span> dy (- (abs dy))) (<span class="org-keyword">setq</span> by (- H ball-radius))))
+</pre>
+</div>
+
+<p>
+And now we simply do it in a loop!
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> ball-frame 0)
+(<span class="org-keyword">setq</span> max-ball-frames 2000)
+(<span class="org-keyword">defun</span> <span class="org-function-name">ball-loop</span> ()
+  (<span class="org-keyword">if</span> (&gt;= ball-frame max-ball-frames)
+      (cancel-timer ball-timer)
+    (<span class="org-keyword">setq</span> ball-frame (1+ ball-frame))
+    (draw-ball bx by BG) <span class="org-comment-delimiter">; </span><span class="org-comment">make old ball invisible (turn it into background color)
+</span>    (ball-bounce)
+    (draw-ball bx by ball-color)
+    (canvas-refresh ball-canvas t)))
+(<span class="org-keyword">setq</span> ball-timer (run-with-timer 0 0.02 'ball-loop))
+</pre>
+</div>
+
+<p>
+Evaluate it all and you would have a yellow ball bouncing inside a violet square. It automatically stops after 2000 frames, but you can have it go on indefinitely as well! Here’s what it will look like:
+</p>
+
+<video><p>Yellow ball bouncing inside a violet canvas.</p></video>
+</div>
+</div>
+<div class="outline-3">
+<h3><span class="section-number-3">4.2.</span> Chaotic Double Pendulum</h3>
+<div class="outline-text-3">
+<aside>
+<p>
+Now obviously I can’t go over all the math in detail, if you’re interested I’ll refer the reader to the classic Goldstein, Poole &amp; Sako’s <i>Classical Mechanics</i> or Landau &amp; Lifshitz’s <i>Course of Theoretical Physics, Vol. I</i>. But since you, the reader, are likely a Lisper, a better book would be Sussman &amp; Wisdom’s <i>Structure and Interpretation of Classical Mechanics</i>.
+</p>
+</aside>
+
+<p>
+One of the things that fascinated me when I was studying classical mechanics for the first time was the <a href="https://en.wikipedia.org/wiki/Double_pendulum">double pendulum</a>. The math underlying this: the <a href="https://en.wikipedia.org/wiki/Euler%E2%80%93Lagrange_equation">Euler-Lagrange equation</a> and <a href="https://en.wikipedia.org/wiki/Calculus_of_variations">variational calculus</a> in general was also very fascinating to me. If you think it’s not, I suggest you look into the history and math behind the <a href="https://en.wikipedia.org/wiki/Brachistochrone_curve">Brachistochrone curve</a>. It’s evident from all this, that I want to put this into visualization using canvas!
+</p>
+
+<p>
+The two equations in Lagrangians which describes the chaotic system:
+</p>
+
+
+<div class="equation-container">
+<span class="equation">
+
+  
+    
+      
+        
+          θ
+          ¨
+        
+        1
+      
+      =
+      
+        
+          
+            
+              
+                −
+                
+                  
+                    m
+                    2
+                  
+                  ⁢
+                  
+                    cos
+                    ⁡
+                    
+                      (
+                      
+                        
+                          θ
+                          1
+                        
+                        −
+                        
+                          θ
+                          2
+                        
+                      
+                      )
+                    
+                  
+                  ⁢
+                  
+                    l
+                    1
+                  
+                  ⁢
+                  
+                    
+                      θ
+                      ˙
+                    
+                    1
+                    2
+                  
+                  ⁢
+                  
+                    sin
+                    ⁡
+                    
+                      (
+                      
+                        
+                          θ
+                          1
+                        
+                        −
+                        
+                          θ
+                          2
+                        
+                      
+                      )
+                    
+                  
+                
+              
+              +
+              
+                
+                  m
+                  2
+                
+                ⁢
+                
+                  cos
+                  ⁡
+                  
+                    (
+                    
+                      
+                        θ
+                        1
+                      
+                      −
+                      
+                        θ
+                        2
+                      
+                    
+                    )
+                  
+                
+                ⁢
+                g
+                ⁢
+                
+                  sin
+                  ⁡
+                  
+                    (
+                    
+                      θ
+                      2
+                    
+                    )
+                  
+                
+              
+            
+            −
+            
+              
+                m
+                2
+              
+              ⁢
+              
+                l
+                2
+              
+              ⁢
+              
+                
+                  θ
+                  ˙
+                
+                2
+                2
+              
+              ⁢
+              
+                sin
+                ⁡
+                
+                  (
+                  
+                    
+                      θ
+                      1
+                    
+                    −
+                    
+                      θ
+                      2
+                    
+                  
+                  )
+                
+              
+            
+            −
+            
+              
+                (
+                
+                  
+                    m
+                    1
+                  
+                  +
+                  
+                    m
+                    2
+                  
+                
+                )
+              
+              ⁢
+              g
+              ⁢
+              
+                sin
+                ⁡
+                
+                  (
+                  
+                    θ
+                    1
+                  
+                  )
+                
+              
+            
+          
+          
+            
+              l
+              1
+            
+            ⁢
+            
+              (
+              
+                
+                  
+                    m
+                    1
+                  
+                  +
+                  
+                    m
+                    2
+                  
+                
+                −
+                
+                  
+                    m
+                    2
+                  
+                  ⁢
+                  
+                    
+                      cos
+                      2
+                    
+                    ⁡
+                    
+                      (
+                      
+                        
+                          θ
+                          1
+                        
+                        −
+                        
+                          θ
+                          2
+                        
+                      
+                      )
+                    
+                  
+                
+              
+              )
+            
+          
+        
+      
+    
+    
+      
+        
+        
+          subscript
+          
+            ¨
+            𝜃
+          
+          1
+        
+        
+          
+          
+            
+            
+              
+              
+                
+                
+                  
+                  
+                    subscript
+                    𝑚
+                    2
+                  
+                  
+                    
+                    
+                      
+                      
+                        subscript
+                        𝜃
+                        1
+                      
+                      
+                        subscript
+                        𝜃
+                        2
+                      
+                    
+                  
+                  
+                    subscript
+                    𝑙
+                    1
+                  
+                  
+                    superscript
+                    
+                      subscript
+                      
+                        ˙
+                        𝜃
+                      
+                      1
+                    
+                    2
+                  
+                  
+                    
+                    
+                      
+                      
+                        subscript
+                        𝜃
+                        1
+                      
+                      
+                        subscript
+                        𝜃
+                        2
+                      
+                    
+                  
+                
+              
+              
+                
+                
+                  subscript
+                  𝑚
+                  2
+                
+                
+                  
+                  
+                    
+                    
+                      subscript
+                      𝜃
+                      1
+                    
+                    
+                      subscript
+                      𝜃
+                      2
+                    
+                  
+                
+                𝑔
+                
+                  
+                  
+                    subscript
+                    𝜃
+                    2
+                  
+                
+              
+            
+            
+              
+              
+                subscript
+                𝑚
+                2
+              
+              
+                subscript
+                𝑙
+                2
+              
+              
+                superscript
+                
+                  subscript
+                  
+                    ˙
+                    𝜃
+                  
+                  2
+                
+                2
+              
+              
+                
+                
+                  
+                  
+                    subscript
+                    𝜃
+                    1
+                  
+                  
+                    subscript
+                    𝜃
+                    2
+                  
+                
+              
+            
+            
+              
+              
+                
+                
+                  subscript
+                  𝑚
+                  1
+                
+                
+                  subscript
+                  𝑚
+                  2
+                
+              
+              𝑔
+              
+                
+                
+                  subscript
+                  𝜃
+                  1
+                
+              
+            
+          
+          
+            
+            
+              subscript
+              𝑙
+              1
+            
+            
+              
+              
+                
+                
+                  subscript
+                  𝑚
+                  1
+                
+                
+                  subscript
+                  𝑚
+                  2
+                
+              
+              
+                
+                
+                  subscript
+                  𝑚
+                  2
+                
+                
+                  
+                    superscript
+                    
+                    2
+                  
+                  
+                    
+                    
+                      subscript
+                      𝜃
+                      1
+                    
+                    
+                      subscript
+                      𝜃
+                      2
+                    
+                  
+                
+              
+            
+          
+        
+      
+    
+    \displaystyle\ddot{\theta}_{1}=\frac{-m_{2}\cos(\theta_{1}-\theta_{2})\,l_{1}%
+\dot{\theta}_{1}^{2}\sin(\theta_{1}-\theta_{2})+m_{2}\cos(\theta_{1}-\theta_{2%
+})\,g\sin(\theta_{2})-m_{2}l_{2}\dot{\theta}_{2}^{2}\sin(\theta_{1}-\theta_{2}%
+)-(m_{1}+m_{2})g\sin(\theta_{1})}{l_{1}\left(m_{1}+m_{2}-m_{2}\cos^{2}(\theta_%
+{1}-\theta_{2})\right)}
+  
+
+</span>
+</div>
+
+
+<div class="equation-container">
+<span class="equation">
+
+  
+    
+      
+        
+          θ
+          ¨
+        
+        2
+      
+      =
+      
+        
+          
+            
+              (
+              
+                
+                  m
+                  1
+                
+                +
+                
+                  m
+                  2
+                
+              
+              )
+            
+            ⁢
+            
+              (
+              
+                
+                  
+                    
+                      l
+                      1
+                    
+                    ⁢
+                    
+                      
+                        θ
+                        ˙
+                      
+                      1
+                      2
+                    
+                    ⁢
+                    
+                      sin
+                      ⁡
+                      
+                        (
+                        
+                          
+                            θ
+                            1
+                          
+                          −
+                          
+                            θ
+                            2
+                          
+                        
+                        )
+                      
+                    
+                  
+                  +
+                  
+                    
+                      
+                        
+                          
+                            θ
+                            ˙
+                          
+                          2
+                          2
+                        
+                        ⁢
+                        
+                          sin
+                          ⁡
+                          
+                            (
+                            
+                              
+                                θ
+                                1
+                              
+                              −
+                              
+                                θ
+                                2
+                              
+                            
+                            )
+                          
+                        
+                        ⁢
+                        
+                          cos
+                          ⁡
+                          
+                            (
+                            
+                              
+                                θ
+                                1
+                              
+                              −
+                              
+                                θ
+                                2
+                              
+                            
+                            )
+                          
+                        
+                        ⁢
+                        
+                          m
+                          2
+                        
+                        ⁢
+                        
+                          l
+                          2
+                        
+                      
+                      
+                        
+                          m
+                          1
+                        
+                        +
+                        
+                          m
+                          2
+                        
+                      
+                    
+                  
+                  +
+                  
+                    
+                      cos
+                      ⁡
+                      
+                        (
+                        
+                          
+                            θ
+                            1
+                          
+                          −
+                          
+                            θ
+                            2
+                          
+                        
+                        )
+                      
+                    
+                    ⁢
+                    g
+                    ⁢
+                    
+                      sin
+                      ⁡
+                      
+                        (
+                        
+                          θ
+                          1
+                        
+                        )
+                      
+                    
+                  
+                
+                −
+                
+                  g
+                  ⁢
+                  
+                    sin
+                    ⁡
+                    
+                      (
+                      
+                        θ
+                        2
+                      
+                      )
+                    
+                  
+                
+              
+              )
+            
+          
+          
+            
+              l
+              2
+            
+            ⁢
+            
+              (
+              
+                
+                  m
+                  1
+                
+                +
+                
+                  
+                    m
+                    2
+                  
+                  ⁢
+                  
+                    
+                      sin
+                      2
+                    
+                    ⁡
+                    
+                      (
+                      
+                        
+                          θ
+                          1
+                        
+                        −
+                        
+                          θ
+                          2
+                        
+                      
+                      )
+                    
+                  
+                
+              
+              )
+            
+          
+        
+      
+    
+    
+      
+        
+        
+          subscript
+          
+            ¨
+            𝜃
+          
+          2
+        
+        
+          
+          
+            
+            
+              
+              
+                subscript
+                𝑚
+                1
+              
+              
+                subscript
+                𝑚
+                2
+              
+            
+            
+              
+              
+                
+                
+                  
+                  
+                    subscript
+                    𝑙
+                    1
+                  
+                  
+                    superscript
+                    
+                      subscript
+                      
+                        ˙
+                        𝜃
+                      
+                      1
+                    
+                    2
+                  
+                  
+                    
+                    
+                      
+                      
+                        subscript
+                        𝜃
+                        1
+                      
+                      
+                        subscript
+                        𝜃
+                        2
+                      
+                    
+                  
+                
+                
+                  
+                  
+                    
+                    
+                      superscript
+                      
+                        subscript
+                        
+                          ˙
+                          𝜃
+                        
+                        2
+                      
+                      2
+                    
+                    
+                      
+                      
+                        
+                        
+                          subscript
+                          𝜃
+                          1
+                        
+                        
+                          subscript
+                          𝜃
+                          2
+                        
+                      
+                    
+                    
+                      
+                      
+                        
+                        
+                          subscript
+                          𝜃
+                          1
+                        
+                        
+                          subscript
+                          𝜃
+                          2
+                        
+                      
+                    
+                    
+                      subscript
+                      𝑚
+                      2
+                    
+                    
+                      subscript
+                      𝑙
+                      2
+                    
+                  
+                  
+                    
+                    
+                      subscript
+                      𝑚
+                      1
+                    
+                    
+                      subscript
+                      𝑚
+                      2
+                    
+                  
+                
+                
+                  
+                  
+                    
+                    
+                      
+                      
+                        subscript
+                        𝜃
+                        1
+                      
+                      
+                        subscript
+                        𝜃
+                        2
+                      
+                    
+                  
+                  𝑔
+                  
+                    
+                    
+                      subscript
+                      𝜃
+                      1
+                    
+                  
+                
+              
+              
+                
+                𝑔
+                
+                  
+                  
+                    subscript
+                    𝜃
+                    2
+                  
+                
+              
+            
+          
+          
+            
+            
+              subscript
+              𝑙
+              2
+            
+            
+              
+              
+                subscript
+                𝑚
+                1
+              
+              
+                
+                
+                  subscript
+                  𝑚
+                  2
+                
+                
+                  
+                    superscript
+                    
+                    2
+                  
+                  
+                    
+                    
+                      subscript
+                      𝜃
+                      1
+                    
+                    
+                      subscript
+                      𝜃
+                      2
+                    
+                  
+                
+              
+            
+          
+        
+      
+    
+    \displaystyle\ddot{\theta}_{2}=\frac{(m_{1}+m_{2})\left(l_{1}\dot{\theta}_{1}^%
+{2}\sin(\theta_{1}-\theta_{2})+\dfrac{\dot{\theta}_{2}^{2}\sin(\theta_{1}-%
+\theta_{2})\cos(\theta_{1}-\theta_{2})\,m_{2}l_{2}}{m_{1}+m_{2}}+\cos(\theta_{%
+1}-\theta_{2})\,g\sin(\theta_{1})-g\sin(\theta_{2})\right)}{l_{2}\left(m_{1}+m%
+_{2}\sin^{2}(\theta_{1}-\theta_{2})\right)}
+  
+
+</span>
+</div>
+
+<p>
+Now let’s create the canvas as usual with black background and display it like before:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> W 250
+      H 250
+      BG #xFF101010)
+(<span class="org-keyword">setq</span> canvas-vec (make-vector (* W H) BG))
+(<span class="org-keyword">setq</span> canvas `(image <span class="org-builtin">:type</span> canvas <span class="org-builtin">:id</span> dp <span class="org-builtin">:data-width</span> ,W <span class="org-builtin">:data-height</span> ,H <span class="org-builtin">:data</span> ,canvas-vec))
+(insert (propertize <span class="org-string">"#"</span> 'display canvas))
+</pre>
+</div>
+
+<p>
+We set some constants: gravity, length of rods, and delta time:
+</p>
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> g 9.8
+      L 60.0
+      dt 0.05)
+</pre>
+</div>
+
+<p>
+We set some initial conditions for the angles 
+  
+    
+      θ
+      1
+    
+    
+      
+        subscript
+        𝜃
+        1
+      
+    
+    \theta_{1}
+  
+ and 
+  
+    
+      θ
+      2
+    
+    
+      
+        subscript
+        𝜃
+        2
+      
+    
+    \theta_{2}
+  
+ ; angular velocities 
+  
+    
+      w
+      1
+    
+    
+      
+        subscript
+        𝑤
+        1
+      
+    
+    w_{1}
+  
+ and 
+  
+    
+      w
+      2
+    
+    
+      
+        subscript
+        𝑤
+        2
+      
+    
+    w_{2}
+  
+, and a fixedd anchor point:
+</p>
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> th1 2.5
+      th2 2.5
+      w1 0.0
+      w2 0.0)
+(<span class="org-keyword">setq</span> pivot-x 125
+      pivot-y 80)
+</pre>
+</div>
+
+<p>
+We need some helpers, we already have the ball one from before and one for drawing a line/rod and to set a pixel in the vector:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">set-px</span> (x y color)
+  (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> (&gt;= x 0) (&lt; x W) (&gt;= y 0) (&lt; y H))
+    (aset canvas-vec (+ (* (truncate y) W) (truncate x)) color)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">draw-line</span> (x0 y0 x1 y1 color)
+  (<span class="org-keyword">let*</span> ((x0 (truncate x0)) (y0 (truncate y0))
+         (x1 (truncate x1)) (y1 (truncate y1))
+         (dx (abs (- x1 x0))) (dy (abs (- y1 y0)))
+         (sx (<span class="org-keyword">if</span> (&lt; x0 x1) 1 -1)) (sy (<span class="org-keyword">if</span> (&lt; y0 y1) 1 -1))
+         (err (- dx dy)) e2)
+    (<span class="org-keyword">while</span> (not (<span class="org-keyword">and</span> (= x0 x1) (= y0 y1)))
+      (set-px x0 y0 color)
+      (<span class="org-keyword">setq</span> e2 (* 2 err))
+      (<span class="org-keyword">when</span> (&gt; e2 (- dy))
+        (<span class="org-keyword">setq</span> err (- err dy))
+        (<span class="org-keyword">setq</span> x0 (+ x0 sx)))
+      (<span class="org-keyword">when</span> (&lt; e2 dx)
+        (<span class="org-keyword">setq</span> err (+ err dx))
+        (<span class="org-keyword">setq</span> y0 (+ y0 sy))))
+    (set-px x0 y0 color)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">draw-circ</span> (cx cy r color)
+  (<span class="org-keyword">let</span> ((r2 (* r r)))
+    (<span class="org-keyword">dotimes</span> (y (* 2 r)) (<span class="org-keyword">dotimes</span> (x (* 2 r))
+                           (<span class="org-keyword">let*</span> ((px (+ (- cx r) x)) (py (+ (- cy r) y))
+                                  (dx (- px cx)) (dy (- py cy)))
+                             (<span class="org-keyword">when</span> (&lt;= (+ (* dx dx) (* dy dy)) r2)
+                               (set-px px py color)))))))
+</pre>
+</div>
+
+<p>
+And now the main procedure that takes care of the pendulum movment:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">pendulum-physics</span> ()
+  (<span class="org-keyword">let*</span> ((dth (- th1 th2))
+         (den (- 3.0 (cos (* 2.0 dth))))
+         (num1 (+ (* (- g) 3.0 (sin th1))
+                  (* (- g) (sin (- th1 (* 2.0 th2))))
+                  (* (- 2.0) (sin dth) (+ (* w2 w2 L) (* w1 w1 L (cos dth))))))
+         (a1 (/ num1 (* L den)))
+         (num2 (* 2.0 (sin dth)
+                  (+ (* 2.0 w1 w1 L)
+                     (* 2.0 g (cos th1))
+                     (* w2 w2 L (cos dth)))))
+         (a2 (/ num2 (* L den))))
+    (<span class="org-keyword">setq</span> w1 (+ w1 (* a1 dt)) w2 (+ w2 (* a2 dt)))
+    (<span class="org-keyword">setq</span> th1 (+ th1 (* w1 dt)) th2 (+ th2 (* w2 dt)))))
+</pre>
+</div>
+
+<p>
+The exercise is left to the reader to make sure the above code follows the math! Specifically compare the two equations we introduced initially with the above procedure. And now the main game loop:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">pendulum-loop</span> ()
+  (<span class="org-keyword">dotimes</span> (i 12) (pendulum-physics))
+  (fillarray canvas-vec BG)
+  (<span class="org-keyword">let*</span> ((x1 (+ pivot-x (* L (sin th1))))
+         (y1 (+ pivot-y (* L (cos th1))))
+         (x2 (+ x1 (* L (sin th2))))
+         (y2 (+ y1 (* L (cos th2)))))
+    (draw-line pivot-x pivot-y x1 y1 #xFF888888)
+    (draw-line x1 y1 x2 y2 #xFF888888)
+    (draw-circ x1 y1 8 #xFF00FF00)
+    (draw-circ x2 y2 8 #xFFFF0000)
+    (set-px pivot-x pivot-y #xFFFFFFFF))
+  (canvas-refresh canvas t))
+(<span class="org-keyword">setq</span> my-timer (run-with-timer 0 0.05 'pendulum-loop))
+</pre>
+</div>
+
+<p>
+And once evaluated, it will look something like this:
+</p>
+
+<video><p>A chaotic double pendulum rendered inside Emacs canvas at 20FPS</p></video>
+
+<p>
+One can enable interactivity here by making the mouse be able to drag the pendulum and set the initial positions, this is very much doable by using Emacs’ <code>track-mouse</code> functionality. I am not including it here because it’ll be too complex.
+</p>
+</div>
+</div>
+<div class="outline-3">
+<h3><span class="section-number-3">4.3.</span> Points in 3D Space</h3>
+<div class="outline-text-3">
+<p>
+This demo is borrowed from Alexey Kutepov, aka <a href="https://github.com/rexim">tsoding</a>. They built a graphics library called <a href="https://tsoding.github.io/olive.c/">olive.c</a>. The following demo is <a href="https://github.com/tsoding/olive.c/blob/master/demos/dots3d.c">Dots3D example</a> from olive.c. Since this is a dynamic module, all the pixel manipulation math would be happening in C and on the Emacs Lisp side we will take care of creating and displaying the canvas and just calling the dynamic module function in a timer to update the canvas. While the original demo didn’t have any mouse interactivity, we can include it in ours quite easily.
+</p>
+
+<p>
+After doing the mandatory <code>int plugin_is_GPL_compatible</code> we define some constants in the dynamic module:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-preprocessor">#define</span> <span class="org-variable-name">WIDTH</span> 960
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">HEIGHT</span> 720
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">BACKGROUND_COLOR</span> 0xFF181818
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">GRID_COUNT</span> 10
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">GRID_PAD</span> (0.5f/GRID_COUNT)
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">GRID_SIZE</span> ((GRID_COUNT - 1)*GRID_PAD)
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">CIRCLE_RADIUS</span> 5
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">Z_START</span> 0.25f
+</pre>
+</div>
+
+<p>
+We’ve just inherited them from the original demo’s code. Now we need one helper to draw the actual circles/points in this grid/space. We can just convert into C the code we wrote earlier for drawing circles:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-type">void</span> <span class="org-function-name">draw_circle</span>(<span class="org-type">uint32_t</span> *<span class="org-variable-name">pixels</span>, <span class="org-type">int</span> <span class="org-variable-name">cx</span>, <span class="org-type">int</span> <span class="org-variable-name">cy</span>, <span class="org-type">int</span> <span class="org-variable-name">r</span>, <span class="org-type">uint32_t</span> <span class="org-variable-name">color</span>) {
+  <span class="org-type">int</span> <span class="org-variable-name">r2</span> = r * r;
+  <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">y</span> = -r; y &lt;= r; ++y) {
+    <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">x</span> = -r; x &lt;= r; ++x) {
+      <span class="org-keyword">if</span> (x*x + y*y &lt;= r2) {
+        <span class="org-type">int</span> <span class="org-variable-name">px</span> = cx + x; <span class="org-type">int</span> <span class="org-variable-name">py</span> = cy + y;
+        <span class="org-keyword">if</span> (px &gt;= 0 &amp;&amp; px &lt; WIDTH &amp;&amp; py &gt;= 0 &amp;&amp; py &lt; HEIGHT)
+          pixels[py * WIDTH + px] = color;
+      }
+    }
+  }
+}
+</pre>
+</div>
+
+<p>
+Now we need to write the actual module function that will be called from Emacs. Firstly, what should this function’s signature be? Since it’s a module function, it has to be like this:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-keyword">static</span> <span class="org-type">emacs_value</span> <span class="org-function-name">render</span>(<span class="org-type">emacs_env</span>* <span class="org-variable-name">env</span>, <span class="org-type">ptrdiff_t</span> <span class="org-variable-name">nargs</span>, <span class="org-type">emacs_value</span> <span class="org-variable-name">args</span>[], <span class="org-type">void</span>* <span class="org-variable-name">data</span>)
+</pre>
+</div>
+
+<p>
+But what should be its arguments when called? Well, firstly it needs the canvas where it will render to. It will also need as arguments the angles from which to render the whole grid, because the grid must be rotating, so the angles will be changing continuously. So let’s get those arguments, and get access to the canvas’ pixel buffer as well:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-keyword">static</span> <span class="org-type">emacs_value</span> <span class="org-function-name">render</span>(<span class="org-type">emacs_env</span>* <span class="org-variable-name">env</span>, <span class="org-type">ptrdiff_t</span> <span class="org-variable-name">nargs</span>, <span class="org-type">emacs_value</span> <span class="org-variable-name">args</span>[], <span class="org-type">void</span>* <span class="org-variable-name">data</span>) {
+    <span class="org-type">emacs_value</span> <span class="org-variable-name">canvas</span> = args[0];
+    <span class="org-type">float</span> <span class="org-variable-name">angle_x</span> = env-&gt;extract_float(env, args[1]);
+    <span class="org-type">float</span> <span class="org-variable-name">angle_y</span> = env-&gt;extract_float(env, args[2]);
+
+    <span class="org-type">uint32_t</span>* <span class="org-variable-name">pixels</span> = env-&gt;canvas_data(env, canvas);
+    <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>pixels) <span class="org-keyword">return</span> Qnil;
+}
+</pre>
+</div>
+
+<p>
+Now the background must be painted, for which we’ll just loop through all the pixels and set them to <code>BACKGROUND_COLOR</code>. We’ll also get some <code>float</code> valuees for the upcoming math. We clearly need some camera math to make it move as well, and since we are in 3D we’ll need a 3-level nested <code>for</code> loop. So here’s what the final function looks like:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-keyword">static</span> <span class="org-type">emacs_value</span> <span class="org-function-name">render</span>(<span class="org-type">emacs_env</span>* <span class="org-variable-name">env</span>, <span class="org-type">ptrdiff_t</span> <span class="org-variable-name">nargs</span>, <span class="org-type">emacs_value</span> <span class="org-variable-name">args</span>[], <span class="org-type">void</span>* <span class="org-variable-name">data</span>) {
+    <span class="org-type">emacs_value</span> <span class="org-variable-name">canvas</span> = args[0];
+    <span class="org-type">float</span> <span class="org-variable-name">angle_x</span> = env-&gt;extract_float(env, args[1]);
+    <span class="org-type">float</span> <span class="org-variable-name">angle_y</span> = env-&gt;extract_float(env, args[2]);
+
+    <span class="org-type">uint32_t</span>* <span class="org-variable-name">pixels</span> = env-&gt;canvas_data(env, canvas);
+    <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>pixels) <span class="org-keyword">return</span> Qnil;
+
+    <span class="org-keyword">for</span>(<span class="org-type">int</span> <span class="org-variable-name">i</span> = 0; i &lt; WIDTH * HEIGHT; ++i) pixels[i] = BACKGROUND_COLOR;
+
+    <span class="org-type">float</span> <span class="org-variable-name">cos_x</span> = cosf(angle_x), <span class="org-variable-name">sin_x</span> = sinf(angle_x);
+    <span class="org-type">float</span> <span class="org-variable-name">cos_y</span> = cosf(angle_y), <span class="org-variable-name">sin_y</span> = sinf(angle_y);
+
+    <span class="org-type">float</span> <span class="org-variable-name">camera_distance</span> = 0.8f;  <span class="org-comment-delimiter">// </span><span class="org-comment">How far the camera is from the center (Lower = closer)
+</span>    <span class="org-type">float</span> <span class="org-variable-name">focal_length</span> = 800.0f;   <span class="org-comment-delimiter">// </span><span class="org-comment">The "zoom" multiplier (Higher = more zoomed in)
+</span>
+    <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">ix</span> = 0; ix &lt; GRID_COUNT; ++ix) {
+        <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">iy</span> = 0; iy &lt; GRID_COUNT; ++iy) {
+            <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">iz</span> = 0; iz &lt; GRID_COUNT; ++iz) {
+                <span class="org-type">float</span> <span class="org-variable-name">x</span> = ix*GRID_PAD - GRID_SIZE/2.0f;
+                <span class="org-type">float</span> <span class="org-variable-name">y</span> = iy*GRID_PAD - GRID_SIZE/2.0f;
+                <span class="org-type">float</span> <span class="org-variable-name">z</span> = Z_START + iz*GRID_PAD;
+
+                <span class="org-type">float</span> <span class="org-variable-name">px</span> = x;
+                <span class="org-type">float</span> <span class="org-variable-name">py</span> = y;
+                <span class="org-type">float</span> <span class="org-variable-name">pz</span> = z - (Z_START + GRID_SIZE/2.0f);
+
+                <span class="org-comment-delimiter">// </span><span class="org-comment">1. Rotate around Y axis (Yaw)
+</span>                <span class="org-type">float</span> <span class="org-variable-name">x1</span> = px * cos_y + pz * sin_y;
+                <span class="org-type">float</span> <span class="org-variable-name">z1</span> = -px * sin_y + pz * cos_y;
+                <span class="org-type">float</span> <span class="org-variable-name">y1</span> = py;
+
+                <span class="org-comment-delimiter">// </span><span class="org-comment">2. Rotate around X axis (Pitch)
+</span>                <span class="org-type">float</span> <span class="org-variable-name">y2</span> = y1 * cos_x - z1 * sin_x;
+                <span class="org-type">float</span> <span class="org-variable-name">z2</span> = y1 * sin_x + z1 * cos_x;
+                <span class="org-type">float</span> <span class="org-variable-name">x2</span> = x1;
+
+                <span class="org-comment-delimiter">// </span><span class="org-comment">3. Apply camera distance
+</span>                <span class="org-type">float</span> <span class="org-variable-name">z_cam</span> = z2 + camera_distance;
+
+                <span class="org-comment-delimiter">// </span><span class="org-comment">4. Perspective projection using focal length
+</span>                <span class="org-type">float</span> <span class="org-variable-name">screen_x</span> = (x2 / z_cam) * focal_length + WIDTH / 2.0f;
+                <span class="org-type">float</span> <span class="org-variable-name">screen_y</span> = (y2 / z_cam) * focal_length + HEIGHT / 2.0f;
+
+                <span class="org-type">uint32_t</span> <span class="org-variable-name">r</span> = ix*255/GRID_COUNT;
+                <span class="org-type">uint32_t</span> <span class="org-variable-name">g</span> = iy*255/GRID_COUNT;
+                <span class="org-type">uint32_t</span> <span class="org-variable-name">b</span> = iz*255/GRID_COUNT;
+                <span class="org-type">uint32_t</span> <span class="org-variable-name">color</span> = 0xFF000000 | (r &lt;&lt; 16) | (g &lt;&lt; 8) | b;
+
+                draw_circle(pixels, (<span class="org-type">int</span>)screen_x, (<span class="org-type">int</span>)screen_y, CIRCLE_RADIUS, color);
+            }
+        }
+    }
+
+    <span class="org-keyword">return</span> Qnil;
+}
+</pre>
+</div>
+
+<p>
+After this we can just initialize the module:
+</p>
+
+<div class="org-src-container">
+<pre><span class="org-type">int</span> <span class="org-function-name">emacs_module_init</span>(<span class="org-keyword">struct</span> <span class="org-type">emacs_runtime</span> *<span class="org-variable-name">rt</span>) {
+    <span class="org-keyword">if</span> ((<span class="org-type">size_t</span>)rt-&gt;size &lt; <span class="org-keyword">sizeof</span> (*rt)) <span class="org-keyword">return</span> 1;
+    <span class="org-type">emacs_env</span>* <span class="org-variable-name">env</span> = rt-&gt;get_environment(rt);
+    <span class="org-keyword">if</span> ((<span class="org-type">size_t</span>)env-&gt;size &lt; <span class="org-keyword">sizeof</span> (*env)) <span class="org-keyword">return</span> 2;
+    Qnil = env-&gt;make_global_ref(env, env-&gt;intern(env, <span class="org-string">"nil"</span>));
+
+    env-&gt;funcall(env, env-&gt;intern(env, <span class="org-string">"defalias"</span>), 2,
+                 (emacs_value[]){
+                     env-&gt;intern(env, <span class="org-string">"dots3d-render"</span>),
+                     env-&gt;make_function(env, 3, 3, render, <span class="org-string">"Render dots3d"</span>, 0)
+                 });
+    <span class="org-keyword">return</span> 0;
+}
+</pre>
+</div>
+
+<p>
+This now needs to be compiled into a shared object, do not forget to add <code>emacs-module.h</code> wherever <code>gcc</code> looks for includes:
+</p>
+
+<div class="org-src-container">
+<pre>gcc -O2 -I%ssrc dots3d.c -o /tmp/dots3d.so -fPIC -shared -lm
+</pre>
+</div>
+
+<p>
+Now we can use this from Emacs Lisp, some preliminary stuff:
+</p>
+
+<div class="org-src-container">
+<pre>(module-load <span class="org-string">"/tmp/dots3d.so"</span>)
+(<span class="org-keyword">declare-function</span> dots3d-render <span class="org-string">"ext:dots3d.c"</span>)
+
+(switch-to-buffer (get-buffer-create <span class="org-string">"*dots3d*"</span>))
+
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-canvas</span>)
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-frame</span> 0)
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-time</span> 0.0)
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-last-time</span> 0.0)
+
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-angle-x</span> 0.0)
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-angle-y</span> 0.0)
+(<span class="org-keyword">defvar</span> <span class="org-variable-name">dots3d-auto-rotate</span> t)
+
+(<span class="org-keyword">setq</span> dots3d-time (float-time))
+(<span class="org-keyword">setq</span> dots3d-last-time (float-time))
+</pre>
+</div>
+
+<p>
+We setup the main canvas:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq</span> dots3d-canvas '(image <span class="org-builtin">:type</span> canvas
+                            <span class="org-builtin">:data-width</span> 960
+                            <span class="org-builtin">:data-height</span> 720
+                            <span class="org-builtin">:margin</span> (20 . 20)
+                            <span class="org-builtin">:scale</span> 1
+                            <span class="org-builtin">:id</span> dots3d))
+</pre>
+</div>
+
+<p>
+We need to disable the mode-line and cursor:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">setq-local</span> cursor-type nil
+            mode-line-position nil
+            mode-line-modified nil
+            mode-line-mule-info nil
+            mode-line-remote nil)
+</pre>
+</div>
+
+<p>
+And we display the canvas:
+</p>
+
+<div class="org-src-container">
+<pre>(insert (propertize <span class="org-string">"#"</span> 'display dots3d-canvas))
+</pre>
+</div>
+
+<p>
+Now the main function that takes care of interacting with the space. We basically use <code>track-mouse</code> to update the canvas by calling the render function with new angles, every time we drag on the canvas. To be noted, we need to stop the auto-rotate while we are dragging.
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">dots3d-start-drag</span> (event)
+  (<span class="org-keyword">interactive</span> <span class="org-string">"e"</span>)
+  (<span class="org-keyword">setq</span> dots3d-auto-rotate nil)
+  (<span class="org-keyword">let*</span> ((start-pos (posn-object-x-y (event-start event)))
+         (last-x (car start-pos))
+         (last-y (cdr start-pos)))
+    (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> last-x last-y)
+      (<span class="org-keyword">track-mouse</span>
+        (<span class="org-keyword">let</span> (evt pos mx my)
+          (<span class="org-keyword">while</span> (<span class="org-keyword">progn</span>
+                   (<span class="org-keyword">setq</span> evt (read-event))
+                   (mouse-movement-p evt))
+            (<span class="org-keyword">setq</span> pos (posn-object-x-y (event-start evt)))
+            (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> (car pos) (cdr pos))
+              (<span class="org-keyword">setq</span> mx (car pos) my (cdr pos))
+              (<span class="org-keyword">setq</span> dots3d-angle-y (+ dots3d-angle-y (* (- mx last-x) 0.01)))
+              (<span class="org-keyword">setq</span> dots3d-angle-x (+ dots3d-angle-x (* (- my last-y) 0.01)))
+              (<span class="org-keyword">setq</span> last-x mx last-y my)
+              (dots3d-render dots3d-canvas dots3d-angle-x dots3d-angle-y)
+              (canvas-refresh dots3d-canvas))))))
+    (<span class="org-keyword">setq</span> dots3d-auto-rotate t)))
+(local-set-key [down-mouse-1] 'dots3d-start-drag)
+</pre>
+</div>
+
+<p>
+And the final render function in Emacs Lisp can be extremely simple, you just call the render function with slightly adjusted angles and we call it in a timer so that it keeps rotating:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">dots3d-update</span> ()
+    (<span class="org-keyword">let*</span> ((time (float-time))
+           (dt (- time dots3d-last-time)))
+      (switch-to-buffer (get-buffer-create <span class="org-string">"*dots3d*"</span>))
+      (<span class="org-keyword">setq</span> dots3d-last-time time)
+      (<span class="org-keyword">when</span> dots3d-auto-rotate
+        (<span class="org-keyword">setq</span> dots3d-angle-y (+ dots3d-angle-y (* dt 0.5))))
+      (dots3d-render dots3d-canvas dots3d-angle-x dots3d-angle-y)
+      (canvas-refresh dots3d-canvas)))
+(run-with-timer nil (/ 1 60.0) 'dots3d-update)
+</pre>
+</div>
+
+<p>
+And after evaluation, you should see as below and be able to move the grid by dragging it:
+</p>
+
+<video><p>A 3D revolving grid of points which can be dragged and moved by mouse. Rendered at 60FPS.</p></video>
+</div>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">5.</span> Conclusion &amp; Further Work</h2>
+<div class="outline-text-2">
+<p>
+As is evident, this feature has enabled a new universe of graphical capabilities within Emacs. Of such possibilities, we have only scratched the surface in a few places. We are very excited to see what kinds of applications hackers can build using this. Here are some possible applications that can be built on top of canvas in Emacs (some of them we might work on ourselves):
+</p>
+
+<ul>
+<li>A full-fledged document reader in Emacs. (<a href="https://codeberg.org/MonadicSheep/emacs-reader">Emacs Reader</a>, the project
+which started it all.)</li>
+<li>A full-fledged video player</li>
+<li>A drawing pad (screw M$ Paint)</li>
+<li>A framework to make video games</li>
+<li>Scientific plotting (integration with Calc)</li>
+<li>Org babel integrations</li>
+<li>Rendering LaTeX snippets directly.</li>
+<li>A nice color picker like <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/color">HTML’s color attribute</a></li>
+<li>2D &amp; 3D Graph viewer</li>
+<li>Image &amp; Video editors</li>
+<li>A visual programming environment</li>
+</ul>
+
+<p>
+And more… we’ve opened a discussion on such graphical applications within Emacs and how to make them composable, feel free to contribute <a href="https://codeberg.org/MonadicSheep/pale/issues/17">there</a>.
+</p>
+</div>
+</div>
+<div class="outline-2">
+<h2><span class="section-number-2">6.</span> Canvas Applications &amp; Resources</h2>
+<div class="outline-text-2">
+<ul>
+<li><a href="https://github.com/minad/emacs-canvas-patch"><code>https://github.com/minad/emacs-canvas-patch</code></a></li>
+<li><a href="https://github.com/minad/emacs-shader-demo/"><code>https://github.com/minad/emacs-shader-demo/</code></a></li>
+<li><a href="https://elpa.nongnu.org/nongnu/doom-game.html"><code>https://elpa.nongnu.org/nongnu/doom-game.html</code></a></li>
+<li><a href="https://github.com/mochar/glmakie-el"><code>https://github.com/mochar/glmakie-el</code></a></li>
+<li><a href="https://codeberg.org/MonadicSheep/pale/"><code>https://codeberg.org/MonadicSheep/pale/</code></a></li>
+<li><a href="https://tusharhero.codeberg.page/emacs-pale-canvas-and-stuff-demos.html"><code>https://tusharhero.codeberg.page/emacs-pale-canvas-and-stuff-demos.html</code></a></li>
+</ul>
+</div>
+</div>
+</body></html>

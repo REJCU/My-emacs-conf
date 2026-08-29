@@ -1,0 +1,123 @@
+<html><head></head><body><p>A year ago I created Org Social. Just a plain-text specification and an <code>.org</code> file served over HTTP. Today it is time to take stock, to see how the project has moved, what has worked and what has not. And above all, to tell the story of a year of development and community.</p>
+<p>A bird's-eye view of the whole year would look like this:</p>
+<p><strong>2025</strong></p>
+<ul>
+<li><strong>August</strong>: the specification is born (Aug 12). Front page of Hacker News and 150 stars in 24 hours. First client, <code>org-social.el</code> (Aug 16). Spec 1.1: the first external contribution removes <code>:REPLY_URL:</code>.</li>
+<li><strong>September</strong>: the Relay is born. Groups arrive in the specification.</li>
+<li><strong>October</strong>: <code>org-social.el</code> v2.0 with a redesigned interface (Oct 1). It lands on MELPA (Oct 26). Proposal to the Org Mode list.</li>
+<li><strong>November</strong>: Relay v1.0 and host is born. A record of 581 posts in a month, probably because the Relay indexed every account. Spec 1.4: boosting posts (<code>:INCLUDE:</code>) and domain migration (<code>:MIGRATION:</code>).</li>
+<li><strong>December</strong>: Org Social overtakes twtxt in activity. Spec 1.5: posts visible only to mentioned people (<code>:VISIBILITY:</code>).</li>
+</ul>
+<p><strong>2026</strong></p>
+<ul>
+<li><strong>January</strong>: the ID moves into the headline (spec 1.6). A big change that required syncing every piece of software in the ecosystem.</li>
+<li><strong>May</strong>: Org Social reaches the App Store (May 11). Spec 1.7 with the <code>:BOT:</code> property.</li>
+<li><strong>July</strong>: Planet Emacslife adopts Org Social. The Relay ships bridges to Mastodon and RSS. Webmentions are integrated into the specification.</li>
+</ul>
+<h2>From the explosion to maturity</h2>
+<p>The autumn of 2025 was the big explosion.</p>
+<p>The specification started moving fast, and a good part of the credit goes to proposals from outside. In version 1.1 (that same August 16) I removed the separation between <code>* Posts</code> and the first <code>**</code>, and dropped the <code>:REPLY_URL:</code> property. That change was pushed by <a href="https://github.com/confusedalex" target="_blank">@confusedalex</a>: a stranger who showed up, pointed out it was unnecessary, and was right. Nothing validates an idea more than a stranger opening an issue to improve it.</p>
+<p>From there, the specification kept growing with judgment:</p>
+<ul>
+<li><strong>1.2</strong>: the avatar now had to be at least 128x128 in JPG or PNG.</li>
+<li><strong>1.3</strong>: <code>:MOOD:</code> (reactions) and <code>:GROUP:</code> (groups) arrived. Groups were added on September 20.</li>
+<li><strong>1.4</strong>: <code>:INCLUDE:</code> to share other people's posts (the classic boost) and <code>:MIGRATION:</code> to announce a domain change.</li>
+<li><strong>1.5</strong>: <code>:VISIBILITY:</code> with the value <code>mention</code>, for posts only mentioned people can see.</li>
+</ul>
+<p>And while the specification grew, so did the ecosystem. Org Social stopped being a file and became a constellation of programs.</p>
+<p>Even before the Relay existed, discovering people was a manual affair: a <code>registers.txt</code> file in the repository where people signed up by hand. It reached 17 active users.</p>
+<p>The <strong>Relay</strong> was born on September 5 and hit its v1.0 on November 1. It is the piece that indexes users, mentions, replies, groups and threads across the whole network, so a client can discover new people and find out that a stranger has mentioned you. It retired <code>registers.txt</code> and surfaced a bunch of new accounts that were there but nobody could see.</p>
+<p>On October 26, with version 2.3, <a href="https://git.andros.dev/org-social/org-social.el">org-social.el</a> landed on <strong>MELPA</strong>. That is the moment the Emacs client became truly stable.</p>
+<h3>The Emacs client I had to rewrite from scratch</h3>
+<p>Getting to that stable client was not free. It was my big headache.</p>
+<p>The first version of <code>org-social.el</code> I wrote in August, quickly, to prove the idea worked. A single file that grew commit by commit: reading feeds, painting the timeline, replying, polls. It worked. But inside it was a snowball. The logic and the interface were tangled together, everything lived in the same place, and every new feature was a fight. When I tried to add threads, groups, notifications and real time, I hit a wall: the architecture could not take any more.</p>
+<p>With everything I had learned, I rewrote it. On October 1, 2025 I announced the second version, <code>org-social.el v2.0</code>, with a completely redesigned interface and "the biggest update yet". It changed more than 4,600 lines at once. I split the monolith into modules: the parser on one side, the feeds on another, the interface in its own <code>ui/</code> folder divided into buffers (timeline, thread, profile, groups, search, discover, notifications), the Relay, the real time, the validator, and more. And there I had to apply several optimization strategies to avoid freezes while Emacs processed feeds or subfeeds. The rewrite was a long and painful birth, but it was worth it.</p>
+<p>During the process I found a bug in Org Mode itself.</p>
+<p>Every Org Social post needs a unique identifier. The original decision, made in the early days, was to use an ISO 8601 timestamp inside the properties drawer. A post looked like this.</p>
+<pre><code class="language-org">** 
+:PROPERTIES:
+:ID: 2025-05-01T12:00:00+0100
+:END:
+This is my post.</code></pre>
+<p>See that empty headline, the <code>**</code> followed by nothing? Well, it is not empty: it must carry a space after it, even though Org Mode's documentation does not say so and is ambiguous. An empty level-two headline needs that trailing space to be valid syntax. Without the space, <code>**</code> stops being a headline. The problem is that a lot of people (myself included) have <code>delete-trailing-whitespace</code> enabled on save, an Emacs command that removes trailing spaces at the end of each line. It is a universally good practice. And it silently wrecked all your posts.</p>
+<p>I reported it and contributed a patch, but it was not accepted for backwards-compatibility reasons. Still, the discussion was very interesting.</p>
+<p>I was forced to ship a fix in version 1.6, on January 4, 2026. I moved the ID into the headline.</p>
+<pre><code class="language-org">** 2025-05-01T12:00:00+0100
+This is my post.</code></pre>
+<p>Now the identifier lives where nothing can erase it.</p>
+<p>In May 2026 I marked the old format as legacy. It is still valid for compatibility, but I recommend the new one and I document the trailing-space trap for anyone who runs into it. I took the chance in that version to also bring in <code>:LOCATION:</code>, <code>:BIRTHDAY:</code>, <code>:LANGUAGE:</code> and <code>:PINNED:</code>.</p>
+<p>During these months I wrote several articles around the project: <a href="http://en.andros.dev/blog/734c56f2/why-org-social-is-the-ethical-fediverse-alternative/">Why Org Social is the ethical Fediverse alternative</a>, where I defend the project without hiding its limits, and <a href="http://en.andros.dev/blog/c68f00c3/quick-tutorial-to-get-a-blog-online-from-org-mode-thanks-to-org-social/">Quick tutorial to get a blog online from Org mode thanks to Org Social</a>, where I use the ecosystem to publish a blog with no server.</p>
+<p>With the specification settled and the client mature, the same old pending task remained: making it easy for anyone to start, Emacs users or not.</p>
+<h3>iOS and host: finally an easy way in</h3>
+<p>On November 18, 2025 <strong>host</strong> was born, the hosting service for your <code>social.org</code> with an automatic nick and public URL, very much in tune with the Tilde philosophy. Not everyone has a server to upload a file to, and this solved that at the root. It also opened the door to native clients, since it let you sync your <code>social.org</code> from any device.</p>
+<p>To communicate, most of us use the smartphone far more than the desktop. A native iOS client broke that barrier.</p>
+<p>On May 11, 2026 the app reached the <a href="https://apps.apple.com/us/app/org-social/id6764415116" target="_blank">App Store</a>. For the first time you could carry your decentralized social network in your pocket, with the interface anyone who has touched a phone expects: posts, replies, threads, polls, groups, scheduled posts and feed export. And all of it with no analytics, no tracking, no telemetry, no third-party SDKs.</p>
+<p>The combination of host and the iOS app made Org Social accessible.</p>
+<p>The flow became as simple as this:</p>
+<ol>
+<li>You sign up to host from your phone. Behind the scenes, host gives you a nick and a public URL.</li>
+<li>You write in the iOS client and save. The client uploads your <code>social.org</code> to host.</li>
+</ol>
+<p>Transparent and frictionless.</p>
+<p>Of course, this is also compatible with the Emacs client, and it is bidirectional: you can write in Emacs and carry on in iOS, or the other way around.</p>
+<p>On April 21, 2026 I published a tiny post, "writing from iOS", from a test build of the app. Seeing it show up in the timeline, coming from an iPhone and not from an Emacs buffer, was one of those moments when a project crosses a line.</p>
+<p>In May the app got custom themes and push notifications, and with that I called it done. It went into maintenance mode. Not all software has to grow forever.</p>
+<p>That same month version 1.7 of the specification arrived with the <code>:BOT:</code> property, to mark posts generated by bots without cluttering anyone's timeline. With it, for example, you can play a game of chess against a bot from Org Social.</p>
+<p>And the year brought signs of maturity. The Relay shipped bridges to follow Mastodon (ActivityPub) accounts and RSS/Atom feeds from any Org Social client, as if they were just more users. A bit later Webmentions were integrated, so that when you link to someone's article they get notified.</p>
+<p>Org Social is starting to talk to the rest of the web, not just to itself.</p>
+<h2>The present</h2>
+<p>A year later, where do we stand?</p>
+<p>The picture of the community is that of a niche project, healthy and stable.</p>
+<p>The numbers:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Registered accounts</td>
+<td>267</td>
+</tr>
+<tr>
+<td>Indexed feeds</td>
+<td>236</td>
+</tr>
+<tr>
+<td>Posts</td>
+<td>2,392</td>
+</tr>
+<tr>
+<td>Follows</td>
+<td>1,274</td>
+</tr>
+<tr>
+<td>Active groups</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div><p>It stays steady at around 19 active accounts a month. Not millions, and it never will be. It is a small community that is still there, month after month.</p>
+<p>The specification is at 1.7, though I do not think a new version will come out, at least not in the short term. It feels finished to me.</p>
+<p>The official ecosystem is already a dozen pieces:</p>
+<ul>
+<li><strong><a href="https://git.andros.dev/org-social/org-social">org-social</a></strong>: the specification, the founding document.</li>
+<li><strong><a href="https://git.andros.dev/org-social/org-social.el">org-social.el</a></strong>: the Emacs client, today at version 2.14 and beyond.</li>
+<li><strong><a href="https://git.andros.dev/org-social/relay">relay</a></strong>: the P2P server that indexes the network.</li>
+<li><strong><a href="https://git.andros.dev/org-social/host">host</a></strong>: hosting for your <code>social.org</code> with an automatic nick.</li>
+<li><strong><a href="https://git.andros.dev/org-social/ios">OrgSocialKit / ios</a></strong>: native library and client for iOS and macOS in Swift, available on the <a href="https://apps.apple.com/us/app/org-social/id6764415116" target="_blank">App Store</a>.</li>
+<li><strong><a href="https://git.andros.dev/org-social/live-preview">live-preview</a></strong> and <strong><a href="https://git.andros.dev/org-social/static-preview">static-preview</a></strong>: social-media-style preview cards for post URLs.</li>
+<li><strong><a href="https://git.andros.dev/org-social/web-reading">web-reading</a></strong>: a web timeline viewer, for those who don't use Emacs.</li>
+<li><strong><a href="https://git.andros.dev/org-social/push">push</a></strong>: push notifications for the iOS app.</li>
+<li><strong><a href="https://git.andros.dev/org-social/rss-bridge">rss-bridge</a></strong>: turns any RSS/Atom feed into Org Social format, so you can follow whatever you want.</li>
+<li><strong><a href="https://git.andros.dev/org-social/awesome">awesome</a></strong>: the curated list of clients, relays, libraries and tools.</li>
+</ul>
+<p>The important stuff already exists.</p>
+<h2>The future</h2>
+<p>I would love a client for Android and one for the terminal. Neither is trivial nor impossible.</p>
+<p>It would also make sense to extend host so it could hold multimedia content, like images and videos. I am still thinking about it.</p>
+<p>What I do want is to improve the funding. Each Relay is a node in the network: the more there are, the more robust it becomes. And Apple's developer account does not pay for itself. If you like the project, consider making a donation.</p>
+<p>And if you have made it this far, you could leave a comment on your <code>social.org</code> by following this <a href="http://en.andros.dev/blog/ddd78757/quick-tutorial-to-get-started-on-org-social/">tutorial</a>.</p>
+<p>See you in the timeline!</p><hr><p>Help me keep writing Every coffee gives me a push toward the next article. <a href="https://ko-fi.com/W7W02LB83">Sure, it's on me!</a></p><p>Send an email to <a href="mailto:comment+article-5fcf45a2@andros.dev">comment+article-5fcf45a2@andros.dev</a> to leave a comment. The subject will be ignored.</p></body></html>

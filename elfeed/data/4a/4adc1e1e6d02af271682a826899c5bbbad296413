@@ -1,0 +1,3 @@
+<html><head></head><body><p>This is now fixed: GCC drive error on macOS: This seems to show up with almost every new Emacs package I’ve been trying recently on my Mac. I remember trying to dig into it, and I went in circles trying to install something from Homebrew. Has anyone fixed this? I’m on GNU Emacs plus 30.2.</p>
+<img src="https://cdn.uploads.micro.blog/96826/2026/2026-08-27-08-47-30.png" alt="A terminal window displays repeated error messages indicating a failure to invoke the GCC driver while compiling with native-compiler in Emacs.">
+</body></html>

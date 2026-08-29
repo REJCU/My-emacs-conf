@@ -1,0 +1,10 @@
+<html><head></head><body><p>Last week, Deepseek released <strong>DSH</strong>, an agent harness with very interesting approach.<br>The same pitch used by VS Code and Eclipse RPC (2024): <em>“everything is a plugin”</em> but this time it’s a bit different. Even the agent loop itself is a plugin.</p>
+<p>In practice, you extend the tool by just prompting. (Reminds me of an <a href="https://donovan-ratefison.mg/2025/08/17/Weird-Yet-Amazing-Modes-In-Emacs/">old post of mine</a> where I said that Emacs is like a modern “Magic Lamp”)<br>It allows maximum customizability and also opens many possibilities.<br>In the official article, they showcased adding snake game to the main interface. Pretty cool!</p>
+<p>Around the same time, I spent a little time playing with the <strong>pi-coding-agent</strong> on Emacs and was thinking that now if I want, I probably could extend Emacs indefinitely by just prompting.  </p>
+<p>Weird synchronicity.</p>
+<p>Anyway, here are some useful links if you want to know more:</p>
+<ul>
+<li><a href="https://deepseek.com/harness/en/">DSH announcement</a></li>
+<li><a href="https://github.com/deepseek-ai/deepseek-harness">deepseek-harness repo</a></li>
+<li><a href="https://github.com/cordiverse/paper">Cordis paper: A Programming Paradigm for Spatiotemporal Composability</a></li>
+<li><a href="https://github.com/dnouri/pi-coding-agent">pi-coding-agent.el</a>: the Emacs frontend I was playing with</li></ul></body></html>

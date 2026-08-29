@@ -1,0 +1,159 @@
+<html><head></head><body><p>If I had a dollar for every time someone asked on the Clojurians Slack in
+<code class="language-plaintext highlighter-rouge">#cider</code> why <code class="language-plaintext highlighter-rouge">C-x C-e</code> evaluated “the wrong thing”, I’d probably be writing this
+post from a yacht.  The answer was always the same: the cursor wasn’t where
+CIDER expected it to be. The <em>upcoming</em> CIDER 2.1 release changes that - the
+evaluation commands now figure out which form you mean from where your cursor
+actually is.</p>
+
+
+
+<h2>A bit of history</h2>
+
+<p>Emacs has a very particular tradition when it comes to evaluating code:
+<code class="language-plaintext highlighter-rouge">eval-last-sexp</code> (the venerable <code class="language-plaintext highlighter-rouge">C-x C-e</code>) acts on the expression <em>before</em> the
+cursor. Not the one you’re looking at, not the one you’re inside of - the one
+that ends exactly where your cursor stands. SLIME follows this tradition,
+Emacs Lisp itself follows it, and for the past 15+ years CIDER has followed it
+too.<sup><a href="https://metaredux.com/#fn:1">1</a></sup> If you grew up in Emacs, this rule is in your fingers and you’ve
+never once thought about it.</p>
+
+<p>Here’s the thing, though - most people using CIDER didn’t grow up in Emacs.
+And many of them never programmed in Emacs Lisp and Common Lisp with SLIME.
+They came to Emacs <em>because of</em> CIDER (or Clojure in general), and for them
+the rule is invisible, arbitrary and mildly hostile. You put your cursor on a
+form, you press the eval key, and CIDER cheerfully evaluates… something
+else. Meanwhile every other modern Clojure environment - Calva, Conjure, the
+various vim plugins - resolves the form from the cursor position and just does
+what you meant.<sup><a href="https://metaredux.com/#fn:2">2</a></sup></p>
+
+<p>For a long time I resisted changing this, mostly out of respect for the Emacs
+tradition (and my own muscle memory). But at some point I had to admit that I
+was optimizing for the wrong audience. CIDER’s users are mostly casual
+Clojure hackers who happen to use Emacs, not Emacs experts who happen to
+write Clojure. The tradition was serving me, and confusing them.</p>
+
+<h2>What’s actually changing</h2>
+
+<p>The evaluation commands (and their macroexpansion, inspection and tapping
+siblings) now resolve “the form the cursor indicates”. Concretely, with <code class="language-plaintext highlighter-rouge">|</code>
+marking the cursor:</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre><code><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="nb">inc</span><span class="w"> </span><span class="err">|</span><span class="p">(</span><span class="nb">range</span><span class="w"> </span><span class="mi">10</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Pressing <code class="language-plaintext highlighter-rouge">C-c C-e</code> here used to evaluate <code class="language-plaintext highlighter-rouge">inc</code> - the form <em>before</em> the cursor,
+which is almost never what you wanted. Now it evaluates <code class="language-plaintext highlighter-rouge">(range 10)</code> - the
+form your cursor is pointing at.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre><code><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="s">"hello"</span><span class="w"> </span><span class="s">" "</span><span class="w"> </span><span class="s">"world"</span><span class="err">|</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This one used to evaluate <code class="language-plaintext highlighter-rouge">"world"</code> (really!), because the last complete
+expression before a cursor sitting on the closing paren is the final string.
+Now it evaluates the whole <code class="language-plaintext highlighter-rouge">(str ...)</code> call.</p>
+
+<p>Macroexpansion benefits too:</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre><code><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">tru</span><span class="err">|</span><span class="n">e</span><span class="w"> </span><span class="p">(</span><span class="nf">launch-missiles</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">C-c C-m</code> here used to complain that <code class="language-plaintext highlighter-rouge">true</code> is not a macro. Now it expands the
+enclosing <code class="language-plaintext highlighter-rouge">(when ...)</code> call, because expanding a bare symbol is never what
+anyone means.</p>
+
+<p>And my favorite one - the rich comment workflow is now consistent everywhere:</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre><code><span class="p">(</span><span class="nb">comment</span><span class="w">
+  </span><span class="p">(</span><span class="nf">calculate-all-the-things</span><span class="err">|</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Every defun-level command - eval, pretty-print, inspect, debug - now treats
+the form inside the <code class="language-plaintext highlighter-rouge">(comment ...)</code> as the top-level one. Evaluating a whole
+<code class="language-plaintext highlighter-rouge">comment</code> form returns <code class="language-plaintext highlighter-rouge">nil</code> by definition, which has exactly zero uses, so
+CIDER no longer does that no matter which command you reach for.</p>
+
+<h2>Why you probably won’t notice</h2>
+
+<p>Here’s the part I’m most pleased with: the new behavior agrees with the old
+one at every position where “the form before the cursor” made sense. Cursor
+right after a form? Same result as always. Cursor in the whitespace after a
+form? Same. Cursor in the middle of a symbol? Same. The two behaviors only
+diverge where the classic answer was something nobody ever wanted - a
+previous sibling, a lone trailing atom.</p>
+
+<p>So if your muscle memory follows the Emacs tradition, nothing changes for
+you. If it doesn’t - CIDER stops punishing you for it. That’s the whole
+change.</p>
+
+<h2>Reverting to the classic behavior (for now)</h2>
+
+<p>If you <em>do</em> want the traditional rules - maybe you genuinely use
+“evaluate the previous sibling while standing on an opening paren” - one
+setting restores them exactly:</p>
+
+<div class="language-emacs-lisp highlighter-rouge"><div class="highlight"><pre><code><span class="p">(</span><span class="k">setq</span> <span class="nv">cider-form-targeting</span> <span class="ss">'preceding</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>There’s also a per-session toggle in the eval menu (<code class="language-plaintext highlighter-rouge">C-c C-v T</code>) that shows
+the active mode in the mode line while you experiment.</p>
+
+<p>This option is probably living on borrowed
+time, though. I added it back when I planned to keep the classic behavior as the
+default and offer smart targeting as an opt-in. Now that the roles are
+reversed, an option whose only job is restoring rules almost nobody
+deliberately relied on doesn’t really make much sense, and lately I’ve been
+trying to trim that kind of clutter from CIDER, not add to it. Don’t be
+surprised if the option quietly disappears - possibly even before the release
+ships. Which is one more reason to speak up now if the classic behavior
+genuinely matters to you.</p>
+
+<h2>Farewell, “last sexp”</h2>
+
+<p>This change forced my hand on something I’d been putting off for years - the
+command names. <code class="language-plaintext highlighter-rouge">cider-eval-last-sexp</code> is a fine name for a command that
+evaluates the last sexp. It’s a lie for a command that evaluates the form
+your cursor indicates. So the commands got honest names:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cider-eval-last-sexp</code> is now <code class="language-plaintext highlighter-rouge">cider-eval-form</code></li>
+  <li><code class="language-plaintext highlighter-rouge">cider-eval-defun-at-point</code> is now <code class="language-plaintext highlighter-rouge">cider-eval-defun</code> (the <code class="language-plaintext highlighter-rouge">-at-point</code>
+never carried information)</li>
+  <li>likewise for the pprint/tap/inspect/insert variants</li>
+</ul>
+
+<p>Every old name keeps working as an alias, so your config and your <code class="language-plaintext highlighter-rouge">M-x</code>
+habits are safe. But why “form” and not “sexp”? Beyond the targeting change,
+there’s a Clojure-specific reason: in Clojure a <em>form</em> isn’t always a single
+sexp. <code class="language-plaintext highlighter-rouge">^:private x</code> is two sexps but one form; so is <code class="language-plaintext highlighter-rouge">#inst "2024-01-01"</code>.
+The commands operate on forms - the reader’s unit of evaluation - and now
+they say so.<sup><a href="https://metaredux.com/#fn:3">3</a></sup> The manual’s evaluation docs got a proper glossary
+explaining all of this.</p>
+
+<h2>Closing thoughts</h2>
+
+<p>All of this is on <code class="language-plaintext highlighter-rouge">master</code> and in the MELPA snapshots today, ahead of the
+next stable release. I’d really love for people to play with it <em>before</em> the
+release ships - especially if you’re an Emacs veteran whose fingers disagree
+with my reasoning, or a newcomer for whom this was supposed to just work. Did
+we get the resolution rules right? Does anything still surprise you?</p>
+
+<p>Share your feedback on the <a href="https://github.com/clojure-emacs/cider/discussions">CIDER discussions</a> board, in
+<code class="language-plaintext highlighter-rouge">#cider</code> on the Clojurians Slack, or just file an issue. This is exactly the
+kind of change that’s easy to adjust before a release and painful after -
+and the fate of the compatibility option depends on what I hear.</p>
+
+<p>That’s all I have for you today. Keep hacking!</p>
+
+<div class="footnotes">
+  <ol>
+    <li>
+      <p>CIDER started its life as a SLIME “clone” for Clojure, after all - the tradition runs deep.&nbsp;<a href="https://metaredux.com/#fnref:1">↩</a></p>
+    </li>
+    <li>
+      <p>Interestingly, Cursive is the only major non-Emacs Clojure environment that kept the classic “form before the caret” model.&nbsp;<a href="https://metaredux.com/#fnref:2">↩</a></p>
+    </li>
+    <li>
+      <p>This also explains a subtlety Emacs veterans might appreciate: plain <code class="language-plaintext highlighter-rouge">forward-sexp</code> movement doesn’t know that Clojure metadata belongs to the form it annotates, which is why clojure-mode has always needed its own “logical sexp” movement functions. The new targeting is built on those, so metadata is never silently dropped from what you evaluate.&nbsp;<a href="https://metaredux.com/#fnref:3">↩</a></p>
+    </li>
+  </ol>
+</div></body></html>

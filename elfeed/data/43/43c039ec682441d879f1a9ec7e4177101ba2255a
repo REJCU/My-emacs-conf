@@ -1,0 +1,246 @@
+<html><head></head><body><p>By default, scrolling in Emacs recenters the window when point moves off-screen, and rapid scrolling through large, heavily fontified files can introduce noticeable input lag. This article outlines configurations that make scrolling more predictable and responsive.</p>
+
+
+
+<h2>Customizing scroll recentering</h2>
+
+
+
+<p>Adjusting the automatic scrolling behavior can prevent Emacs from making large jumps when point moves beyond the visible portion of the window:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Scroll by up to 20 lines to bring point back into view before falling back to</span>
+<span class="hljs-comment">;; the normal automatic scrolling behavior.</span>
+(<span class="hljs-name">setq</span> scroll-conservatively <span class="hljs-number">20</span>)</code></span></pre>
+
+
+<p>When point moves off-screen or into the scroll margin, setting <code>scroll-conservatively</code> to a moderate value like 20 allows Emacs to scroll the text by up to 20 lines in either direction to bring point back into view.</p>
+
+
+
+<p>Note: Setting <code>scroll-conservatively</code> to a value above 100 prevents automatic scrolling from centering point, regardless of how far point moves. Emacs instead scrolls only far enough to bring point into view, placing it at the top or bottom of the window depending on the direction of scrolling.</p>
+
+
+
+<h2>Maintaining vertical context</h2>
+
+
+
+<p>While <code>scroll-conservatively</code> controls how Emacs reacts when point leaves the window, you can also define a boundary to force scrolling before point reaches the absolute edge:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Keep 3 lines of context visible above and below point.</span>
+(<span class="hljs-name">setq</span> scroll-margin <span class="hljs-number">3</span>)</code></span></pre>
+
+
+<p>Setting <code>scroll-margin</code> to 3 establishes a boundary of three lines at both the top and bottom of the Emacs window, forcing the buffer to scroll automatically as soon as your cursor enters this area instead of waiting for it to reach the absolute edge of the screen.</p>
+
+
+
+<p>This keeps point away from the top and bottom edges of the window whenever automatic scrolling can move it out of the margin.</p>
+
+
+
+<p>Note: Leaving <code>scroll-margin</code> at the default of <code>0</code> ensures the cursor can sit directly on the top or bottom line before triggering a scroll. Many users prefer this default setting because it maximizes usable vertical screen space and mirrors the edge-scrolling behavior found in most other modern text editors.</p>
+
+
+
+<h2>Horizontal scrolling</h2>
+
+
+
+<p>When line truncation is enabled (<code>truncate-lines</code> is non-nil), Emacs automatically scrolls horizontally when point approaches the left or right edge of the window. <code>hscroll-margin</code> controls how close point can get to an edge, while <code>hscroll-step</code> controls how far the window moves when automatic horizontal scrolling occurs.</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Horizontal scrolling</span>
+(<span class="hljs-name">setq</span> hscroll-margin <span class="hljs-number">2</span>
+      hscroll-step <span class="hljs-number">1</span>)</code></span></pre>
+
+
+<p>Setting <code>hscroll-margin</code> to <code>2</code> causes horizontal scrolling to trigger when point comes within two columns of the left or right edge, while setting <code>hscroll-step</code> to <code>1</code> forces the window to pan exactly one column at a time. </p>
+
+
+
+<p>This transforms horizontal movement into a column-by-column scroll, replacing the default behavior where Emacs jumps the view by half a screen horizontally and forces you to visually search for your cursor.</p>
+
+
+
+<h2>Deferring fontification during input</h2>
+
+
+
+<p>Fontification (syntax highlighting) requires CPU time to parse and colorize text. In large or complex buffers, this process can block the main thread, leading to input latency. Setting <code>redisplay-skip-fontification-on-input</code> to <code>t</code> causes Emacs to prioritize user input over immediate syntax highlighting:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Skip some fontification when input is pending.</span>
+(<span class="hljs-name">setq</span> redisplay-skip-fontification-on-input <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>The tradeoff is that syntax highlighting may temporarily lag behind the underlying text while your input is actively being processed. When scrolling rapidly into an unseen section of a file or pasting a large block of code, the text might appear uncolored or incorrectly colored for a fraction of a second. However, the delay is virtually unnoticeable, and the correct colors will render as soon as the input queue clears.</p>
+
+
+
+<h2>Preserving screen position</h2>
+
+
+
+<p>Setting <code>scroll-preserve-screen-position</code> to <code>t</code> fixes a common visual annoyance when paging up or down through a file (using <code>C-v</code> or <code>M-v</code>). If your cursor is in the middle of the screen and you hit Page Down, the cursor stays exactly in the middle of your monitor:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Preserve point's vertical screen position when scrolling.</span>
+(<span class="hljs-name">setq</span> scroll-preserve-screen-position <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>Note: There is one exception involving <code>next-screen-context-lines</code> (default 2), which controls how many lines of text are repeated from your previous screen when you scroll by a full window. If your cursor is resting on one of these repeated lines at the edge of the window when you jump, Emacs does not preserve its vertical screen position. Instead, it moves the cursor into the newly revealed text. This prevents the cursor from getting stranded at the extreme edge of the window and ensures you have enough surrounding text to read comfortably.</p>
+
+
+
+<h2>Disabling automatic vertical scrolling</h2>
+
+
+
+<p>Setting <code>auto-window-vscroll</code> to <code>nil</code> prevents movement and scrolling functions from automatically modifying the window's vertical scroll position when they encounter display rows taller than the window:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Do not automatically adjust vertical scrolling through tall display rows.</span>
+(<span class="hljs-name">setq</span> auto-window-vscroll <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<p>This makes vertical movement through buffers containing large elements, such as inline images, much more predictable by avoiding sudden partial-screen shifts. The tradeoff is that tall display rows become more cumbersome to navigate because Emacs no longer automatically scrolls through their partially visible portions to reveal the rest of the element.</p>
+
+
+
+<h2>Top and bottom scroll errors</h2>
+
+
+
+<p>By default, Emacs immediately signals an error if you attempt to scroll past the top or bottom of a buffer. Setting <code>scroll-error-top-bottom</code> to <code>t</code> changes this behavior so that your first attempt to scroll past the boundary safely moves the cursor to the exact beginning or end of the document:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Move point to the buffer boundary before signaling a scrolling error.</span>
+(<span class="hljs-name">setq</span> scroll-error-top-bottom <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>Instead of throwing an error immediately, it moves your cursor directly to the first or last character of the buffer. If you attempt to scroll again while your cursor is already resting on that final position, Emacs will then signal the standard scrolling error.</p>
+
+
+
+<h2>Enabling faster scrolling</h2>
+
+
+
+<p>Rapid scrolling can become sluggish when Emacs encounters previously unfontified text. Setting <code>fast-but-imprecise-scrolling</code> to <code>t</code> prevents Emacs from becoming unresponsive when you move rapidly through large buffers:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Avoid fontifying unfontified text while scrolling rapidly.</span>
+(<span class="hljs-name">setq</span> fast-but-imprecise-scrolling <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>The primary tradeoff is that scrolling can become visually imprecise. However, this behavior is generally nothing to worry about. For typical programming tasks using a standard monospaced font, line heights remain consistent, meaning you will likely never experience this imprecision at all. Even in modes that do use variable font sizes, the visual jump is minor and temporary. Once you stop scrolling and the input queue clears, Emacs finishes fontifying the visible text and corrects the layout, ensuring your final view is accurate.</p>
+
+
+
+<h2>Scroll aggressiveness</h2>
+
+
+
+<p>By default, when point moves beyond the top or bottom of the window, Emacs scrolls the buffer and places point around the middle of the screen. Setting <code>scroll-up-aggressively</code> and <code>scroll-down-aggressively</code> to <code>0.01</code> keeps point near the edge of the screen instead:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Provide a "stick-to-edge" scrolling experience.</span>
+(<span class="hljs-name">setq-default</span> scroll-up-aggressively <span class="hljs-number">0.01</span>
+              scroll-down-aggressively <span class="hljs-number">0.01</span>)</code></span></pre>
+
+
+<p>This results in minimal, predictable scrolling increments.</p>
+
+
+
+<h2>Permitting scrolling during search</h2>
+
+
+
+<p>By default, attempting to scroll the window while in an active <code>isearch</code> session (using <code>C-s</code> or <code>C-r</code>) cancels the search. You can allow scrolling without losing your search context.</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Allow scrolling actions while remaining inside a search block.</span>
+(<span class="hljs-name">setq</span> isearch-allow-scroll 'unlimited)</code></span></pre>
+
+
+<p>This allows you to scroll away from your current match to check another part of the file for reference, and then resume your search by pressing <code>C-s</code> to jump to the next match.</p>
+
+
+
+<h2>Shell and compilation buffers</h2>
+
+
+
+<p>When executing long-running processes in interactive shells or REPLs (<code>comint-mode</code>), new output arriving at the bottom of the buffer will frequently scroll your view downward. Setting comint-scroll-to-bottom-on-input to t and comint-scroll-to-bottom-on-output to nil causes Emacs to snap point to the bottom of the buffer only when you supply keyboard input:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Auto-scroll to bottom only when you type, not when background output arrives.</span>
+(<span class="hljs-name">setq-default</span> comint-scroll-to-bottom-on-input <span class="hljs-literal">t</span>
+              comint-scroll-to-bottom-on-output <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<p>This allows you to scroll up through compilation logs or terminal history to read errors without the screen aggressively jumping to the bottom every time a new line is printed.</p>
+
+
+
+<h2>The mouse wheel scrolling</h2>
+
+
+
+<p>The default mouse wheel behavior in Emacs can feel jumpy, as it scrolls multiple lines per click and accelerates based on scroll speed. You can easily modify this and assign modifier keys to perform horizontal scrolling or text scaling:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Scroll one line at a time and map modifier keys to specific actions.</span>
+(<span class="hljs-name">setq</span> mouse-wheel-scroll-amount
+      '(<span class="hljs-number">1</span>
+        ((shift) . hscroll) ((meta))
+        ((control meta) . global-text-scale)
+        ((control) . text-scale)))
+
+<span class="hljs-comment">;; Disable acceleration of scrolling.</span>
+(<span class="hljs-name">setq</span> mouse-wheel-progressive-speed <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<p>Setting <code>mouse-wheel-scroll-amount</code> to <code>1</code> configures the mouse wheel to scroll exactly one line vertically, while mapping modifier keys like Shift for horizontal scrolling and Control for text scaling turns your mouse into a navigation multi-tool. Paired with setting <code>mouse-wheel-progressive-speed</code> to <code>nil</code>, this prevents rapid wheel movements from dynamically accelerating the scroll distance.</p>
+
+
+
+<p>The result is a predictable, line-by-line scrolling experience that stops you from losing your place, with the tradeoff being that navigating very long files with a physical scroll wheel requires more physical effort since the view will not jump in large increments.</p>
+
+
+
+<p>Note: If you prefer a keyboard-driven workflow and want to disable mouse input entirely, check out the <a href="https://github.com/jamescherti/inhibit-mouse.el">inhibit-mouse</a> package.</p>
+
+
+
+<h2>Modern pixel-precise scrolling</h2>
+
+
+
+<p>Emacs 29 introduced pixel-precise scrolling for pointing devices that support suitable high-resolution scrolling events.</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Enable pixel-precise scrolling for supported pointing devices.</span>
+(<span class="hljs-name">pixel-scroll-precision-mode</span> <span class="hljs-number">1</span>)
+
+<span class="hljs-comment">;; (setq pixel-scroll-precision-use-momentum nil) ; Optional: disable momentum</span></code></span></pre>
+
+
+<p>Enabling <code>pixel-scroll-precision-mode</code> activates pixel-resolution scrolling for supported mouse and touchpad input, removing the traditional limitation of scrolling by whole text lines. </p>
+<div class="yarpp yarpp-related yarpp-related-rss yarpp-template-list">
+
+<h3>Related posts:</h3><ol>
+<li><a href="https://www.jamescherti.com/emacs-fix-org-mode-copy-paste-yank-bleed/">Copy-paste without Emacs org-mode or markdown-mode Formatting Bleeding Into Other Buffers</a></li>
+<li><a href="https://www.jamescherti.com/emacs-eglot-performance/">Configuring Emacs Eglot for Better Performance and Latency</a></li>
+<li><a href="https://www.jamescherti.com/emacs-why-use-setq-instead-setopt/">Emacs startup - Why setq beats setopt, customize-set-variable, and use-package :custom?</a></li>
+<li><a href="https://www.jamescherti.com/emacs-compile-angel-byte-native-compile/">The compile-angel Emacs package: Byte-compile and Native-compile Emacs Lisp libraries Automatically</a></li>
+<li><a href="https://www.jamescherti.com/emacs-ultisnips-mode-edit-snippets-files/">ultisnips-mode.el - An Emacs major mode for editing Ultisnips snippet files (*.snippets files)</a></li>
+<li><a href="https://www.jamescherti.com/easysession-el-persist-restore-emacs-session/">easysession.el: Easily persist and restore Emacs sessions (windows, tab-bar, file buffers, scratch, Dired, narrowing, indirect buffers/clones, Magit buffers...); a robust desktop.el replacement</a></li>
+<li><a href="https://www.jamescherti.com/essential-emacs-packages/">Must-have Emacs Packages for Efficient Software Development and Text Editing</a></li>
+</ol>
+</div>
+</body></html>

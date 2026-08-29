@@ -1,0 +1,32 @@
+<html><head></head><body><p>This month's Emacs Carnival theme is <a href="https://www.chiply.dev/post-august-emacs-carnival">The Search For Knowledge</a>, which is kinda something near and dear to my heart. I wrote an <a href="https://mike.hostetlerhome.com/from-obsidian-to-emacs">Obsidian to Emacs post</a> from a little over a year ago and one of the things that I mentioned is that Obsidian has a Knowledge Graph that I didn't use. <code>denote-explore</code> does have one and I set graphing up once but I don't use it at all. I work just fine without a Knowledge Graph. Using <a href="https://protesilaos.com/emacs/denote">Denote</a>, <a href="https://github.com/BurntSushi/ripgrep">ripgrep</a>, and <a href="https://github.com/minad/consult">consult</a>, things work great for me. It's smooth and not a lot of fuss.</p>
+<p>I literally do all my knowledge management now within Emacs in a Denote system. I dump all of my notes into one folder in org format. Denote puts a time stamp on the file name as well as the title and the tags. Searching by tag is really just a filename search. See examples from my own denote folder:</p>
+<div class="highlight text"><pre><span></span>20260714T130657--org-agenda-views__orgmode.org
+20260714T100032--filtering-org-ql-results__orgmode_productivity.org
+20250605T091129--escape-character-in-orgmode__orgmode.org
+</pre></div>
+
+<p>For me the file name is the index. It's simple. I don't need a SQLite database or anything else on the backend. As soon as I create a file I know that I can search by the file name or search its contents. This keeps things simple and, for me, simple is good. When I want to search for all of my notes about <code>orgmode</code>, I just run my <code>mh/consult-denote-find-files</code> , type <code>orgmode</code> and all of those files appear. If I want to add something else to that search, I just type that in. Here is my simple function that does that, using <code>consult-find</code></p>
+<div class="highlight elisp"><pre><span></span><span class="p">(</span><span class="nb">defun</span> <span class="nv">mh/consult-denote-find-files</span> <span class="p">()</span>
+  <span class="s">"Find files in the Denote notes directory by name via </span><span class="ss">`consult-find'</span><span class="s">."</span>
+  <span class="p">(</span><span class="k">interactive</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">consult-find</span> <span class="p">(</span><span class="nf">car</span> <span class="p">(</span><span class="nv">denote-directories</span><span class="p">))))</span>
+</pre></div>
+
+<p>So that brings up the files using the wonderful <code>consult-find</code> format. I just keep typing to narrow down my search. Easy and effective.</p>
+<p>And inside the files, the denote tags are the same as org mode tags when the document is open since it uses the <code>TAGS</code> property on the top of the file. I generally use just ripgrep for that – see the function I use below:</p>
+<div class="highlight elisp"><pre><span></span>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">mh/rg-org-wiki</span> <span class="p">()</span>
+  <span class="s">"Search ~/org-wiki with ripgrep via </span><span class="ss">`consult-ripgrep'</span><span class="s">.</span>
+<span class="s">Follows symlinks and ignores JSON files."</span>
+  <span class="p">(</span><span class="k">interactive</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">wiki-dir</span> <span class="p">(</span><span class="nf">expand-file-name</span> <span class="s">"~/org-wiki"</span><span class="p">)))</span>
+    <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nf">file-directory-p</span> <span class="nv">wiki-dir</span><span class="p">)</span>
+        <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">consult-ripgrep-args</span>
+               <span class="p">(</span><span class="nf">concat</span> <span class="nv">consult-ripgrep-args</span> <span class="s">" --follow --glob=!*.json"</span><span class="p">)))</span>
+          <span class="p">(</span><span class="nv">consult-ripgrep</span> <span class="nv">wiki-dir</span><span class="p">))</span>
+      <span class="p">(</span><span class="nf">message</span> <span class="s">"Directory ~/org-wiki does not exist!"</span><span class="p">))))</span>
+</pre></div>
+
+<p>(yes, my denote files are in a folder called <code>org-wiki</code>. That actually dates back to a pre-Obsidian setup I had once. This function actually dates back to that but it's easy to reuse here. Again, another win for Emacs and simplicity)</p>
+<p>I do have <a href="https://github.com/pprevos/denote-explore">denote-explore</a> installed and I do use <code>denote-explore-random-note</code> to, well, <em>explore</em> my notes. I find things that I forgot, and find things to update. I use that generally when I just want to work in my notes for a while.</p>
+<p>But that is the exception and not the rule. I set up links to explore my notes. Using the example files above, I use <code>denote-link</code> to link to a top-level <code>OrgMode</code> note (since they're all about OrgMode). That note is kind of a <a href="https://obsidian.rocks/maps-of-content-effortless-organization-for-notes/">Map Of Content</a> about OrgMode. That is how I <strong>want</strong> to discover notes… the individual notes link to top-level notes and that note is linked to all else about OrgMode. Well that is the theory anyway… I set it up but I don't do it near as much as I thought I would. This goes back to how I used Obsidian. I tried really hard to use a very rigid and disciplined link structure and at the end I find I didn't use it. It took more time than writing a lot of my notes. So really my flow is – I find and read notes that my past self used and update them to what I currently think but I don't necessarily follow a web of links. While a graph is useful for a lot of people, it just doesn't seem as useful for me. The filename is a good enough index for me.</p>
+</body></html>

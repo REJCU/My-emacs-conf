@@ -1,0 +1,9 @@
+<html><head></head><body><p>
+Happy news this morning. Sean Whitton has <a href="https://lists.gnu.org/archive/html/emacs-devel/2026-08/msg00760.html">announced the release of Emacs 31.1</a>. As usual, it’s available at the mirror nearest you. Note, however, that the URLs in Whitton’s announcement have a typo. See <a href="https://lists.gnu.org/archive/html/emacs-devel/2026-08/msg00764.html">this message from Eli</a> for the correct URLs.
+</p>
+<p>
+I’m writing this with the just built new Emacs and everything seems fine. I had a bit of trouble downloading the source because, apparently, some of the mirrors haven’t updated yet. If that happens to you, just repeat the request a time or two and you should get everything. After that, enjoy your new Emacs and all the goodies it brings. As always, <a href="https://www.masteringemacs.org/article/whats-new-in-emacs-311">Mickey has his usual exegesis of the changes</a>.
+</p>
+<p>
+As I invariably say at times like this, Eli and the rest of the development team deserve our huge thanks for their selfless efforts on our behalf.</p>
+</body></html>

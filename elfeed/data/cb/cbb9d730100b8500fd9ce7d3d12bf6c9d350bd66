@@ -1,0 +1,81 @@
+<html><head></head><body><p> I saw an <a href="https://www.reddit.com/r/emacs/s/jguphKtZYm">amusing Reddit post</a> recently with an Emacs user thinking about declaring “Emacs bankruptcy” with a config file falling in the 800-900 line range. </p>
+<p> Many users in the replies were happy to point out that even 10-12K lines is nothing if you understand what’s going on, and it’s well-documented. </p>
+<p> This reminded me of something I’ve been experimenting with lately.  Instead of updating my config, I’m trying out directory-local variables per project. </p>
+<p> Having local configurations in a project avoids the extra cogitation of worrying about conflicts with other file types or projects down the line.  I like this.  Also makes settings easier to transfer to a similar project in the future. </p>
+<div>
+<h2>Table of Contents</h2>
+<div>
+<ul>
+<li><a href="https://chrismaiorana.com/category/emacs/#local">Manage multiple project settings with ease</a></li>
+<li><a href="https://chrismaiorana.com/category/emacs/#eval">What’s in the dir-locals.el file?</a></li>
+<li><a href="https://chrismaiorana.com/category/emacs/#organization">How to keep your settings organized</a></li>
+</ul>
+</div>
+</div>
+<div class="outline-2">
+<h2>Keeping it local</h2>
+<div class="outline-text-2">
+<p> The bedrock of my init file has not changed much over the years.  I don’t even use a theme for very long before succumbing to the default colors.  Most of the time the editing I do in the config involves tweaking wrap and fill settings or adjusting export functions for different writing projects. </p>
+<p> I’ve made use of various hooks that trigger slightly different settings for writing and programming modes.  But now I’m <i>keeping it local</i>. </p>
+<p> Creating a <code>dir-locals.el</code> file right in your project’s working directory lets you set local variables and custom functions that will apply to all files in that directory tree but nowhere else in Emacs. </p>
+<p> I’ve found this incredibly helpful for managing compilation settings for different writing projects with slightly different deliverable formats.  Instead of configuring multiple export options as needed, I can just edit that build file once per project. </p>
+</div>
+</div>
+<div class="outline-2">
+<h2>Evaluate on entry – juggle settings with ease</h2>
+<div class="outline-text-2">
+<p> The “dir-locals” file evaluates when you open that project directory.  So if you don’t visit that directory today, none of those settings will take effect. </p>
+<p> I like to keep to keep my init file pretty lean anyway.  I have a habit of throwing things in as a trial and then letting them linger past usefulness. </p>
+<p> The nice thing about having these directory-local functions is that they stay with the project forever, and I can tweak and adjust without having to touch my minimalist config. </p>
+<p> Over the years I’ve had to oscillate needlessly between hard vs soft line wrapping.  In some cases I needed soft wrapping in org documents used for my blog, but preferred hard wrapping in plain <code>.txt</code> files.  Likewise, I might prefer to have Olivetti mode ON for a fiction project, but OFF for a technical writing project. </p>
+<p> These minor problems no longer vex me.  With directory local, I can easily have one project with auto-fill-mode set at 60 characters per line and jump right to a project with visual-line-mode soft-wrapping with no sweat. </p>
+</div>
+</div>
+<div class="outline-2">
+<h2>Put the right stuff where it needs to go</h2>
+<div class="outline-text-2">
+<p> In most cases the big, unmovable landmasses of your editor configuration will go in your init file.  But directory-local is there for settings that should only apply to that particular project. </p>
+<p> The separation might look something like this: </p>
+<table>
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th>Init file</th>
+<th>Directory local</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Theme, font, style</td>
+<td>Compilation/build settings</td>
+</tr>
+<tr>
+<td>Modeline</td>
+<td>Linters</td>
+</tr>
+<tr>
+<td>Editor defaults (auto save, backups)</td>
+<td>Fill-column or wrap settings</td>
+</tr>
+<tr>
+<td>Org agenda stuff</td>
+<td>Indentation styles</td>
+</tr>
+</tbody>
+</table>
+<p> I like having this directory-local option in the back pocket so I can focus on one project at a time.  Also, I think it’s nice to have a quick and dirty way to try a certain variable on before blasting it out globally. </p>
+<hr>
+<p> Update on the <a href="https://chrismaiorana.com/hard-pass-beta-readers/">hacker novel beta reading call</a>: big BIG THANK YOU to everyone who reached out and offered their time and talent.  I have received some great feedback and still waiting on some more.  Then it’s off to a final draft run. </p>
+<p> Here are some other nice items for you to check out: </p>
+<ul>
+<li>Check out my eBooks: <a href="https://chris-maiorana.kit.com/products/emacs-for-writers">Emacs For Writers</a> and <a href="https://chris-maiorana.kit.com/products/git-for-writers">Git For Writers</a>.</li>
+<li>Subscribe to the <a href="https://chris-maiorana.kit.com/f9e94a7435">newsletter for occasional updates</a> on similar topics.</li>
+</ul>
+<p> As always, thanks for reading, see you next time. </p>
+</div>
+</div>
+<p>The post <a href="https://chrismaiorana.com/dont-go-bankrupt-go-local/">Don’t go bankrupt, go local</a> appeared first on <a href="https://chrismaiorana.com">Chris Maiorana</a>.</p>
+</body></html>

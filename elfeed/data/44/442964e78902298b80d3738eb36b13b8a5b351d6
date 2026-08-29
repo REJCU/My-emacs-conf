@@ -1,0 +1,182 @@
+<html><head></head><body><p>Eglot ships with Emacs as a built-in, lightweight LSP client, and its default configuration is sufficient for most projects. However, working with large codebases can cause latency. When Eglot becomes sluggish, the problem may involve work performed by Eglot and Emacs as well as the language server itself. Event logging, filesystem watching, diagnostics, completion, and other editor activity can all contribute to latency.</p>
+
+
+
+<p>This article covers practical changes for keeping Eglot responsive when working with large projects.</p>
+
+
+
+<h2>Auto-shutting down idle Eglot servers</h2>
+
+
+
+<p>This reduces resource usage when switching between multiple projects. The <code>eglot-autoshutdown</code> variable shuts down the LSP server after the last managed buffer has been killed.</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">setq</span> eglot-autoshutdown <span class="hljs-literal">t</span>)</code></span></pre>
+
+
+<p>This is useful when many separate language servers would otherwise remain running after their buffers have been closed.</p>
+
+
+
+<p><em>(If you find yourself routinely leaving unused buffers open, the <a href="https://github.com/jamescherti/buffer-terminator.el">buffer-terminator</a> package can automate this cleanup. It quietly monitors your buffer activity and terminates idle file buffers, ensuring <code>eglot-autoshutdown</code> can trigger reliably without requiring you to manually execute <code>kill-buffer</code>.)</em></p>
+
+
+
+<h2>Preventing Eglot from blocking the Emacs UI on connection</h2>
+
+
+
+<p>Opening a project can cause Emacs to block while waiting for the LSP server to initialize. Setting <code>eglot-sync-connect</code> to <code>nil</code> prevents Eglot from blocking on the initial connection, allowing the connection to continue in the background:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">setq</span> eglot-sync-connect <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<p>This prevents the connection attempt from unnecessarily delaying interactive editing.</p>
+
+
+
+<h2>Disabling LSP event logging</h2>
+
+
+
+<p>Eglot maintains an events buffer containing JSON-RPC activity. Large event logs consume memory and add string allocation costs, especially when retaining complete JSON payloads is not needed during normal editing.</p>
+
+
+
+<p>Configuring <code>eglot-events-buffer-config</code> (or <code>eglot-events-buffer-size</code> on Emacs 29 and earlier) reduces the volume of retained data:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Disable event logging completely (Emacs &gt;= 30)</span>
+(<span class="hljs-name">setq</span> eglot-events-buffer-config '(<span class="hljs-symbol">:size</span> <span class="hljs-number">0</span> <span class="hljs-symbol">:format</span> short))
+
+<span class="hljs-comment">;; For Emacs &lt;= 29</span>
+<span class="hljs-comment">;; (setq eglot-events-buffer-size 0)</span></code></span></pre>
+
+
+<p>Setting <code>:size 0</code> disables the events buffer.</p>
+
+
+
+<h2>Reducing file watchers</h2>
+
+
+
+<p>Allowing a language server to monitor large portions of a repository can consume OS file descriptors, increase memory usage, and add startup delay. To reduce these resource costs, limit the number of file that Eglot watches using:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">setq</span> eglot-max-file-watches <span class="hljs-number">5000</span>)</code></span></pre>
+
+
+<p>In addition, where supported by the language server, configure it to ignore large generated directories such as <code>node_modules</code>, <code>.git</code>, or build output folders. Because these exclusion rules are specific to the language server, they must be passed through the <code>eglot-workspace-configuration</code> variable. (The standard method is to define these rules per-project using a <code>.dir-locals.el</code> file at the root of your repository.)</p>
+
+
+
+<h2>Disabling progress reporting</h2>
+
+
+
+<p>Whenever a server reports progress (e.g., during indexing or builds), this can trigger mode-line redisplays. The following suppress mode-line progress reports:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Suppress mode-line progress animations</span>
+(<span class="hljs-name">setq</span> eglot-report-progress <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<h2>Disabling automatic code action probing</h2>
+
+
+
+<p>By default, Eglot can asynchronously query the language server for available code actions at point when the cursor is idle. Disabling these automatic indications reduces continuous process communication and background activity during editing:</p>
+
+
+<pre><span><code class="hljs language-lisp"><span class="hljs-comment">;; Disable automatic code action indicators to reduce background polling</span>
+(<span class="hljs-name">setq</span> eglot-code-action-indications <span class="hljs-literal">nil</span>)</code></span></pre>
+
+
+<p>Note: Disabling this feature only removes the automatic UI indicators. You retain the ability to manually request and execute code actions at any time by invoking <code>M-x eglot-code-actions</code>.</p>
+
+
+
+<h2>Disabling unneeded LSP server capabilities</h2>
+
+
+
+<p>Note: You do not need to disable all of these capabilities, as some of them are very useful. Only disable the ones you do not use.</p>
+
+
+
+<p>LSP servers can provide optional capabilities. Disabling features that are not needed can reduce processing and visual clutter, although the actual performance benefit depends on the language server and project.</p>
+
+
+
+<p>Eglot handles on-type formatting by evaluating every single keystroke to check if the connected language server supports the feature and if the typed character is a registered trigger character. If a match occurs, Eglot issues an RPC request and applies the asynchronous edits, which can conflict with external formatters and introduce typing latency. To prevent these background requests and bypass the per-keystroke evaluation entirely, use:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">add-to-list</span> 'eglot-ignored-server-capabilities <span class="hljs-symbol">:documentOnTypeFormattingProvider</span>)</code></span></pre>
+
+
+<p>Inlay hints (<code>eglot-inlay-hints-mode</code>) display automatically determined types and parameter names as annotations in the buffer. Disabling them removes the associated visual annotations and any work required to maintain them:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">add-to-list</span> 'eglot-ignored-server-capabilities <span class="hljs-symbol">:inlayHintProvider</span>)</code></span></pre>
+
+
+<p>When the cursor rests on a symbol, the LSP server can highlight other occurrences of that symbol (<code>eglot-highlight-eldoc-function</code>). Disabling it will stop Eglot from highlighting other occurrences of the symbol under the cursor:</p>
+
+
+<pre><span><code class="hljs language-lisp">(<span class="hljs-name">add-to-list</span> 'eglot-ignored-server-capabilities <span class="hljs-symbol">:documentHighlightProvider</span>)</code></span></pre>
+
+
+<p>For major modes with Tree-sitter support, Tree-sitter already provides syntax-aware fontification locally and can be sufficient for many users. When the language server supports semantic tokens, Eglot can request semantic-token information over LSP and use it for additional syntax highlighting. Processing these responses requires JSON-RPC communication, decoding the token data, and applying the corresponding fontification. On large or frequently changing buffers, this can add CPU overhead. Ignoring the server's semantic-token capability prevents Eglot from using this feature:</p>
+
+
+<pre><span><code class="hljs language-php">(add-to-<span class="hljs-keyword">list</span> <span class="hljs-string">'eglot-ignored-server-capabilities :semanticTokensProvider)</span></code></span></pre>
+
+
+<p>Note: The tradeoff is that some semantic highlighting supplied by the language server may be lost. Tree-sitter fontification and LSP semantic tokens are not identical, so disabling semantic tokens can result in less precise or less detailed highlighting for some languages.</p>
+
+
+
+<h2>Garbage collection, native compilation, and read process output max</h2>
+
+
+
+<ul>
+<li><strong>The Emacs garbage collector</strong> can cause pauses during heavy workloads. LSP activity can increase allocation through diagnostics, completion, JSON processing, and other editor integrations. GC tuning can therefore help in some workloads, but the effect is workload-dependent. Increasing <code>gc-cons-threshold</code> permanently can reduce garbage collection frequency:<br><code>(setq gc-cons-threshold (* 100 1024 1024))</code><br><em>(Alternatively, several users rely on the <code>gcmh</code> package, which raises the GC threshold during active editing and forces a collection when Emacs becomes idle.)</em></li>
+
+
+
+<li><strong>Enable Native Compilation</strong>: Ensure that Emacs is built with native compilation support enabled. Native compilation can improve the execution speed of Emacs Lisp code, including code used by Eglot and other packages. <em>(Recommendation: Use the <a href="https://github.com/jamescherti/compile-angel.el/">compile-angel</a> package to ensure that all packages are natively compiled.)</em></li>
+
+
+
+<li><strong>read-process-output-max</strong>: <code>read-process-output-max</code> controls the maximum amount of data Emacs reads from a subprocess in a single operation. Since Eglot communicates with language servers through subprocesses, increasing this value can improve performance when a server sends large bursts of JSON-RPC data, such as during initialization, workspace indexing, or large file updates, by reducing the number of read operations required to consume the output. Raising it can help workloads that regularly receive large bursts of process output:<br><code>(setq read-process-output-max (* 1024 1024))</code><br><em>(This raises the limit to 1 MiB. It does not reserve 1 MiB of memory for each process or increase the amount of data a server can send; it only allows Emacs to consume more output per read operation. On GNU/Linux systems, the value should not exceed</em> <code>/proc/sys/fs/pipe-max-size</code><em>)</em></li>
+</ul>
+
+
+
+<h2>Freeing up the main Emacs thread with tree-sitter</h2>
+
+
+
+<p>Emacs executes Lisp, handles asynchronous process output, and updates the UI on a single main thread. In traditional major modes, typing triggers complex regular expression evaluations for syntax highlighting (font-locking). This CPU-bound work competes directly with Eglot, which relies on the exact same thread to deserialize incoming JSON-RPC payloads and render diagnostics. If the main thread is busy computing regexes, Eglot is forced to wait in the queue, resulting in input lag even if the external language server responds instantly.</p>
+
+
+
+<p>Major modes built on Tree-sitter (the <code>*-ts-mode</code> variants, such as <code>c-ts-mode</code>, <code>python-ts-mode</code>, and <code>rust-ts-mode</code>) use the Tree-Sitter C library for incremental syntax parsing. If a stable <code>*-ts-mode</code> exists for your programming language, enabling it can improve Eglot's responsiveness.</p>
+<div class="yarpp yarpp-related yarpp-related-rss yarpp-template-list">
+
+<h3>Related posts:</h3><ol>
+<li><a href="https://www.jamescherti.com/emacs-python-dev-using-eglot-pylsp-ruff-pylint-flake8/">Configuring Eglot for Python Development in Emacs: Integrating python-lsp-server (pylsp) with Linters and Formatters</a></li>
+<li><a href="https://www.jamescherti.com/emacs-scrolling-better-performance-usability/">Configuring Emacs Scrolling for Better Usability</a></li>
+<li><a href="https://www.jamescherti.com/emacs-fix-org-mode-copy-paste-yank-bleed/">Copy-paste without Emacs org-mode or markdown-mode Formatting Bleeding Into Other Buffers</a></li>
+<li><a href="https://www.jamescherti.com/emacs-why-use-setq-instead-setopt/">Emacs startup - Why setq beats setopt, customize-set-variable, and use-package :custom?</a></li>
+<li><a href="https://www.jamescherti.com/emacs-persist-restore-text-scale/">persist-text-scale.el - Persist and Restore the Text Scale</a></li>
+<li><a href="https://www.jamescherti.com/emacs-toggle-a-shell-window-shell-pop/">Easily Toggle an Emacs Terminal with a Single Keystroke using shell-pop (Recently Refactored)</a></li>
+<li><a href="https://www.jamescherti.com/emacs-compile-angel-byte-native-compile/">The compile-angel Emacs package: Byte-compile and Native-compile Emacs Lisp libraries Automatically</a></li>
+</ol>
+</div>
+</body></html>

@@ -1,0 +1,15 @@
+<html><head></head><body><p>
+James Cherti has an interesting and useful post <a href="https://www.jamescherti.com/emacs-why-use-setq-instead-setopt/">about the relative efficiency of setq, setq-default, setopt, and customize-set-variable</a>. Cherti justifies this concern on their effect on Emacs startup time but according to well established Irreal dicta this doesn’t matter because we seldom restart Emacs so a few seconds more or less simply don’t matter.
+</p>
+<p>
+Oddly, there are some people who pay no attention to Irreal dicta and who obsess about every millisecond—Cherti’s term—of Emacs startup time. For those people and those who worry about execution times in general, Cherti’s post is very useful and explains why some of those commands are faster than others.
+</p>
+<p>
+The crux of the matter is that <code>defcustom</code> can include a setter method that can be arbitrarily complex. Cherti has a nice example of this that will help you understand what’s going on. Cherti says that very often there’s no reason to invoke that setter method <i>during startup</i> and that <code>setq</code> or <code>setq-default</code> is faster and just as useful. Commands like <code>setopt</code> and <code>customize-set-variable</code> always call the setter method so they may be slower. Cherti’s examples show how to avoid unnecessary bottlenecks.
+</p>
+<p>
+Cherti also shows how even the <code>:custom</code> keyword in <code>use-package</code> can trigger the setter methods of those variables and gives some workarounds. The main problem is that it’s hard to know when you can avoid the setter method and when you can’t. Sometimes, you just have to read the source code to figure it out.
+</p>
+<p>
+Obsessing about startup times aside, it’s nice to have an explanation of what these commands do and how their use might affect run time. Cherti’s post is relatively short and well worth a minute or two to read.</p>
+</body></html>

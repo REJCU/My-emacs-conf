@@ -1,4 +1,4 @@
-;;; -*- lexical: t -*-
+;;; ...  -*- lexical-binding: t -*-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -14,13 +14,14 @@
      default))
  '(package-selected-packages
    '(anti-zenburn-theme avy cape company corfu dashboard doom-themes eat
-			ef-themes evil exec-path-from-shell flycheck
-			kanagawa-themes magit marginalia markdown-mode
+			ef-themes elfeed elpher emms eradio evil
+			exec-path-from-shell flycheck kanagawa-themes
+			magit marginalia markdown-mode
 			melpa-upstream-visit moe-theme
 			nerd-icons-completion nerd-icons-corfu
 			nerd-icons-dired orderless pet projectile
-			ripgrep treesit-auto vertico-posframe
-			zenburn-theme))
+			radio ripgrep rust-mode treesit-auto
+			vertico-posframe zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

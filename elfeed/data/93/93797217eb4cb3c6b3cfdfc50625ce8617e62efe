@@ -1,0 +1,162 @@
+<html><head></head><body><p>
+In the <a href="https://amitp.blogspot.com/2025/02/emacs-tree-sitter-custom-highlighting.html">part 1</a> I described my initial attempt at customizing font-lock
+using Emacs 29 tree-sitter. Regular font locking uses regular expression
+matching. Tree sitter allows combining regular expression matching with
+parse tree matching, like "variable declaration" or "function call". The
+ideas I came up with were mostly things that I could have implemented with
+regular expressions alone, but I wanted to experiment with the tree sitter
+approach. Here's the effect of conventional highlighting, using color for
+<em>keywords</em> and other syntax:
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-color-none.png" alt="Screenshot showing no use of color">
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-color-keywords.png" alt="Screenshot showing color for syntax">
+  <figcaption>Screenshots showing the use of color for syntax highlighting</figcaption>
+</figure>
+
+<a name="more"></a>
+
+<p>
+I wanted to instead mark variable names. In some projects I'm working with
+geometry, and I sometimes make mistakes putting the wrong variables
+together. I decided to mark <em>horizontal</em> and <em>vertical</em> variables differently. First, I defined a regular expression to guess that a variable represents something "horizontal":
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defvar</span> <span class="variable-name">amitp/regexp-horizontal-identifiers</span>
+  (<span class="keyword">rx</span>
+   (seq
+    string-start
+    (<span class="keyword">or</span> <span class="string">"x"</span> <span class="string">"dx"</span> <span class="string">"width"</span> <span class="string">"left"</span> <span class="string">"right"</span> <span class="string">"q"</span> <span class="string">"col"</span> <span class="string">"cols"</span> <span class="string">"columns"</span>)
+    (zero-or-more digit)
+    string-end)))
+
+(<span class="keyword">defvar</span> <span class="variable-name">amitp/regexp-vertical-identifiers</span>
+  (<span class="keyword">rx</span>
+   (seq
+    string-start
+    (<span class="keyword">or</span> <span class="string">"y"</span> <span class="string">"dy"</span> <span class="string">"height"</span> <span class="string">"top"</span> <span class="string">"bottom"</span> <span class="string">"up"</span> <span class="string">"down"</span> <span class="string">"r"</span> <span class="string">"row"</span> <span class="string">"rows"</span>)
+    (zero-or-more digit)
+    string-end)))
+</pre>
+</div>
+
+<p>
+I had started out with a string regexp but switched to the <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Rx-Notation.html">rx syntax</a>. Over
+time I added more patterns to this, including all caps and camelcase
+patterns.
+</p>
+
+<p>
+Unlike regular expression font locking, I can limit these regular expressions to match within certain types of parse tree nodes:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defvar</span> <span class="variable-name">amitp/treesit-font-lock-typescript-axis-variables</span>
+  (treesit-font-lock-rules
+   <span class="builtin">:language</span> 'typescript
+   <span class="builtin">:feature</span> 'semantic-identifier
+   <span class="builtin">:override</span> t
+   `(
+     ([(identifier) (property_identifier) (shorthand_property_identifier_pattern)]
+      @variable-horizontal-face
+      (<span class="builtin">:match</span> ,amitp/regexp-horizontal-identifiers @variable-horizontal-face))
+     ([(identifier) (property_identifier) (shorthand_property_identifier_pattern)]
+      @variable-vertical-face
+      (<span class="builtin">:match</span> ,amitp/regexp-vertical-identifiers @variable-vertical-face))
+     )))
+
+(add-hook
+ 'typescript-ts-mode-hook
+ (<span class="keyword">lambda</span> ()
+   (<span class="keyword">setq-local</span> treesit-font-lock-settings
+               (append treesit-font-lock-settings
+                       amitp/treesit-font-lock-typescript-axis-variables))))
+</pre>
+</div>
+
+
+
+<p>
+I think the restriction doesn't help much in this case, but it was fun
+learning how to use <code>treesit-font-lock-rules</code> for this. Here's the result:
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-color-variables.png" alt="Screenshot showing color for variables">
+</figure>
+
+<p>
+Do you notice the bug?
+</p>
+
+<p>
+This was a fun experiment. But it's a bit too noisy, especially if I have
+<em>both</em> variable and syntax highlighting. I think it'd be better if I could
+highlight <em>only</em> the problematic subexpression (the <kbd>y2-dx</kbd>). I decided to try
+it with a simpler problem.
+</p>
+
+<p>
+In some of my projects, I use geometry meshes that have integer IDs for
+regions (<code>r</code>), sides (<code>s</code>), and triangles (<code>t</code>). I want to avoid bug where an
+array is indexed by a triangle ID, but I accidentally index it by a
+triangle ID. Some languages have a feature called "newtype" to make these
+separate types, but I don't have them in Javascript. Instead, I use a
+naming convention to help me catch these:
+</p>
+
+<ul>
+<li><code>x_foo</code> is a value storing type x</li>
+<li><code>x_foo_y</code> is a function or array indexed by type y and stores values of type x</li>
+</ul>
+
+<p>
+I was hoping to use tree-sitter to find <em>subscript expressions</em>, and
+then check if the array name ends with the same type <code>_x</code> as the index
+expression <code>x_</code> starts with. I implemented it for simple cases:
+</p>
+
+<div class="org-src-container">
+<pre>(<span class="keyword">defvar</span> <span class="variable-name">amitp/treesit-font-lock-typescript-indexing</span>
+  (treesit-font-lock-rules
+   <span class="builtin">:language</span> 'typescript
+   <span class="builtin">:feature</span> 'semantic-identifier
+   <span class="builtin">:override</span> t
+   `(((subscript_expression) @error
+      (<span class="builtin">:match</span> <span class="string">"_r\\[_?[st]</span><span class="regexp-grouping-backslash"><span class="string">\\</span></span><span class="regexp-grouping-construct"><span class="string">|</span></span><span class="string">_s\\[_?[rt]</span><span class="regexp-grouping-backslash"><span class="string">\\</span></span><span class="regexp-grouping-construct"><span class="string">|</span></span><span class="string">_t\\[_?[sr]"</span> @error)))
+   ))
+</pre>
+</div>
+
+<p>  
+And it does work:
+</p>
+
+<figure>
+  <img src="https://www.redblobgames.com/x/screenshots/emacs-font-lock-color-indexing-1.png" alt="Screenshot">
+  <figcaption>Highlighting potential indexing error</figcaption>
+</figure>
+
+<p>
+However, tree-sitter plays almost no role in this. The real work is done by
+the regular expression. It doesn't catch these cases:
+</p>
+
+<div class="org-src-container">
+<pre>elevation_t[obj.t]       <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[obj.r]       <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[t_from_r(r)] <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[r_from_t(t)] <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[x.t_fn(x)]   <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[x.r_fn(x)]   <span class="comment-delimiter">// </span><span class="comment">bug</span>
+elevation_t[x.t_arr[i]]  <span class="comment-delimiter">// </span><span class="comment">good</span>
+elevation_t[x.r_arr[i]]  <span class="comment-delimiter">// </span><span class="comment">bug</span>
+</pre>
+</div>
+
+<p>
+How would I also handle these cases? I attempted it, but it took more time than I had originally planned for, so that'll be in <a href="https://amitp.blogspot.com/2025/03/emacs-tree-sitter-custom-highlighting-3.html">part 3</a>.
+</p>
+</body></html>

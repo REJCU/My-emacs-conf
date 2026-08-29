@@ -1,0 +1,96 @@
+<html><head></head><body><p>Two years ago I was a skeptic about GenAI.  Now Emacs has become my
+agent cockpit.</p>
+<h2>Harness</h2>
+<p>My favorite harness right now is <a href="https://github.com/nousresearch/hermes-agent">hermes-agent</a>, which is probably the
+<em>“emacs of agent harnesses”</em> with how easy it is to configure
+and extend, while not being “just an agent harness.”  Hermes supports
+messaging gateways, so you have first-class support for mobile as
+well.  All you have to do is <code>/handoff &lt;platform&gt;</code> to continue your
+session via a mobile messaging app.</p>
+<figure>
+    <img loading="lazy" src="https://thanosapollo.org/images/hermes-dashboard-01.png"> 
+</figure>
+
+<p>To interact with hermes via emacs, I’m using <a href="https://elpa.nongnu.org/nongnu/hermes.html">emacs-hermes, which is
+available via NonGNU ELPA.</a></p>
+<p>Sometimes I also use <a href="https://github.com/openai/codex">codex</a> via <a href="https://elpa.nongnu.org/nongnu/codex-ide.html">emacs-codex-ide</a>.  But it’s not as
+token-efficient as my hermes setup, and it’s not where I am most
+productive.  Unlike most harnesses, hermes supports codex native
+compaction, which is the “killer” feature of codex.</p>
+<h2>Models</h2>
+<p>I currently use <code>gpt-5.6-sol</code> for most tasks through my codex
+subscription.  It is exceptionally good at long-running goals.  It can
+easily keep going for 20h+ trying to complete its task, and I have
+found the quality of its work more than adequate.</p>
+<blockquote>
+<p>TIP: to save tokens with hermes, adjust the <code>auxiliary.approval</code> model
+to a cheap open-weight one, such as deepseek-v4-flash, which is
+practically free on nous portal.  This has cut my usage by more than
+35%.</p>
+</blockquote>
+<p>I’m also surprised by the recent leap x.ai made with Grok, which
+is currently the best value-for-money model by far.  The benchmarks
+place it close to gpt-5.6-sol and fable.</p>
+<figure>
+    <img loading="lazy" src="https://cdn.sanity.io/images/6vfeftx9/articles/5be9320cb6edf4847a0ab5beaf98244c1d5da13d-2228x912.png" alt="Figure 1: Artificial Analysis Intelligence Index"> <figcaption>
+            <p><span class="figure-number">Figure 1: </span>Artificial Analysis Intelligence Index</p>
+        </figcaption>
+</figure>
+
+<p>It’s currently my fallback model when I reach my usage limit on codex.
+It’s the fastest “frontier” model I’ve tried.</p>
+<p>I avoid using models from Anthropic.  Models like opus-5 and fable are
+good for coding tasks, but I found them subpar for my studies even
+compared to grok-4.6, plus overpriced.  The API prices are insane, and
+their subscription only supports their proprietary harness.</p>
+<h3>What about open models?</h3>
+<p>A friend and I tried to self-host our “AI Homelab”, repurposing an old
+ethereum mining rig plus a couple of new Nvidia GPUs.  The performance
+was not ideal with models like GLM-5.2 compared to subscriptions by a
+long shot.  Forget subagent workflows if you ever attempt it.  Not to
+mention that my electricity bill was the same as I’d pay for a
+subscription plan.</p>
+<p>A lot of people in the “GNU/Linux” sphere are looking for “free”
+models.  <strong>Even if</strong> there were a 6T+ “free” model that outperforms
+frontiers, there is no “free hardware” that could run it, and <strong>even if</strong>
+there were a FOSS Nvidia alternative, would it be financially worth it
+for most people as an investment?  Would your average hobbyist rather
+pay $20/month or buy the next gen “free” DGX Spark for $5,000?</p>
+<h2>Extra goodies &amp; Skills</h2>
+<h3>Memory</h3>
+<p>No matter your setup, the biggest upgrade for me has been <a href="https://github.com/vectorize-io/hindsight">hindsight</a>.
+It’s an agent memory system that you can share across harnesses, and
+it helps your agents remember your preferences and workflow details.</p>
+<p>It’s free and easy to self-host.</p>
+<h3>Skills</h3>
+<p>Skills are where my setup stops being generic.  Instead of explaining
+the same preferences and workflow every session, I put them in
+<code>SKILL.md</code> files that Hermes loads depending on the task.  I have
+skills for how I want elisp written and reviewed, and even for drafts
+like this post.</p>
+<p>Everyone takes a different approach, from GSD/BMAD/Spec-driven
+workflows that automate most of the work to “real engineering” skills
+that want you to babysit the agent.  I prefer smaller skills I can mix
+together instead of one framework owning my whole workflow.</p>
+<p>If you are just starting out, browse <a href="https://www.skills.sh/">skills.sh</a> for anything that “looks
+cool”, experiment with it, then start writing your own.  The two I
+recommend to most people are <a href="https://www.skills.sh/cursor/plugins/unslop">unslop</a> and <a href="https://www.skills.sh/mattpocock/skills/grill-me">grill-me</a>.</p>
+<h3>Other tools and environments</h3>
+<p>As of now, the only other tools I’d recommend are web tools like
+<a href="https://www.firecrawl.dev/">firecrawl</a> and <a href="https://github.com/searxng/searxng">searxng</a>.</p>
+<h2>Current state of my “AI Psychosis”</h2>
+<p>The past year the value I have gained from GenAI tools is <strong>insane</strong>.  I
+had not dreamed, even in my wildest dreams, that I would have such
+tools in my lifetime.</p>
+<p>Tasks that used to bottleneck my workflow, such as adjusting a
+software tool to help me study, are now cheap to solve.  Software is
+more of a commodity now, no longer a moat.
+Anything you like can be built easily.  You can see that even in
+projects like hermes, which copied the “Grok Bot” “killer-feature” in
+less than 24h and made it open source in their harness.</p>
+<p>Grunt work like notes for my syllabus based on my university lecture
+slides used to take me weeks.  Now it’s just a <code>/goal</code> prompt, go for a
+walk for 2h, and come back and they are ready in the same exact format
+the rest of my notes already have.  All that is left is for me to study
+them.</p>
+<p><strong><em>We live in exciting times.</em></strong></p></body></html>
