@@ -340,6 +340,15 @@
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
+;; nixd 
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'eglot-format nil t)))
+
+(with-eval-after-load 'eglot
+  (dolist (mode '((nix-mode . ("nixd"))))
+    (add-to-list 'eglot-server-programs mode)))
+
 ;; Rust mode - might consider moving to treesit mode for slightly faster performance
 (add-hook 'rust-mode-hook
           (lambda () (setq indent-tabs-mode nil)))
@@ -472,3 +481,9 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
+;; would open up alongside dashboard
+(with-eval-after-load 'desktop
+  (add-to-list 'desktop-files-not-to-open "\\.viminfo\\'"))
+
+(with-eval-after-load 'recentf
+  (add-to-list 'recentf-exclude ".*viminfo.*"))

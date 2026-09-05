@@ -28,15 +28,16 @@
  ("/home/rye/.emacs.d/" . "splash/")
  ("/home/rye/UNI/OperatingSystems/" . "Exam/")
  ("/home/rye/UNI/" . "DeepLearning/")
- ("/home/rye/" . ".config/")
+ ("/home/rye/" . ".emacs.d/")
 )
 
 ;; ----- ido-work-directory-list -----
 (
+ "/home/rye/.emacs.d/"
  "/home/rye/"
+ "/home/rye/nix-dev/"
  "/home/rye/.config/"
  "/home/rye/.emacs.d/external/"
- "/home/rye/.emacs.d/"
  "/home/rye/git_Stuff/svg-line/"
  "/home/rye/org/Home-Lab/"
  "/home/rye/org/"
@@ -82,11 +83,11 @@
  "/home/rye/cpp_projects/Invaders/build/"
  "/home/rye/c_projects/ryshell/"
  "/home/rye/c_projects/ryshell/src/"
- "/home/rye/UNI/DeepLearning/Exam/"
 )
 
 ;; ----- ido-work-file-list -----
 (
+ "nix-test.nix"
  "cat-bar.el"
  "svg-line.el"
  "home-lab.org"
@@ -96,34 +97,37 @@
  "aliases"
  ".zsh_plugins.txt"
  "rusdb.rs"
- "week1.org"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
+ ("/home/rye/.emacs.d/" (27291 43448 930031 351000) "ido.last" "ido.last~" "custom-vars.el" ".mc-lists.el" ".mc-lists.el~" "tramp" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
+
+ ("/home/rye/" (27291 43331 750496 156000) ".viminfo~" "nix-dev/" ".gtkrc-2.0" "wmenu" "fuzzel" ".steampid" ".steampath" ".password-store/" ".sigstore/" ".docker/" ".zshrc" ".zshrc~" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" ".zsh_history" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".python_history" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
+
+ ("/home/rye/nix-dev/" (27291 42593 771296 825000) "../" "./")
+
+ ("/home/rye/projects/Rss-Reader/src-tauri/src/" (27291 25178 88134 27000) "rusdb.rs" "rusdb.rs~" "feed.rs" "feed.rs~" "models.rs" "models.rs~" "parsing.rs" "parsing.rs~" "mod.rs" "fetcher.rs" "main.rs" "main.rs~" "lib.rs" "lib.rs~" "../" "./")
+
+ ("/home/rye/.config/hypr/" (27291 24474 204145 334000) "workspaces.conf" "monitors.conf" "#hyprland.lua#" ".git/" "autostart.lua" "oldConfig/" "scripts.lua" "hyprland.lua" "windowrule.lua" "layout.lua" "style.lua" "keybinds.lua" "../" "./")
+
+ ("/home/rye/.config/fuzzel/" (27291 21824 226761 787000) "fuzzel.ini" "fuzzel.ini~" "../" "./")
+
+ ("/home/rye/org/Home-Lab/" (27290 38273 605333 919000) "home-lab.org" "home-lab.org~" "../" "./")
+
+ ("/home/rye/.emacs.d/external/" (27290 38214 10898 769000) "cat-bar.el" "cat-bar.el~" "svg-line.el" "container.el" "container.el~" "../" "./")
+
+ ("/home/rye/.config/" (27291 39039 450559 107000) "Kitware/" "trashrc" "katerc" "QtProject.conf" "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "starship.toml" "starship.toml~" "zsh/" "mimeapps.list" "kconf_updaterc" "arkrc" "amfora/" "okularrc" "okularpartrc" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "kdeglobals" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "kritarc" "dolphinrc" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "kritadisplayrc" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
+
  ("/home/rye/alias/" (27291 23448 441071 813000) "aliases" "aliases~" "../" "./")
-
- ("/home/rye/" (27291 20393 976029 18000) "fuzzel" ".viminfo" "-ef --forest | grep -i pgpq" ".steampid" ".steampath" "Projects/" ".password-store/" ".sigstore/" ".docker/" ".zshrc" ".zshrc~" ".gtkrc-2.0" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" ".zsh_history" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".python_history" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" "VirtualBox VMs/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
-
- ("/home/rye/.emacs.d/" (27290 37874 400110 275000) "#.mc-lists.el#" ".#.mc-lists.el" "ido.last" "ido.last~" ".mc-lists.el" ".mc-lists.el~" "tramp" "custom-vars.el" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
 
  ("/home/rye/git_Stuff/svg-line/" (27290 37330 965721 740000) "version.txt" "test/" "svg-line.el" "release-please-config.json" "recipes/" "README.md" "LICENSE" "Eask" "CONTRIBUTING.md" "CLAUDE.md" "CHANGELOG.md" ".release-please-manifest.json" ".gitignore" ".github/" ".elpaignore" ".git/" "../" "./")
 
  ("/home/rye/git_Stuff/" (27290 37329 529738 542000) "svg-line/" "fuzzel/" "ascii_moon/" "pure/" "superhtml/" "amfora/" "raylib-cpp/" "glfw-3.4/" "tree-sitter/" "../" "./")
 
- ("/home/rye/.emacs.d/external/" (27290 37796 951913 982000) "container.el" "container.el~" "../" "./")
-
- ("/home/rye/org/Home-Lab/" (27290 36908 238958 527000) "#home-lab.org#" ".#home-lab.org" "home-lab.org" "home-lab.org~" "../" "./")
-
  ("/home/rye/org/" (27290 25040 865354 468000) "emacsstuff.org" "emacsstuff.org~" "Home-Lab/" "Docker/" "Projects/" "uni/" "docs/" ".orgids" "todo.org" "../" "./")
 
  ("/home/rye/org/Docker/" (27290 893 138455 488000) "Docker-searngx.org" "Docker-searngx.org~" "../" "./")
-
- ("/home/rye/.config/" (27289 64852 239418 554000) "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "QtProject.conf" "katerc" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "starship.toml" "starship.toml~" "zsh/" "trashrc" "mimeapps.list" "kconf_updaterc" "arkrc" "amfora/" "okularrc" "okularpartrc" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "kdeglobals" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "kritarc" "dolphinrc" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "kritadisplayrc" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
-
- ("/home/rye/.config/hypr/" (27289 16945 304814 595000) "workspaces.conf" "monitors.conf" "#hyprland.lua#" ".git/" "autostart.lua" "oldConfig/" "scripts.lua" "hyprland.lua" "windowrule.lua" "layout.lua" "style.lua" "keybinds.lua" "../" "./")
-
- ("/home/rye/.config/fuzzel/" (27289 17777 247088 57000) "fuzzel.ini" "fuzzel.ini~" "../" "./")
 
  ("/home/rye/git_Stuff/fuzzel/" (27289 17812 47732 124000) "bld/" "#dmenu.c#" "xsnprintf.h" "xsnprintf.c" "xmalloc.h" "xmalloc.c" "xdg.h" "xdg.c" "wayland.h" "wayland.c" "uri.h" "uri.c" "timing.h" "timing.c" "test/" "subprojects/" "stride.h" "srgb.py" "shm.h" "shm.c" "render.h" "render.c" "prompt.h" "prompt.c" "png.c" "png-fuzzel.h" "path.h" "path.c" "nanosvgrast.c" "nanosvg/" "nanosvg.c" "meson_options.txt" "meson.build" "match.h" "match.c" "main.c" "macros.h" "log.h" "log.c" "key-binding.h" "key-binding.c" "icon.h" "icon.c" "generate-version.sh" "fuzzel.ini" "fdm.h" "fdm.c" "external/" "event.h" "event.c" "doc/" "dmenu.h" "dmenu.c" "debug.h" "debug.c" "config.h" "config.c" "completions/" "column.h" "column.c" "clipboard.h" "clipboard.c" "char32.h" "char32.c" "application.h" "application.c" "README.md" "PKGBUILD" "LICENSE" "CONTRIBUTING.md" "CHANGELOG.md" "3rd-party/" ".woodpecker.yaml" ".gitmodules" ".gitignore" ".forgejo/" ".editorconfig" ".builds/" ".git/" "../" "./")
 
@@ -138,8 +142,6 @@
  ("/usr/share/locale/" (27264 3066 88534 640000) "locale.alias" "nan_TW@latin/" "nan_TW/" "he_IL/" "da_DK/" "ca_ES/" "zh_HANT/" "zh_HANS/" "zh/" "za/" "vo/" "ty/" "tw/" "ts/" "to/" "tn/" "szl/" "su/" "st/" "ss/" "sn/" "sma/" "sg/" "sco/" "rue/" "rn/" "rm/" "qu/" "os/" "om/" "oj/" "ny/" "nr/" "ng/" "nd/" "mo/" "mh/" "lu/" "la/" "ks/" "kr/" "kj/" "jv/" "ik/" "ii/" "ig/" "id_ID/" "hz/" "ho/" "fr_CA/" "fj/" "en_ZA/" "cu/" "cr/" "bm/" "bh/" "av/" "ae/" "aa/" "ln/" "ilo/" "zh_TW.UTF-8/" "zh_CN.UTF-8/" "sk.cp1250/" "pl.UTF-8/" "ko.UTF-8/" "ja.euc-jp/" "cs.cp1250/" "sm/" "or_IN/" "ku_IQ/" "ks_IN/" "es_MX/" "cgg/" "brx/" "am_ET/" "bo/" "ta_IN/" "es_CL/" "uk_UA/" "ga_IE/" "fil_PH/" "es_ES/" "es_AR/" "vi_VN/" "ru_RU/" "pl_PL/" "it_IT/" "fr_FR/" "zh_Hans/" "nl_BE/" "ko_KR/" "gl_ES/" "fa_IR/" "co/" "pt_PT/" "no/" "kg/" "rom/" "ain/" "mjw/" "az_IR/" "li/" "ang/" "wal/" "ve/" "tzm/" "tt@iqtelif/" "tk/" "tig/" "ti/" "son/" "so/" "sd/" "sc/" "ro_MD/" "pi/" "pap/" "pa_PK/" "ota/" "nv/" "nso/" "nah/" "na/" "mt/" "mi/" "mhr/" "kv/" "kok/" "kmr/" "kl/" "ki/" "jam/" "iu/" "io/" "ht/" "haw/" "gv/" "gn/" "gez/" "frp/" "fil/" "ff/" "ee/" "dv/" "cv/" "chr/" "ch/" "ce/" "byn/" "bn_BD/" "bi/" "bar/" "ba/" "ay/" "ak/" "ace/" "tok/" "sw/" "ha/" "en/" "uz@cyrillic/" "sr@ijekavianlatin/" "sr@ijekavian/" "se/" "sa/" "lb/" "hsb/" "hne/" "fy/" "csb/" "uz/" "wo/" "bal/" "nb_NO/" "en_NZ/" "en_AU/" "ach/" "lo/" "crh/" "yue/" "zh_Hant/" "eu_ES/" "es_419/" "br/" "az_AZ/" "kw/" "ckb/" "yi/" "xh/" "ug/" "tt/" "sr@ije/" "ps/" "nds/" "mg/" "mai/" "ku/" "kab/" "ie/" "hy/" "gd/" "en_CA/" "en@shaw/" "be@latin/" "an/" "ab/" "wa/" "oc/" "fo/" "ca@valencia/" "tl/" "dz/" "ast/" "lg/" "zu/" "zh_HK/" "yo/" "ur/" "th/" "tg/" "te/" "ta/" "sr@latin/" "si/" "pa/" "or/" "nn/" "ne/" "my/" "mr/" "mn/" "ml/" "mk/" "lv/" "ky/" "kw_GB/" "kn/" "km/" "kk/" "is/" "hi/" "he/" "gu/" "fa/" "eu/" "de_CH/" "cy/" "bs/" "bn_IN/" "bn/" "az/" "as/" "ar/" "am/" "en_US/" "ms/" "fur/" "sq/" "ga/" "et/" "en@quot/" "en@boldquot/" "af/" "zh_TW/" "zh_CN/" "vi/" "uk/" "tr/" "sv/" "sr/" "sl/" "sk/" "rw/" "ru/" "ro/" "pt_BR/" "pt/" "pl/" "nl/" "nb/" "lt/" "ko/" "ka/" "ja/" "it/" "id/" "ia/" "hu/" "hr/" "gl/" "fr/" "fi/" "es/" "eo/" "en_GB/" "el/" "de/" "da/" "cs/" "ca/" "bg/" "be/" "../" "./")
 
  ("/home/rye/projects/Rss-Reader/src/" (27287 46263 641321 496000) "main.ts" "main.ts~" "styles.css" "assets/" "../" "./")
-
- ("/home/rye/projects/Rss-Reader/src-tauri/src/" (27287 57078 280707 215000) "rusdb.rs" "rusdb.rs~" "feed.rs" "feed.rs~" "models.rs" "models.rs~" "parsing.rs" "parsing.rs~" "mod.rs" "fetcher.rs" "main.rs" "main.rs~" "lib.rs" "lib.rs~" "../" "./")
 
  ("/home/rye/rustplayground/" (27287 44477 886505 199000) "rusqlite/" "rewquestaround/" "../" "./")
 

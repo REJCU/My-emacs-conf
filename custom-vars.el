@@ -24,9 +24,10 @@
 			kanagawa-themes magit marginalia markdown-mode
 			melpa-upstream-visit moe-theme
 			multiple-cursors nerd-icons-completion
-			nerd-icons-corfu nerd-icons-dired orderless
-			pet projectile radio ripgrep rust-mode
-			treesit-auto vertico-posframe zenburn-theme))
+			nerd-icons-corfu nerd-icons-dired nix-mode
+			nix-ts-mode orderless pet projectile radio
+			ripgrep rust-mode treesit-auto
+			vertico-posframe zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
