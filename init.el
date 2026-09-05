@@ -290,6 +290,7 @@
          (python-mode    . eglot-ensure)
          (python-ts-mode . eglot-ensure)
          (mhtml-mode  . eglot-ensure)
+	 (nix-mode .eglot-ensure)
 	 (nix-ts-mode . eglot-ensure)
 	 (js-mode . subword-mode)
          (js-mode . electric-pair-mode)
