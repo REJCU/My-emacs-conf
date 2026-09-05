@@ -1,5 +1,10 @@
 ;; Auto-generated file; don't edit -*- mode: lisp-data -*-
-((:url "https://news.ycombinator.com/" :title "Hacker News" :time
+((:url
+  "https://www.jamescherti.com/emacs-scrolling-better-performance-usability/"
+  :title
+  "Configuring Emacs Scrolling for Better Usability | James Cherti"
+  :time "Sun Aug 30 19:30:54 2026")
+ (:url "https://news.ycombinator.com/" :title "Hacker News" :time
        "Mon Aug 24 09:23:58 2026")
  (:url
   "https://embedjournal.com/implementing-circular-buffer-embedded-c/"

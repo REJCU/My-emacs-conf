@@ -12,16 +12,21 @@
      "3b2ae1d19f5843cdc5833266b76e6367744932d96c5ddd713ede9797a2bd93fe"
      "daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077"
      default))
+ '(elfeed-feeds
+   '("https://www.radleylewis.com/feed.xml"
+     "https://nullprogram.com/feed/"
+     "https://planet.emacslife.com/atom.xml"
+     "https://www.abc.net.au/news/feed/1948/rss.xml") t)
  '(package-selected-packages
-   '(anti-zenburn-theme avy cape company corfu dashboard doom-themes eat
-			ef-themes elfeed elpher emms eradio evil
-			exec-path-from-shell flycheck kanagawa-themes
-			magit marginalia markdown-mode
+   '(anti-zenburn-theme avy cape company corfu dashboard docker
+			doom-themes eat ef-themes elfeed elpher emms
+			eradio evil exec-path-from-shell flycheck
+			kanagawa-themes magit marginalia markdown-mode
 			melpa-upstream-visit moe-theme
-			nerd-icons-completion nerd-icons-corfu
-			nerd-icons-dired orderless pet projectile
-			radio ripgrep rust-mode treesit-auto
-			vertico-posframe zenburn-theme))
+			multiple-cursors nerd-icons-completion
+			nerd-icons-corfu nerd-icons-dired orderless
+			pet projectile radio ripgrep rust-mode
+			treesit-auto vertico-posframe zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

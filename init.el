@@ -4,6 +4,10 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
+;; el modules
+(setq custom-file "~/.emacs.d/external/container.el")
+(load custom-file)
+
 ;; QOL
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
@@ -11,6 +15,9 @@
 (save-place-mode 1)
 (setq compilation-ask-about-save nil)
 
+;; visual line mode for text and derives - md, org 
+(setq-default truncate-lines t)
+(add-hook 'text-mode-hook #'visual-line-mode)
 
 ; increase proccess output buffer for LSP
 (setq read-process-output-max (* 4 1024 1024))
@@ -45,6 +52,7 @@
 ;; imenu-confs
 (setq use-package-enable-imenu-support t)
 
+(setq switch-to-buffer-obey-display-actions t)
 
 ;; Isearch
 (setopt isearch-lazy-count t)
@@ -282,12 +290,14 @@
          (python-mode    . eglot-ensure)
          (python-ts-mode . eglot-ensure)
          (mhtml-mode  . eglot-ensure)
+	 (nix-ts-mode . eglot-ensure)
 	 (js-mode . subword-mode)
          (js-mode . electric-pair-mode)
          (js-mode . eglot-ensure)
          (js-mode . completion-preview-mode)
 	 (typescript-mode . eglot-ensure)
 	 (typescript-ts-mode . eglot-ensure)
+	 (tsx-ts-mode . eglot-ensure)
 	 (js-ts-mode .eglot-ensure)
          (html-ts-mode . eglot-ensure)
          (LaTeX-mode  . eglot-ensure)   
@@ -309,10 +319,12 @@
                '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs
                '((LaTeX-mode latex-mode) . ("texlab")))
+  (add-to-list 'typescript-ts-mode-hook #'eglot-ensure)
+  (add-to-list 'tsx-ts-mode-hook #'eglot-ensure)
   (add-to-list 'eglot-server-programs
 	       '(qml-ts-mode  . ("qmlls6" "-E")))
-(add-to-list 'eglot-server-programs
-             '((html-ts-mode mhtml-mode) . ("superhtml" "lsp")))  
+  (add-to-list 'eglot-server-programs
+             '((html-ts-mode mhtml-mode) . ("vscode-html-language-server" "--stdio")))
   (add-to-list 'eglot-server-programs
                '((rust-mode rust-ts-mode) . ("rust-analyzer" :initializationOptions
                                              (:checkOnSave (:command "clippy")
@@ -421,6 +433,8 @@
   :init
   (setq org-return-follows-link t))
 
+(setq org-agenda-files '("~/org/"))
+
 ;; elfeed
 (keymap-global-set "C-x w" #'elfeed)
 
@@ -450,3 +464,10 @@
  'radio-stations-alist
  '(("First station" . "https://example.com/first.aac")
    ("Second station" . "https://example.com/second.aac")))
+
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
