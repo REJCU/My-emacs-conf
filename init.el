@@ -254,7 +254,9 @@
 (use-package ef-themes
   :ensure t
   :config
-  (modus-themes-load-theme 'ef-cyprus))
+  (modus-themes-load-theme 'ef-day))
+
+;(load-theme 'modus-vivendi)
 
 ; stop highlight when changing theme
 ;; (dolist (face '(font-lock-keyword-face
@@ -462,9 +464,16 @@
 (global-set-key (kbd "C-c r t") 'eradio-toggle)
 
 (setq eradio-channels '(("def con - soma fm" . "https://somafm.com/defcon256.pls")          ;; electronica with defcon-speaker bumpers
-                        ("metal - soma fm"   . "https://somafm.com/metal130.pls")           ;; \m/
-                        ("cyberia - lainon"  . "https://lainon.life/radio/cyberia.ogg.m3u") ;; cyberpunk-esque electronica / currently does not work
-                        ("cafe - lainon"     . "https://lainon.life/radio/cafe.ogg.m3u")))  ;; boring ambient, but with lain / cureently does not work
+                        ("metal - soma fm"   . "https://somafm.com/metal130.pls")
+			("Groove Salad - soma fm" . "https://somafm.com/groovesalad2130.pls")
+			("Bossa Beyond - some fm " . "https://somafm.com/bossa130.pls")
+			("SF Police Scanner - soma fm" . "https://somafm.com/scanner130.pls")
+			("Drone Zone - soma fm" . "https://somafm.com/dronezone130.pls")
+			("Indie Pop Rocks! - soma fm" . "https://somafm.com/indiepop130.pls")
+			("Soma fm specials - soma fm" . "https://somafm.com/specials130.pls")
+			("Lush - soma fm" . "https://somafm.com/lush130.pls")			
+			))
+
 ;; radio 
 (customize-set-variable
  'radio-command
