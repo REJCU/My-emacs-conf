@@ -8,12 +8,24 @@
 (setq custom-file "~/.emacs.d/external/container.el")
 (load custom-file)
 
+(setq custom-file "~/.emacs.d/extend/flyspell.el")
+(load custom-file)
+
+(setq custom-file "~/.emacs.d/extend/org-mode.el")
+(load custom-file)
+
+(setq custom-file "~/.emacs.d/extend/eww-conf.el")
+(load custom-file)
+
 ;; QOL
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
 (recentf-mode 1)
 (save-place-mode 1)
 (setq compilation-ask-about-save nil)
+
+;; auto closing brackets
+(electric-pair-mode t)
 
 ;; visual line mode for text and derives - md, org 
 (setq-default truncate-lines t)
@@ -245,16 +257,20 @@
   :ensure t
   :init (which-key-mode))
 
-;;For Kanagawa
-;; (use<>-package kanagawa-themes
-;;   :ensure t
-;;   :config (load-theme 'kanagawa-wave))
-
-; ef-themes 
-(use-package ef-themes
+;; For Kanagawa
+(use-package kanagawa-themes
   :ensure t
   :config
-  (modus-themes-load-theme 'ef-day))
+  (load-theme 'kanagawa-wave))
+
+;;(load-theme 'moe-dark)
+
+; ef-themes 
+;; (use-package ef-themes
+;;   :ensure t
+;;   :config
+;;   (modus-themes-load-theme 'ef-day))
+
 
 ;(load-theme 'modus-vivendi)
 
@@ -439,13 +455,6 @@
       eww-search-prefix "https://duckduckgo.com/html?q="
       url-privacy-level '(email agent cookies lastloc))
 
-;; org-mode - as large, could export to another file
-(use-package org
-  :mode (("\\.org" . org-mode))
-  :init
-  (setq org-return-follows-link t))
-
-(setq org-agenda-files '("~/org/"))
 
 ;; elfeed
 (keymap-global-set "C-x w" #'elfeed)

@@ -28,11 +28,15 @@
  ("/home/rye/.emacs.d/" . "splash/")
  ("/home/rye/UNI/OperatingSystems/" . "Exam/")
  ("/home/rye/UNI/" . "Mobile_computing/")
- ("/home/rye/" . "UNI/")
+ ("/home/rye/" . ".config/")
 )
 
 ;; ----- ido-work-directory-list -----
 (
+ "/home/rye/.config/hypr/"
+ "/home/rye/.emacs.d/extend/"
+ "/home/rye/.emacs.d/"
+ "/home/rye/UNI/"
  "/home/rye/UNI/Programming-3/Prac/week1/"
  "/home/rye/projects/Rss-Reader/"
  "/home/rye/projects/Rss-Reader/src-tauri/src/"
@@ -43,12 +47,9 @@
  "/home/rye/UNI/Programming-3/"
  "/home/rye/data/docker/"
  "/home/rye/UNI/Programming-3/Class/"
- "/home/rye/UNI/"
  "/home/rye/projects/Rss-Reader/src-tauri/"
- "/home/rye/.config/hypr/"
  "/home/rye/.config/"
  "/home/rye/"
- "/home/rye/.emacs.d/"
  "/home/rye/nix-dev/"
  "/home/rye/.emacs.d/external/"
  "/home/rye/git_Stuff/svg-line/"
@@ -82,62 +83,71 @@
  "/home/rye/cpp_projects/Invaders/"
  "/home/rye/ryquick/taskbar/"
  "/home/rye/.config/kitty/"
- "/home/rye/.config/quickshell/"
 )
 
 ;; ----- ido-work-file-list -----
 (
+ "indentation.el"
+ "eww-conf.el"
+ "flyspell.el"
+ "org-mode.el"
  "week1programs.cpp"
  "W1-SecurityFundamentals.org"
  ".gitingnore"
  ".envrc"
  ".zshrc"
  "nix-test.nix"
- "cat-bar.el"
- "svg-line.el"
- "home-lab.org"
- "container.el"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
- ("/home/rye/UNI/Programming-3/Prac/week1/" (27296 42910 611703 421000) "week1programs.cpp" "week1programs.cpp~" "Printtext.cpp" "Printtext.cpp~" "build/" "StructureForaCar.cpp" "SalaryandSwitchStatement.cpp" "TypeCastingandIfStatement.cpp" "../" "./")
+ ("/home/rye/" (27299 31693 735067 564000) ".aspell.en.pws" ".aspell.en.prepl" "docker-compose.yaml" "histfile" ".nix-defexpr/" ".python_history" ".zshrc" ".zshrc~" ".viminfo~" "nix-dev/" ".gtkrc-2.0" "wmenu" "fuzzel" ".steampid" ".steampath" ".password-store/" ".sigstore/" ".docker/" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" ".zsh_history" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile/" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
 
- ("/home/rye/projects/Rss-Reader/src-tauri/src/" (27295 52228 79616 489000) "#lib.rs#" ".#lib.rs" "#main.rs#" ".#main.rs" "rusdb.rs" "rusdb.rs~" "feed.rs" "feed.rs~" "models.rs" "models.rs~" "parsing.rs" "parsing.rs~" "mod.rs" "fetcher.rs" "main.rs" "main.rs~" "lib.rs" "lib.rs~" "../" "./")
+ ("/home/rye/.emacs.d/extend/" (27297 62904 90683 976000) "eww-conf.el" "eww-conf.el~" "flyspell.el" "flyspell.el~" "org-mode.el" "org-mode.el~" "../" "./")
+
+ ("/home/rye/UNI/Programming-3/Misc/src/" (27298 18994 974106 451000) "main.rs" "main.rs~" "../" "./")
+
+ ("/home/rye/.emacs.d/" (27297 61951 397885 576000) "#init.el#" ".#init.el" "extend/" "ido.last" "ido.last~" "custom-vars.el" ".mc-lists.el" ".mc-lists.el~" "tramp" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
+
+ ("/home/rye/UNI/Information-Sec/class/" (27297 60804 18669 483000) "W1-SecurityFundamentals.org" "W1-SecurityFundamentals.org~" "../" "./")
+
+ ("/home/rye/cpp_projects/Invaders/src/ecs/" (27295 42285 949810 472000) "entity.hpp" "entity.hpp~" "../" "./")
+
+ ("/home/rye/cpp_projects/Invaders/src/" (27295 45177 572047 503000) "physics/" "gamestate.cpp" "gamestate.cpp~" "ecs/" "state/" "main.cpp" "../" "./")
+
+ ("/home/rye/projects/Rss-Reader/src/" (27295 54987 867258 23000) "main.ts" "main.ts~" "styles.css" "assets/" "../" "./")
+
+ ("/home/rye/.config/" (27296 55999 98783 140000) "wireshark/" "QtProject.conf" "okularrc" "okularpartrc" "dolphinrc" "gwenviewrc" "starship.toml" "starship.toml~" "Kitware/" "trashrc" "katerc" "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "zsh/" "mimeapps.list" "kconf_updaterc" "arkrc" "amfora/" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "kdeglobals" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "kritarc" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "kritadisplayrc" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
+
+ ("/home/rye/projects/Rss-Reader/src-tauri/" (27295 54986 891278 289000) "app.db" "Cargo.toml" "Cargo.toml~" "gen/" "target/" "Cargo.lock" "src/" "icons/" "capabilities/" "build.rs" ".gitignore" "tauri.conf.json" "../" "./")
+
+ ("/home/rye/UNI/Information-Sec/" (27297 58098 702951 82000) ".git/" "misc/" "prac/" "assessment/" "class/" "../" "./")
+
+ ("/home/rye/projects/Rss-Reader/src-tauri/src/" (27295 54757 550142 640000) "rusdb.rs" "rusdb.rs~" "feed.rs" "feed.rs~" "models.rs" "models.rs~" "parsing.rs" "parsing.rs~" "mod.rs" "fetcher.rs" "main.rs" "main.rs~" "lib.rs" "lib.rs~" "../" "./")
+
+ ("/home/rye/projects/Rss-Reader/" (27295 54068 866874 249000) "index.html" "index.html~" ".git/" "package-lock.json" "node_modules/" "vite.config.ts" "tsconfig.json" "src/" "package.json" ".gitignore" "README.md" "src-tauri/" "../" "./")
+
+ ("/home/rye/UNI/Programming-3/Prac/week1/" (27296 49240 901114 56000) "week1programs.cpp" "week1programs.cpp~" "Printtext.cpp" "Printtext.cpp~" "build/" "StructureForaCar.cpp" "SalaryandSwitchStatement.cpp" "TypeCastingandIfStatement.cpp" "../" "./")
 
  ("/home/rye/cpp_projects/Invaders/build/" (27295 42434 540294 35000) "invaders" "compile_commands.json" "cmake_install.cmake" "Makefile" "CMakeCache.txt" ".cache/" "CPackSourceConfig.cmake" "CPackConfig.cmake" "_deps/" "CMakeFiles/" "../" "./")
 
  ("/home/rye/cpp_projects/Invaders/src/physics/" (27281 18925 219055 974000) "physics.cpp" "physics.cpp~" "../" "./")
 
- ("/home/rye/.emacs.d/" (27295 17735 564092 844000) "ido.last" "ido.last~" "custom-vars.el" ".mc-lists.el" ".mc-lists.el~" "tramp" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
-
- ("/home/rye/projects/Rss-Reader/src-tauri/" (27294 34626 876577 109000) "app.db" "Cargo.toml" "Cargo.toml~" "gen/" "target/" "Cargo.lock" "src/" "icons/" "capabilities/" "build.rs" ".gitignore" "tauri.conf.json" "../" "./")
-
  ("/home/rye/UNI/Programming-3/" (27294 19483 938102 700000) ".gitingnore" "flake.lock" "flake.nix" ".envrc" ".git/" "Prac/" "Misc/" "Assignment/" "Class/" "../" "./")
-
- ("/home/rye/UNI/Information-Sec/" (27295 17523 105387 591000) "misc/" "prac/" "assessment/" "class/" "../" "./")
-
- ("/home/rye/UNI/Information-Sec/class/" (27295 17523 104387 573000) "../" "./")
 
  ("/home/rye/data/docker/searxng/" (27294 14301 98262 770000) "docker-compose.yml" "docker-compose.yml~" ".env" ".env.example" "core-config/" "../" "./")
 
  ("/home/rye/org/" (27294 2220 401518 901000) "emacsstuff.org" "emacsstuff.org~" "Docker-Podman/" "Home-Lab/" "Projects/" "uni/" "docs/" ".orgids" "todo.org" "../" "./")
 
- ("/home/rye/" (27294 15704 514621 977000) ".nix-defexpr/" ".python_history" ".zshrc" ".zshrc~" ".viminfo~" "nix-dev/" ".gtkrc-2.0" "wmenu" "fuzzel" ".steampid" ".steampath" ".password-store/" ".sigstore/" ".docker/" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" ".zsh_history" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile/" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
-
  ("/home/rye/data/docker/" (27289 64727 108748 285000) "searxng/" "../" "./")
 
  ("/home/rye/UNI/Programming-3/Prac/" (27294 852 845652 773000) "week1/" "../" "./")
-
- ("/home/rye/cpp_projects/Invaders/src/" (27293 65418 346689 834000) "physics/" "gamestate.cpp" "gamestate.cpp~" "ecs/" "state/" "main.cpp" "../" "./")
 
  ("/home/rye/UNI/Programming-3/Class/" (27294 584 826464 9000) "lecture1-introduction.org" "lecture1-introduction.org~" "../" "./")
 
  ("/home/rye/Picture/Wallpaper/" (27291 57477 398082 519000) "wallhaven-6do37x.png" "wallhaven-9ogdrx.jpg" "wallhaven-w5xemq.jpg" "wallhaven-7jlor9.jpg" "wallhaven-pog1vj.jpg" "wallhaven-qrokv5.jpg" "wallhaven-5y39k8.jpg" "wallhaven-yq9x9k.png" "wallhaven-6lygkx.jpg" "wallhaven-e87wzk.jpg" "wallhaven-z85jyy.png" "wallhaven-283x86.jpg" "wallhaven-oxdwyp.jpg" "wallhaven-4gvj93.jpg" "wallhaven-zxeo3o.png" "wallhaven-13jw6v.jpg" "wallhaven-8grqjo.jpg" "wallhaven-5ymy19.jpg" "wallhaven-1qr6mg.png" "wallhaven-qrm3dl.jpg" "wallhaven-rqpy57.jpg" "wallhaven-9o927x.jpg" "wallhaven-xepeld.jpg" "wallhaven-5yrwq8.jpg" "wallhaven-og23ep.jpg" "wallhaven-zp5z2w.png" "wallhaven-213edy.png" "wallhaven-w5mgxr.jpg" "wallhaven-w5m3vp.png" "wallhaven-xepjgv.jpg" "wallhaven-vp53rm.png" "wallhaven-28rr8m.jpg" "wallhaven-d6g16l.jpg" "wallhaven-r2ze21.jpg" "wallhaven-6depdl.png" "wallhaven-5gqde7.jpg" "wallhaven-6kg6kq.jpg" "wallhaven-og5ex7.jpg" "wallhaven-lyyowr.png" "wallhaven-yq5m9g.png" "wallhaven-7j9j8y.jpg" "wallhaven-9ozzdk.jpg" "wallhaven-7j9wme.jpg" "wallhaven-gw5ypd.jpg" "wallhaven-5ykpw8.png" "wallhaven-d8w8gj.jpg" "wallhaven-e8wxwl.jpg" "wallhaven-qrgkpl.png" "818cVxOk2YL._AC_UF894,1000_QL80_.jpg" "wallhaven-lyk6gl.jpg" "wallhaven-lyk15y.jpg" "wallhaven-jekzmw.jpg" "wallhaven-yqgpyx.jpg" "wallhaven-ogl95l.jpg" "wallhaven-lykzjy.jpg" "wallhaven-7jwrp3.jpg" "wallhaven-qrgm87.jpg" "wallhaven-8gd8xo.jpg" "wallhaven-rqo3pq.jpg" "wallhaven-5ykm79.png" "wallhaven-vpye85.jpg" "wallhaven-8gdpgo.png" "wallhaven-k8kgz1.jpg" "wallhaven-w5lj7p.jpg" "wallhaven-qrgqyq.jpg" "wallhaven-3q5jl6.png" "wallhaven-gw9gwe.jpg" "wallhaven-yqglpx.jpg" "wallhaven-pojpdm.jpg" "wallhaven-6dxq67.png" "wallhaven-gpxo17.jpg" "wallhaven-o5zrj7.jpg" "wallhaven-k83or7.jpg" "wallhaven-3qkzqv.jpg" "wallhaven-8orz32.jpg" "wallhaven-m99kr8.jpg" "wallhaven-o3zovm.jpg" "wallhaven-o55vdm.jpg" "wallhaven-d6qv8l.png" "wallhaven-wy66zx.png" "wallhaven-d69rq3.jpg" "wallhaven-q6d1j7.jpg" "wallhaven-e839ql.jpg" "wallhaven-polmep.jpg" "wallhaven-e89x5o.jpg" "wallhaven-ml1lek.png" "wallhaven-wyomo6.jpg" "wallhaven-poj733.png" "wallhaven-k88jv6.jpg" "wallhaven-vpo89p.jpg" "wallhaven-yq5ejd.png" "wallhaven-13mrg3.jpg" "wallhaven-k88oy6.jpg" "wallhaven-qrrx75.jpg" "wallhaven-1qq56w.jpg" "wallhaven-9oz2mk.jpg" "wallhaven-21zog9.jpg" "wallhaven-lyzj5r.png" "wallhaven-e83378.jpg" "wallhaven-8gk9jj.png" "wallhaven-vpz8pp.png" "wallhaven-9oz7o8.png" "wallhaven-je1d5p.jpg" "wallhaven-ogl9l7.jpg" "wallhaven-gwqy67.png" "wallhaven-yqgj3l.jpg" "wallhaven-21d726.png" "wallhaven-6l2qdw.jpg" "wallhaven-6l2kp7.png" "wallhaven-yqedzx.jpg" "wallhaven-9o27rk.jpg" "wallhaven-3q5k8y.png" "wallhaven-lyk8qq.jpg" "wallhaven-6l2dql.jpg" "wallhaven-mlw989.png" "wallhaven-1qdevv.jpg" "wallhaven-zpqp6g.jpg" "wallhaven-gwq6me.jpg" "wallhaven-je1kdw.png" "wallhaven-9o22j8.jpg" "wallhaven-zp85do.png" "wallhaven-d8kklo.jpg" "wallhaven-lywm22.png" "wallhaven-6l5mww.png" "wallhaven-5y53x5.jpg" "wallhaven-qr3peq.jpg" "wallhaven-rqyw7q.jpg" "wallhaven-d83okm.jpg" "wallhaven-ml1d68.png" "wallhaven-8gkx2k.jpg" "wallhaven-8gk3ry.jpg" "wallhaven-d8k5rm.jpg" "wallhaven-dgrx2l.jpg" "wallhaven-md3wd9.jpg" "wallhaven-8orqmj.png" "wallhaven-57p7e1.jpg" "wallhaven-q6m557.png" "wallhaven-odkykm.jpg" "wallhaven-8x16mo.png" "wallhaven-rdj1yw.jpg" "wallhaven-72yzje.jpg" "wallhaven-96l5xd.png" "wallhaven-gpxxq7.jpg" "wallhaven-5gpv25.jpg" "wallhaven-g76m7d.jpg" "wallhaven-wed6k6.png" "wallhaven-1k6ljv.jpg" "wallhaven-72vwpo.jpg" "wallhaven-gpd6v7.jpg" "wallhaven-l315vy.png" "wallhaven-5gwvz5.jpg" "wallhaven-j5mz95.png" "wallhaven-e7pwdw.jpg" "wallhaven-vqo2yl.png" "wallhaven-jewwxm.png" "wallhaven-x8eydz.jpg" "wallhaven-39mvvy.png" "wallhaven-r71zwq.jpg" "wallhaven-4x95v4.jpg" "wallhaven-m3z1oy.jpg" "wallhaven-45m6p5.jpg" "../" "./")
 
  ("/home/rye/org/Home-Lab/" (27293 11899 591203 757000) "home-lab.org" "home-lab.org~" "../" "./")
-
- ("/home/rye/.config/" (27292 62765 827925 936000) "QtProject.conf" "okularrc" "okularpartrc" "dolphinrc" "gwenviewrc" "starship.toml" "starship.toml~" "Kitware/" "trashrc" "katerc" "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "zsh/" "mimeapps.list" "kconf_updaterc" "arkrc" "amfora/" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "kdeglobals" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "kritarc" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "kritadisplayrc" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
 
  ("/home/rye/.config/hypr/" (27291 57530 398959 693000) "workspaces.conf" "monitors.conf" "#hyprland.lua#" ".git/" "autostart.lua" "oldConfig/" "scripts.lua" "hyprland.lua" "windowrule.lua" "layout.lua" "style.lua" "keybinds.lua" "../" "./")
 
@@ -165,8 +175,6 @@
 
  ("/usr/share/locale/" (27264 3066 88534 640000) "locale.alias" "nan_TW@latin/" "nan_TW/" "he_IL/" "da_DK/" "ca_ES/" "zh_HANT/" "zh_HANS/" "zh/" "za/" "vo/" "ty/" "tw/" "ts/" "to/" "tn/" "szl/" "su/" "st/" "ss/" "sn/" "sma/" "sg/" "sco/" "rue/" "rn/" "rm/" "qu/" "os/" "om/" "oj/" "ny/" "nr/" "ng/" "nd/" "mo/" "mh/" "lu/" "la/" "ks/" "kr/" "kj/" "jv/" "ik/" "ii/" "ig/" "id_ID/" "hz/" "ho/" "fr_CA/" "fj/" "en_ZA/" "cu/" "cr/" "bm/" "bh/" "av/" "ae/" "aa/" "ln/" "ilo/" "zh_TW.UTF-8/" "zh_CN.UTF-8/" "sk.cp1250/" "pl.UTF-8/" "ko.UTF-8/" "ja.euc-jp/" "cs.cp1250/" "sm/" "or_IN/" "ku_IQ/" "ks_IN/" "es_MX/" "cgg/" "brx/" "am_ET/" "bo/" "ta_IN/" "es_CL/" "uk_UA/" "ga_IE/" "fil_PH/" "es_ES/" "es_AR/" "vi_VN/" "ru_RU/" "pl_PL/" "it_IT/" "fr_FR/" "zh_Hans/" "nl_BE/" "ko_KR/" "gl_ES/" "fa_IR/" "co/" "pt_PT/" "no/" "kg/" "rom/" "ain/" "mjw/" "az_IR/" "li/" "ang/" "wal/" "ve/" "tzm/" "tt@iqtelif/" "tk/" "tig/" "ti/" "son/" "so/" "sd/" "sc/" "ro_MD/" "pi/" "pap/" "pa_PK/" "ota/" "nv/" "nso/" "nah/" "na/" "mt/" "mi/" "mhr/" "kv/" "kok/" "kmr/" "kl/" "ki/" "jam/" "iu/" "io/" "ht/" "haw/" "gv/" "gn/" "gez/" "frp/" "fil/" "ff/" "ee/" "dv/" "cv/" "chr/" "ch/" "ce/" "byn/" "bn_BD/" "bi/" "bar/" "ba/" "ay/" "ak/" "ace/" "tok/" "sw/" "ha/" "en/" "uz@cyrillic/" "sr@ijekavianlatin/" "sr@ijekavian/" "se/" "sa/" "lb/" "hsb/" "hne/" "fy/" "csb/" "uz/" "wo/" "bal/" "nb_NO/" "en_NZ/" "en_AU/" "ach/" "lo/" "crh/" "yue/" "zh_Hant/" "eu_ES/" "es_419/" "br/" "az_AZ/" "kw/" "ckb/" "yi/" "xh/" "ug/" "tt/" "sr@ije/" "ps/" "nds/" "mg/" "mai/" "ku/" "kab/" "ie/" "hy/" "gd/" "en_CA/" "en@shaw/" "be@latin/" "an/" "ab/" "wa/" "oc/" "fo/" "ca@valencia/" "tl/" "dz/" "ast/" "lg/" "zu/" "zh_HK/" "yo/" "ur/" "th/" "tg/" "te/" "ta/" "sr@latin/" "si/" "pa/" "or/" "nn/" "ne/" "my/" "mr/" "mn/" "ml/" "mk/" "lv/" "ky/" "kw_GB/" "kn/" "km/" "kk/" "is/" "hi/" "he/" "gu/" "fa/" "eu/" "de_CH/" "cy/" "bs/" "bn_IN/" "bn/" "az/" "as/" "ar/" "am/" "en_US/" "ms/" "fur/" "sq/" "ga/" "et/" "en@quot/" "en@boldquot/" "af/" "zh_TW/" "zh_CN/" "vi/" "uk/" "tr/" "sv/" "sr/" "sl/" "sk/" "rw/" "ru/" "ro/" "pt_BR/" "pt/" "pl/" "nl/" "nb/" "lt/" "ko/" "ka/" "ja/" "it/" "id/" "ia/" "hu/" "hr/" "gl/" "fr/" "fi/" "es/" "eo/" "en_GB/" "el/" "de/" "da/" "cs/" "ca/" "bg/" "be/" "../" "./")
 
- ("/home/rye/projects/Rss-Reader/src/" (27287 46263 641321 496000) "main.ts" "main.ts~" "styles.css" "assets/" "../" "./")
-
  ("/home/rye/rustplayground/" (27287 44477 886505 199000) "rusqlite/" "rewquestaround/" "../" "./")
 
  ("/home/rye/rustplayground/rusqlite/src/" (27287 57151 391600 879000) "main.rs" "main.rs~" "../" "./")
@@ -187,8 +195,6 @@
 
  ("/home/rye/rustplayground/rewquestaround/" (27283 61586 815823 262000) "Cargo.toml" "Cargo.toml~" "Cargo.lock" "target/" "src/" ".gitignore" ".git/" "../" "./")
 
- ("/home/rye/projects/Rss-Reader/" (27286 9636 212250 585000) "index.html" "index.html~" ".git/" "package-lock.json" "node_modules/" "vite.config.ts" "tsconfig.json" "src/" "package.json" ".gitignore" "README.md" ".vscode/" "src-tauri/" "../" "./")
-
  ("/home/rye/rustplayground/rewquestaround/src/" (27283 61651 578242 387000) "main.rs" "main.rs~" "../" "./")
 
  ("/home/rye/org/Projects/" (27281 21453 955621 37000) "RSSreader/" "BulletHellGame/" "Gemini_Protocol/" "../" "./")
@@ -198,8 +204,6 @@
  ("/home/rye/projects/" (27282 8152 146690 691000) "Rss-Reader/" "emacsdir/" "idea/" "Touch_Typing_GUI/" "Touch_Typing_Classes/" "Touch_Typing/" "../" "./")
 
  ("/home/rye/cpp_projects/" (27265 18063 641533 273000) "Invaders/" "RayTracingInOneWeekend/" "../" "./")
-
- ("/home/rye/cpp_projects/Invaders/src/ecs/" (27282 7472 495214 164000) "entity.hpp" "entity.hpp~" "../" "./")
 
  ("/home/rye/org/Projects/Gemini_Protocol/" (27281 4308 726686 195000) "main.org" "main.org~" "protocol-specification.gmi" "../" "./")
 
