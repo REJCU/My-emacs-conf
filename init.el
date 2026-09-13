@@ -17,6 +17,9 @@
 (setq custom-file "~/.emacs.d/extend/eww-conf.el")
 (load custom-file)
 
+(setq custom-file "~/.emacs.d/external/meowconf.el")
+(load custom-file)
+
 ;; QOL
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
@@ -183,6 +186,7 @@
 ;; corfu
 (use-package corfu
   ;; Optional customizations
+  :ensure t 
   :custom
       (corfu-auto t)
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -258,18 +262,18 @@
   :init (which-key-mode))
 
 ;; For Kanagawa
-(use-package kanagawa-themes
-  :ensure t
-  :config
-  (load-theme 'kanagawa-wave))
-
-;;(load-theme 'moe-dark)
-
-; ef-themes 
-;; (use-package ef-themes
+;; (use-package kanagawa-themes
 ;;   :ensure t
 ;;   :config
-;;   (modus-themes-load-theme 'ef-day))
+;;   (load-theme 'kanagawa-wave))
+
+;;(load-theme ')
+
+; ef-themes 
+(use-package ef-themes
+  :ensure t
+  :config
+  (modus-themes-load-theme 'ef-arbutus))
 
 
 ;(load-theme 'modus-vivendi)

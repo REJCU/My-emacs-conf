@@ -5,7 +5,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("953a4391d91a93ac734777a53001d1b514c22c4b7233c932ae029a5b01cdf3f7"
+   '("05f1ee9db2c66cd715ab6d36ff949386c47dfff91a7df1f203d015b3ea304dbb"
+     "953a4391d91a93ac734777a53001d1b514c22c4b7233c932ae029a5b01cdf3f7"
      "2dd2fe7575d76094652d9e04de604db1cd1cdf1582e1494bc646b2a6e402afb0"
      "bb18b6d5982beeb76a37ced9211e972f84e8e76af9579456aa8cef794ae0bcb9"
      "4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d"
@@ -41,7 +42,7 @@
 			doom-themes eat ef-themes elfeed elpher emms
 			eradio evil exec-path-from-shell flycheck
 			kanagawa-themes magit marginalia markdown-mode
-			melpa-upstream-visit moe-theme
+			melpa-upstream-visit meow moe-theme
 			multiple-cursors nerd-icons-completion
 			nerd-icons-corfu nerd-icons-dired nix-mode
 			nix-ts-mode orderless pet projectile radio
