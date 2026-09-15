@@ -1,0 +1,214 @@
+<p>I just published the latest stable release of <a href="https://protesilaos.com/emacs/modus-themes">the Modus
+themes</a>. The change log
+entry is reproduced further below. For any questions, you are welcome
+to <a href="https://protesilaos.com/contact/">contact me</a>. I will now work to
+apply these same changes to emacs.git, so please wait a little longer
+for the updates to trickle down to you.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">modus-themes</code> (also built into Emacs 28+)</li>
+  <li>Official manual: <a href="https://protesilaos.com/emacs/modus-themes">https://protesilaos.com/emacs/modus-themes</a></li>
+  <li>Change log: <a href="https://protesilaos.com/emacs/modus-themes-changelog">https://protesilaos.com/emacs/modus-themes-changelog</a></li>
+  <li>Colour palette: <a href="https://protesilaos.com/emacs/modus-themes-colors">https://protesilaos.com/emacs/modus-themes-colors</a></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/modus-themes-pictures">https://protesilaos.com/emacs/modus-themes-pictures</a></li>
+  <li>Git repositories:
+    <ul>
+      <li>GitHub: <a href="https://github.com/protesilaos/modus-themes">https://github.com/protesilaos/modus-themes</a></li>
+      <li>GitLab: <a href="https://gitlab.com/protesilaos/modus-themes">https://gitlab.com/protesilaos/modus-themes</a></li>
+    </ul>
+  </li>
+  <li>Backronym: My Old Display Unexpectedly Sharpened … themes.</li>
+</ul>
+
+<hr />
+
+<h2>5.3.0 on 2026-06-21</h2>
+
+<p>The Modus themes are in a stable state. To my mind, they provide the
+best “default theme” experience across the 40+ original themes I have
+carefully designed.</p>
+
+<p>Modus is also a platform for making themes for Emacs. There are plenty
+of derivatives already. I am linking to them through the project’s
+README.md and am always happy to mention more packages—just let me
+know.</p>
+
+<p>This version does not include many user-facing changes. Most of my
+work focused on making internal refinements.</p>
+
+<h3>Load the themes through the <code class="language-plaintext highlighter-rouge">early-init.el</code></h3>
+
+<p>The Modus themes can now be loaded through the <code class="language-plaintext highlighter-rouge">early-init.el</code> file.
+The idea is to avoid the flash of light that occurs under certain
+conditions during startup.</p>
+
+<p>This feature is the result of several changes to helper functions,
+especially those contributing to the <code class="language-plaintext highlighter-rouge">modus-themes-generate-palette</code>
+function that Modus derivatives may be relying on.</p>
+
+<p>Thanks to Steven Allen for an intermediate refinement in pull request
+194 and to Mike Olson for another relevant tweak in pull request 199:</p>
+
+<ul>
+  <li><a href="https://github.com/protesilaos/modus-themes/pull/194">https://github.com/protesilaos/modus-themes/pull/194</a></li>
+  <li><a href="https://github.com/protesilaos/modus-themes/pull/199">https://github.com/protesilaos/modus-themes/pull/199</a></li>
+</ul>
+
+<p>Steven’s contribution no longer exists in the code base due to other
+changes I made, but was still useful at the time.</p>
+
+<p>Both changes are small, meaning that their authors do not need to
+assign copyright to the Free Software Foundation.</p>
+
+<p>Also thanks to Jacod “Jake” Gordon for reminding me to apply one of
+the new functions to the <code class="language-plaintext highlighter-rouge">org-habit</code> faces. This was done in issue
+197: <a href="https://github.com/protesilaos/modus-themes/issues/197">https://github.com/protesilaos/modus-themes/issues/197</a>.</p>
+
+<h3>The underline for widget fields has the correct colour</h3>
+
+<p>Relevant faces use the palette entry for <code class="language-plaintext highlighter-rouge">border</code> (invoke the command
+<code class="language-plaintext highlighter-rouge">modus-themes-preview-colors</code> or <code class="language-plaintext highlighter-rouge">modus-themes-preview-colors-current</code>
+to view the entries in a theme’s palette).</p>
+
+<p>A popular package that makes use of <code class="language-plaintext highlighter-rouge">widget.el</code> widgets is <code class="language-plaintext highlighter-rouge">notmuch</code>.</p>
+
+<p>Thanks to ukiran03 for the contribution, which was done in pull
+request 193: <a href="https://github.com/protesilaos/modus-themes/pull/193">https://github.com/protesilaos/modus-themes/pull/193</a>.
+The change is small, meaning that ukiran03 does not need to assign
+copyright to the Free Software Foundation.</p>
+
+<h3>A palette can now have a <code class="language-plaintext highlighter-rouge">bg-popup</code> entry</h3>
+
+<p>This gives users and derivative themes the option to pick a suitable
+value for popup interfaces, such as those of the <code class="language-plaintext highlighter-rouge">company</code> and <code class="language-plaintext highlighter-rouge">corfu</code>
+packages.</p>
+
+<p>Thanks to aikrahguzar for making this suggestion in issue 70 of my
+<code class="language-plaintext highlighter-rouge">ef-themes</code> repository (the <code class="language-plaintext highlighter-rouge">ef-themes</code> are built on top of the
+<code class="language-plaintext highlighter-rouge">modus-themes</code> since Modus version <code class="language-plaintext highlighter-rouge">5.0.0</code>, Ef version <code class="language-plaintext highlighter-rouge">2.0.0</code>):
+<a href="https://github.com/protesilaos/ef-themes/issues/70">https://github.com/protesilaos/ef-themes/issues/70</a>.</p>
+
+<h3>Support for faces or packages</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">lin</code> by Protesilaos.</li>
+  <li><code class="language-plaintext highlighter-rouge">pulsar</code> by Protesilaos.</li>
+  <li><code class="language-plaintext highlighter-rouge">institution-calendar</code> by Protesilaos.</li>
+  <li><code class="language-plaintext highlighter-rouge">markdown-ts-mode</code> by Rahul Martim Juliato and Stéphane Marks.</li>
+  <li><code class="language-plaintext highlighter-rouge">trust-manager</code> by Eshel Yaron.</li>
+  <li><code class="language-plaintext highlighter-rouge">typst-ts-mode</code> by Ziqi Yang. Thanks to Pranshu Sharma for
+suggesting its inclusion in issue 208: <a href="https://github.com/protesilaos/modus-themes/issues/208">https://github.com/protesilaos/modus-themes/issues/208</a>.</li>
+  <li>new <code class="language-plaintext highlighter-rouge">elfeed</code> faces since the maintenance of the project was assumed
+by Daniel Mendler, Karthik Chikmagalur, and Ihor Radchenko. To this
+end, thanks to Steven Allen for pull request 217 that added the
+<code class="language-plaintext highlighter-rouge">elfeed-show-*</code> faces: <a href="https://github.com/protesilaos/modus-themes/pull/217">https://github.com/protesilaos/modus-themes/pull/217</a></li>
+</ul>
+
+<h3>Internal refinements to the <code class="language-plaintext highlighter-rouge">modus-themes-with-colors</code> macro</h3>
+
+<p>It now correctly handles the order of default palette colours and
+user-defined palette overrides. Thanks to JD Smith for the
+contribution in pull request 191: <a href="https://github.com/protesilaos/modus-themes/pull/191">https://github.com/protesilaos/modus-themes/pull/191</a>.</p>
+
+<p>The change is small, meaning that JD does not need to assign copyright
+to the Free Software Foundation.</p>
+
+<h3>The <code class="language-plaintext highlighter-rouge">multiple-cursors</code> are fine even when a bar is used</h3>
+
+<p>When the <code class="language-plaintext highlighter-rouge">cursor-type</code> is configured to be a <code class="language-plaintext highlighter-rouge">bar</code>, the fake cursors
+produced by the <code class="language-plaintext highlighter-rouge">multiple-cursors</code> package will still look right.
+Thanks to Elias Gabriel Perez for the change to the
+<code class="language-plaintext highlighter-rouge">mc/cursor-bar-face</code> in pull request 213: <a href="https://github.com/protesilaos/modus-themes/pull/213">https://github.com/protesilaos/modus-themes/pull/213</a>.</p>
+
+<h3>The <code class="language-plaintext highlighter-rouge">blink-matching-paren-offscreen</code> is the same as <code class="language-plaintext highlighter-rouge">show-paren-match</code></h3>
+
+<p>This is for thematic consistency. Thanks to Troy Brown for suggesting
+this change in issue 209: <a href="https://github.com/protesilaos/modus-themes/issues/209">https://github.com/protesilaos/modus-themes/issues/209</a>.</p>
+
+<h3>Get <code class="language-plaintext highlighter-rouge">vc-annotate</code> look right</h3>
+
+<p>The built-in <code class="language-plaintext highlighter-rouge">vc-annotate</code> command relies on a user option to read
+color values. We cannot handle this nicely at the theme level. Users
+need to write their own configuration like this:</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">my-modus-vc-annotate</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">_</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">modus-themes-with-colors</span>
+    <span class="p">(</span><span class="k">setq</span> <span class="nv">vc-annotate-background-mode</span> <span class="no">nil</span><span class="p">)</span>
+    <span class="p">(</span><span class="k">setq</span> <span class="nv">vc-annotate-very-old-color</span> <span class="nv">fg-dim</span><span class="p">)</span>
+    <span class="p">(</span><span class="k">setq</span> <span class="nv">vc-annotate-color-map</span>
+          <span class="o">`</span><span class="p">((</span> <span class="mi">20.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">red</span><span class="p">)</span>
+            <span class="p">(</span> <span class="mi">40.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">red-cooler</span><span class="p">)</span>
+            <span class="p">(</span> <span class="mi">60.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">red-warmer</span><span class="p">)</span>
+            <span class="p">(</span> <span class="mi">80.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">yellow-warmer</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">100.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">yellow</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">120.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">yellow-cooler</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">140.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">green-warmer</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">160.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">green</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">180.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">green-cooler</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">200.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">cyan-cooler</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">220.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">cyan-warmer</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">240.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">cyan</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">260.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">blue-warmer</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">280.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">blue</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">300.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">blue-cooler</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">320.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">blue-intense</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">340.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">magenta-cooler</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">360.</span> <span class="o">.</span> <span class="o">,</span><span class="nv">fg-dim</span><span class="p">)))))</span>
+
+<span class="p">(</span><span class="nv">with-eval-after-load</span> <span class="ss">'vc-annotate</span>
+  <span class="p">(</span><span class="nv">my-modus-vc-annotate</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'enable-theme-functions</span> <span class="nf">#'</span><span class="nv">my-modus-vc-annotate</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>[ The above code is relevant as of this writing. Though remember that
+  I do not keep older publications up-to-date. The only source of
+  truth is the manual of the Modus themes. ]</p>
+
+<h3>Two old user options are no longer needed</h3>
+
+<p>The user options <code class="language-plaintext highlighter-rouge">modus-themes-completions</code> and <code class="language-plaintext highlighter-rouge">modus-themes-prompts</code>
+are obsolete. They used to be relevant before the introduction of
+palette overrides.</p>
+
+<h3>Rewrote large parts of the manual</h3>
+
+<p>I did it for clarity, but also to remove notes that were specific to
+older versions of Emacs.</p>
+
+<h3>Many new ERT tests for the project</h3>
+
+<p>I have written many tests. They do not cover every single function,
+though the plan is to do that eventually. These tests are important to
+ensure that Modus is a solid platform for making derivative themes.</p>
+
+<p>Much of this was done live: <a href="https://protesilaos.com/codelog/2026-04-10-emacs-spontaneous-live-modus-themes/">https://protesilaos.com/codelog/2026-04-10-emacs-spontaneous-live-modus-themes/</a>.</p>
+
+<p>Thanks to Benjamin Kästner for a couple of tweaks to a relevant macro
+in the tests’ file. This was done in pull request 212, with further
+changes by me: <a href="https://github.com/protesilaos/modus-themes/pull/212">https://github.com/protesilaos/modus-themes/pull/212</a>.</p>
+
+<h3>Links to projects related to Modus</h3>
+
+<p>In the README.md I now mention projects that are related to the Modus
+themes, such as derivative Emacs themes, but also ports for other
+editors.</p>
+
+<p>There is also a link to my <code class="language-plaintext highlighter-rouge">modus-themes-exporter</code> package, which I
+developed during a live stream:</p>
+
+<ul>
+  <li><a href="https://github.com/protesilaos/modus-themes-exporter">https://github.com/protesilaos/modus-themes-exporter</a></li>
+  <li><a href="https://protesilaos.com/codelog/2026-04-13-emacs-live-develop-modus-themes-exporter-package/">https://protesilaos.com/codelog/2026-04-13-emacs-live-develop-modus-themes-exporter-package/</a></li>
+</ul>
+
+<h3>Git commits</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git shortlog 5.2.0..5.3.0 --summary --numbered
+    123	Protesilaos
+     2	Benjamin Kästner
+     2	Steven Allen
+     1	Elias Gabriel Perez
+     1	JD Smith
+     1	Mike Olson
+     1	ukiran03
+</code></pre></div></div>

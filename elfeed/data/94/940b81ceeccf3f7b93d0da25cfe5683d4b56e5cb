@@ -1,0 +1,129 @@
+<p>TMR provides facilities for setting timers using a convenient
+notation. Lots of commands are available to operate on timers, while
+there also exists a tabulated view to display all timers in a nice
+grid.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">tmr</code></li>
+  <li>Official manual: <a href="https://protesilaos.com/emacs/tmr">https://protesilaos.com/emacs/tmr</a></li>
+  <li>Change log: <a href="https://protesilaos.com/emacs/tmr-changelog">https://protesilaos.com/emacs/tmr-changelog</a></li>
+  <li>Git repositories:
+    <ul>
+      <li>GitHub: <a href="https://github.com/protesilaos/tmr">https://github.com/protesilaos/tmr</a></li>
+      <li>GitLab: <a href="https://gitlab.com/protesilaos/tmr">https://gitlab.com/protesilaos/tmr</a></li>
+    </ul>
+  </li>
+  <li>Video demonstration: <a href="https://protesilaos.com/codelog/2026-01-19-emacs-timers-tmr-demo/">https://protesilaos.com/codelog/2026-01-19-emacs-timers-tmr-demo/</a></li>
+  <li>Backronym: TMR May Ring; Timer Must Run.</li>
+</ul>
+
+<p>Below are the release notes.</p>
+
+<hr />
+
+<h2>Version 1.4.0 on 2026-07-31</h2>
+
+<p>TMR is an efficient package that has been stable for years. This new
+version introduces some nice new features as well as several smaller
+internal refinements.</p>
+
+<h3>Create a timer that repeats</h3>
+
+<p>The command <code class="language-plaintext highlighter-rouge">tmr-repeat</code> prompts for a duration, like the standard
+<code class="language-plaintext highlighter-rouge">tmr</code> command but also asks for a number of times to repeat the given
+timer. When called with a prefix argument (<code class="language-plaintext highlighter-rouge">C-u</code> with default
+keybindings), <code class="language-plaintext highlighter-rouge">tmr-repeat</code> will also ask for a description for the new
+timer and whether it should be acknowledged or not after all
+repetitions have elapsed.</p>
+
+<p>Thanks to Óscar Fuentes for contributing the original implementation
+of <code class="language-plaintext highlighter-rouge">tmr-repeat</code> (with many extra changes/features by me). This was
+done in pull request 16: <a href="https://github.com/protesilaos/tmr/pull/16">https://github.com/protesilaos/tmr/pull/16</a>.
+Óscar has assigned copyright to the Free Software Foundation.</p>
+
+<h3>Modify the repeat count of an existing timer</h3>
+
+<p>The command <code class="language-plaintext highlighter-rouge">tmr-edit-repeat-count</code> prompts for an existing timer and
+updates its repeat count. If the repeat count is set to <code class="language-plaintext highlighter-rouge">0</code>, then the
+timer is no longer considered repeatable.</p>
+
+<p>As with all commands that operate on existing timers, <code class="language-plaintext highlighter-rouge">tmr-edit-repeat-count</code>
+automatically applies to the timer at point when called from inside
+the tabulated list of timers (per <code class="language-plaintext highlighter-rouge">tmr-tabulated-view</code>).</p>
+
+<p>Modifying a timer’s repeat count does not start a new timer. It simply
+updates the relevant data. Use the command <code class="language-plaintext highlighter-rouge">tmr-clone</code> to start a new
+timer using the data of an existing timer.</p>
+
+<h3>The tabulated view has more columns and all of them can be adjusted</h3>
+
+<p>The tabulated list of timers, which is typically produced by the
+command <code class="language-plaintext highlighter-rouge">tmr-tabulated-view</code>, now has extra columns for the data that
+pertains to repeatable timers.</p>
+
+<p>Users who want to control which columns are displayed, and in what
+order, can modify the user option <code class="language-plaintext highlighter-rouge">tmr-tabulated-columns</code>. Its
+documentation covers the technicalities. The default value is to
+display all columns.</p>
+
+<h3>Completion metadata for the prompt that selects a timer</h3>
+
+<p>Advanced users can now modify all the <code class="language-plaintext highlighter-rouge">completion-metadata</code> associated
+with the prompt that reads/selects one among the existing timer
+objects (the function is <code class="language-plaintext highlighter-rouge">tmr-read-timer</code>). The relevant variable is
+<code class="language-plaintext highlighter-rouge">tmr-completion-metadata</code>. I am not providing this as a user option,
+because regular users will anyway not be able to do much with it as it
+involves custom functions.</p>
+
+<h3>Timers in the completion prompt are sorted by end time</h3>
+
+<p>The prompt for selecting a timer now sorts candidates by their end
+time. The closest end time appears at the top.</p>
+
+<p>This affects all commands that operate on a timer, such as
+<code class="language-plaintext highlighter-rouge">tmr-edit-repeat-count</code>, <code class="language-plaintext highlighter-rouge">tmr-cancel</code>, and more.</p>
+
+<p>In the past, there was no sorting whatsoever. Users who prefer that
+style can add the following to their configuration:</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">tmr-completion-metadata</span>
+      <span class="p">(</span><span class="nb">list</span>
+       <span class="p">(</span><span class="nb">cons</span> <span class="ss">'category</span> <span class="ss">'tmr-timer</span><span class="p">)</span>
+       <span class="p">(</span><span class="nb">cons</span> <span class="ss">'display-sort-function</span> <span class="nf">#'</span><span class="nb">identity</span><span class="p">)</span> <span class="c1">; THIS IS THE RELEVANT PART</span>
+       <span class="p">(</span><span class="nb">cons</span> <span class="ss">'annotation-function</span> <span class="nf">#'</span><span class="nv">tmr-completion-annotate</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<h3>Miscellaneous</h3>
+
+<ul>
+  <li>
+    <p>The manual is easier to read. I have rewritten it to group commands
+and user options under appropriate headings.</p>
+  </li>
+  <li>
+    <p>Lots of internal refinements to the code. I tweaks things to make
+the code easier to maintain and contribute to.</p>
+  </li>
+  <li>
+    <p>Thanks to Pavlo Lysov for adding a small example to the manual about
+using TMR hooks to send a custom notification on the macOS. This was
+done in pull request 25: <a href="https://github.com/protesilaos/tmr/pull/25">https://github.com/protesilaos/tmr/pull/25</a>.
+Pavlo does not need to assign copyright to the Free Software
+Foundation.</p>
+  </li>
+  <li>
+    <p>Thanks to Carlos Pajuelo Rojo for refining an earlier version of the
+function that produces a message about the repeat count of a given
+timer (I have since made lots of changes on this and other fronts).
+Carlos’ contribution is in pull request 20: <a href="https://github.com/protesilaos/tmr/pull/20">https://github.com/protesilaos/tmr/pull/20</a>.
+The change is small, meaning that Carlos does not need to assign
+copyright to the Free Software Foundation.</p>
+  </li>
+  <li>
+    <p>Thanks to f6p for use the appropriate face for the paused indicator
+in the tabulated view. This was done in pull request 17:
+<a href="https://github.com/protesilaos/tmr/pull/17">https://github.com/protesilaos/tmr/pull/17</a>. The change is small,
+meaning that the author does not need to assign copyright to the
+Free Software Foundation.</p>
+  </li>
+</ul>

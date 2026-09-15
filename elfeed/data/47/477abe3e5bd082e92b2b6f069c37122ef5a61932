@@ -1,0 +1,265 @@
+<h1>Arch Linux Installation Guide</h1>
+<p>Good morning, good afternoon or good evening, wherever you are reading this from. These installation instructions form the foundation of the Arch system that I use on my own machine. While it's important to always consult the official Arch wiki, my intention here is to provide a walkthrough on setting up your own system with the following stack:</p>
+<div class="callout callout--resources"><div class="callout__header"><span class="callout__type">resources</span><span class="callout__title"><strong>Supporting links:</strong></span></div><div class="callout__body"><ul>
+<li><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Linux installation guide</a></li>
+<li><a href="https://youtu.be/fFxWuYui2LI">YouTube tutorial</a></li>
+<li><a href="https://github.com/radleylewis/technical_guides">GitHub guides (including this one)</a></li>
+</ul></div></div>
+<ul>
+<li><a href="https://btrfs.readthedocs.io/en/latest/">btrfs</a>: A feature-rich, copy-on-write filesystem for Linux.</li>
+<li><a href="https://gitlab.com/cryptsetup/cryptsetup/">encryption</a>: LUKS disk encryption based on the dm-crypt kernel module.</li>
+<li><a href="https://github.com/systemd/zram-generator">zram-generator</a>: RAM compression for memory savings.</li>
+<li><a href="https://github.com/linuxmint/timeshift">timeshift</a>: A system restore tool for Linux.</li>
+<li><a href="https://system76.com/cosmic/">COSMIC Alpha</a>: A new desktop environment by System76.</li>
+</ul>
+<p>My intention is to keep this guide up-to-date, and any feedback is more than welcome.</p>
+<p>Let's get started!</p>
+<hr />
+<h3>Step 1: Creating a Bootable Arch Media Device</h3>
+<p>Here we will follow the Arch wiki:</p>
+<p><strong>i.</strong> Acquire an installation image <a href="https://archlinux.org/download/">here</a>.</p>
+<p><strong>ii.</strong> Verify the signature on the downloaded ISO image (section 1.2 of the installation guide).</p>
+<p><strong>iii.</strong> Write your ISO to a USB (check out <a href="https://www.scaler.com/topics/burn-linux-iso-to-usb/">this</a> guide).</p>
+<p><strong>iv.</strong> Insert the USB into your target device and boot into it.</p>
+<hr />
+<h3>Step 2: Setting Up Our System with the Arch ISO</h3>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">tip</span><span class="callout__title">OPTIONAL: SSH into your target machine</span></div><div class="callout__body"><ul>
+<li>Create a password for the ISO root user with <code>passwd</code>; and,</li>
+<li>Ensure <code>sshd</code> is running: <code>systemctl status sshd</code> (start with <code>systemctl start sshd</code> if not).</li>
+</ul></div></div>
+<p><strong>i.</strong> Set the console keyboard layout (US by default):</p>
+<ul>
+<li>list available keymaps with <code>localectl list-keymaps</code>; and,</li>
+<li>load your keymap with <code>loadkeys &lt;your-keymap&gt;</code>.</li>
+</ul>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">tip</span><span class="callout__title">OPTIONAL: Set the console font size</span></div><div class="callout__body"><pre><code class="language-bash">setfont ter-132b
+</code></pre></div></div>
+<p><strong>ii.</strong> Verify the UEFI boot mode:</p>
+<pre><code class="language-bash">cat /sys/firmware/efi/fw_platform_size
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">This installation is written for a 64-bit x64 UEFI system. If you are on a different boot mode, consult section 1.6 of the official guide.</span></div></div>
+<p><strong>iii.</strong> Connect to the internet:</p>
+<ul>
+<li>use <code>iwctl</code> for WiFi; and,</li>
+<li>confirm your connection with <code>ping -c 2 archlinux.org</code>.</li>
+</ul>
+<p><strong>iv.</strong> Set the timezone:</p>
+<pre><code class="language-bash">timedatectl list-timezones
+timedatectl set-timezone Asia/Bangkok   # replace with your timezone
+timedatectl set-ntp true
+</code></pre>
+<p><strong>v.</strong> Partition your disk:</p>
+<ul>
+<li>list partitions with <code>lsblk</code>; and,</li>
+<li>open your target disk with <code>gdisk</code> or <code>fdisk</code> to delete existing partitions and create two new ones.</li>
+</ul>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">warning</span><span class="callout__title">The following step will delete all data on the target disk. Ensure you have selected the correct disk before proceeding.</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>zram vs swap partition</strong></span></div><div class="callout__body"><p>The official Arch guide suggests a swap partition. This guide uses <code>zram</code> instead, which compresses data in RAM and avoids SSD wear. zram is only active when RAM is at or near capacity.</p></div></div>
+<table><thead><tr><th>Partition</th><th>Size</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>/dev/nvme0n1p1</code></td><td>1GB</td><td>EFI System</td></tr>
+<tr><td><code>/dev/nvme0n1p2</code></td><td>Remaining space</td><td>Linux filesystem</td></tr>
+</tbody></table>
+<p><strong>vi.</strong> Format your main partition:</p>
+<pre><code class="language-bash"># set up LUKS encryption
+cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup luksOpen /dev/nvme0n1p2 main
+
+# format as btrfs
+mkfs.btrfs /dev/mapper/main
+</code></pre>
+<p><strong>vii.</strong> Create btrfs subvolumes:</p>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">Timeshift requires <code>@</code> and <code>@home</code> as subvolume names. Do not rename them.</span></div></div>
+<pre><code class="language-bash">mount /dev/mapper/main /mnt
+cd /mnt
+
+btrfs subvolume create @
+btrfs subvolume create @home
+
+cd -
+umount /mnt
+</code></pre>
+<p><strong>viii.</strong> Mount subvolumes:</p>
+<pre><code class="language-bash">mkdir /mnt/home
+
+mount -o noatime,ssd,compress=zstd,discard=async,subvol=@ /dev/mapper/main /mnt
+mount -o noatime,ssd,compress=zstd,discard=async,subvol=@home /dev/mapper/main /mnt/home
+</code></pre>
+<p><strong>ix.</strong> Format and mount the EFI partition:</p>
+<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
+mkdir /mnt/boot
+mount /dev/nvme0n1p1 /mnt/boot
+</code></pre>
+<p><strong>x.</strong> Install base packages:</p>
+<pre><code class="language-bash">pacstrap -K /mnt base linux linux-firmware
+</code></pre>
+<p><strong>xi.</strong> Generate the filesystem table:</p>
+<pre><code class="language-bash">genfstab -U -p /mnt &gt;&gt; /mnt/etc/fstab
+</code></pre>
+<ul>
+<li>Verify with <code>cat /mnt/etc/fstab</code> that all subvolumes and boot entries are present and correct before continuing.</li>
+</ul>
+<p><strong>xii.</strong> Change root into the new system:</p>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<p>You are now working within your new Arch system (i.e. not from the ISO) and you will now see that your prompt starts with <code>#</code>. Great work so far!</p>
+<hr />
+<h3>Step 3: Working Within Our New System</h3>
+<p>We are now working within our Arch system, chrooted in from the ISO. Let's continue with a few steps that we need to repeat (such as setting our root password, timezone, keymaps and language).</p>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">warning</span><span class="callout__title">Do not reboot yet. Complete all steps in this section before rebooting.</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">You are now running as root inside the chroot (i.e. no <code>sudo</code>).</span></div></div>
+<p><strong>i.</strong> Configure the timezone and hardware clock:</p>
+<pre><code class="language-bash">ln -sf /usr/share/zoneinfo/Asia/Bangkok /etc/localtime   # replace with your timezone
+hwclock --systohc
+</code></pre>
+<p>In <code>nvim /etc/locale.gen</code>, uncomment your locale (e.g. <code>en_US.UTF-8</code>), write and exit, then run:</p>
+<pre><code class="language-bash">locale-gen
+echo "LANG=en_US.UTF-8" &gt;&gt; /etc/locale.conf
+echo "KEYMAP=us" &gt;&gt; /etc/vconsole.conf
+</code></pre>
+<p><strong>ii.</strong> Configure the hostname:</p>
+<pre><code class="language-bash">echo "t480" &gt; /etc/hostname   # replace with your hostname
+</code></pre>
+<p><strong>iii.</strong> Set the root password:</p>
+<pre><code class="language-bash">passwd
+</code></pre>
+<p><strong>iv.</strong> Create a user (replace <code>rad</code> with your preferred username):</p>
+<pre><code class="language-bash">useradd -m -g users -G wheel rad
+passwd rad
+mkdir /etc/sudoers.d
+chmod 755 /etc/sudoers.d    # readable, executable by all; writable by root only
+echo "rad ALL=(ALL) ALL" &gt;&gt; /etc/sudoers.d/rad
+chmod 0440 /etc/sudoers.d/rad    # read-only for root and group; visudo will refuse otherwise
+</code></pre>
+<p><strong>v.</strong> Set the mirrorlist:</p>
+<pre><code class="language-bash">pacman -S reflector
+reflector -c Thailand -a 12 --sort rate --save /etc/pacman.d/mirrorlist
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">You could install all of the following packages together, but they are grouped below to make them easier to reason about.</span></div></div>
+<p><strong>vi.</strong> Install core packages:</p>
+<pre><code class="language-bash">pacman -Syu \
+  base-devel \
+  linux-headers \
+  btrfs-progs \
+  grub \
+  efibootmgr \
+  mtools \
+  networkmanager \
+  network-manager-applet \
+  openssh \
+  sudo \
+  neovim \
+  git \
+  iptables-nft \
+  ipset \
+  firewalld \
+  reflector \
+  acpid \
+  grub-btrfs
+</code></pre>
+<p><strong>vii.</strong> Install CPU microcode:</p>
+<ul>
+<li><strong>Intel:</strong> <code>pacman -S intel-ucode</code></li>
+<li><strong>AMD:</strong> <code>pacman -S amd-ucode</code></li>
+</ul>
+<p><strong>viii.</strong> Install a desktop environment and display manager:</p>
+<pre><code class="language-bash">pacman -S cosmic ly
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">This guide uses COSMIC by System76. You can substitute gnome, kde, or any tiling window manager you prefer.</span></div></div>
+<p><strong>ix.</strong> Install other useful packages:</p>
+<pre><code class="language-bash">pacman -S \
+  man-db \
+  man-pages \
+  texinfo \
+  bluez \
+  bluez-utils \
+  alsa-utils \
+  pipewire \
+  pipewire-pulse \
+  pipewire-jack \
+  sof-firmware \
+  ttf-firacode-nerd \
+  alacritty \
+  firefox
+</code></pre>
+<p><strong>x.</strong> Configure mkinitcpio for LUKS + btrfs:</p>
+<p>In <code>nvim /etc/mkinitcpio.conf</code>, update MODULES and HOOKS:</p>
+<pre><code class="language-bash">MODULES=(btrfs)
+HOOKS=(base udev autodetect modconf kms keyboard keymap block encrypt filesystems)
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">This guide is <code>udev</code>-based — for a <code>systemd</code>-based initramfs replace <code>encrypt</code> with <code>sd-encrypt</code>. <code>fsck</code> is removed as btrfs uses <code>btrfsck</code> externally. Add <code>usbhid</code> and <code>atkbd</code> to MODULES if you need an external keyboard available at the LUKS prompt.</span></div></div>
+<p>Regenerate the initramfs:</p>
+<pre><code class="language-bash">mkinitcpio -P
+</code></pre>
+<p><strong>xi.</strong> Configure GRUB:</p>
+<pre><code class="language-bash">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+</code></pre>
+<p>Get the UUID of your LUKS partition and append it to the grub defaults file for reference:</p>
+<pre><code class="language-bash">blkid -s UUID -o value /dev/nvme0n1p2 &gt;&gt; /etc/default/grub
+</code></pre>
+<p>Edit <code>/etc/default/grub</code> and set the following - replacing <code>&lt;uuid&gt;</code> with the value appended at the bottom of the file, then delete that line:</p>
+<pre><code class="language-bash">GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet zswap.enabled=0 cryptdevice=UUID=&lt;uuid&gt;:main root=/dev/mapper/main"
+</code></pre>
+<p>Generate the GRUB config:</p>
+<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p><strong>xii.</strong> Enable services:</p>
+<pre><code class="language-bash">systemctl enable NetworkManager    # network management
+systemctl enable bluetooth         # Bluetooth
+systemctl enable sshd              # SSH server
+systemctl enable ly.service        # display manager
+systemctl enable firewalld         # firewall
+systemctl enable reflector.timer   # mirror ranking
+systemctl enable fstrim.timer      # weekly SSD trim
+systemctl enable acpid             # ACPI events
+</code></pre>
+<p><strong>xiii.</strong> Reboot:</p>
+<pre><code class="language-bash">reboot
+</code></pre>
+<hr />
+<h3>Step 4: Tweaking Our New Arch System</h3>
+<p>When you boot up you will be presented with the GRUB bootloader menu. Once you have selected Arch Linux and entered your encryption password, ly will greet you. Log in with the user you created earlier.</p>
+<p><strong>i.</strong> Install <a href="https://github.com/Morganamilo/paru">paru</a>:</p>
+<pre><code class="language-bash">sudo pacman -S --needed base-devel
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+</code></pre>
+<p><strong>ii.</strong> Install <code>zram-generator</code>:</p>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>zram vs zswap</strong></span></div><div class="callout__body"><p><code>zram</code> compresses data and stores it in RAM, resulting in less SSD wear. <code>zswap</code> uses a compressed in-RAM cache in front of a disk-based swap partition. This guide uses <code>zram</code>. If you regularly exceed your RAM ceiling, <code>zswap</code> is preferable.</p></div></div>
+<pre><code class="language-bash">sudo pacman -Syu zram-generator
+</code></pre>
+<p>Create <code>/etc/systemd/zram-generator.conf</code>:</p>
+<pre><code class="language-ini">[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
+</code></pre>
+<p>Then reboot.</p>
+<p><strong>iii.</strong> Install <a href="https://github.com/linuxmint/timeshift">timeshift</a>:</p>
+<pre><code class="language-bash">paru -S timeshift timeshift-autosnap
+sudo timeshift --list-devices
+sudo timeshift --create --comments "initial snapshot" --tags D
+sudo systemctl edit --full grub-btrfsd
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">In the editor, replace:</span></div><div class="callout__body"><p><code>ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots</code>
+with:
+<code>ExecStart=/usr/bin/grub-btrfsd --syslog -t</code></p></div></div>
+<pre><code class="language-bash">sudo grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<hr />
+<h3>Optional Further Steps</h3>
+<p><strong>i.</strong> Install <code>power-profiles-daemon</code>:</p>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">You may also like <code>tlp</code>, although for my use case <code>tlp</code> does not work with COSMIC's power applet.</span></div></div>
+<pre><code class="language-bash">sudo pacman -Syu power-profiles-daemon
+sudo systemctl enable --now power-profiles-daemon.service
+</code></pre>
+<p><strong>ii.</strong> Install <a href="https://github.com/AdnanHodzic/auto-cpufreq">auto-cpufreq</a>:</p>
+<pre><code class="language-bash">paru -S auto-cpufreq
+sudo systemctl enable --now auto-cpufreq.service
+</code></pre>
+<p><strong>iii.</strong> Install <code>brave-browser</code>:</p>
+<pre><code class="language-bash">paru -S brave-browser
+</code></pre>
+<hr />
+<p>That's all folks!</p>

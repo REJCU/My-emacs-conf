@@ -5,7 +5,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("05f1ee9db2c66cd715ab6d36ff949386c47dfff91a7df1f203d015b3ea304dbb"
+   '("d12b1d9b0498280f60e5ec92e5ecec4b5db5370d05e787bc7cc49eae6fb07bc0"
+     "e1df746a4fa8ab920aafb96c39cd0ab0f1bac558eff34532f453bd32c687b9d6"
+     "01a9797244146bbae39b18ef37e6f2ca5bebded90d9fe3a2f342a9e863aaa4fd"
+     "0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
+     "d481904809c509641a1a1f1b1eb80b94c58c210145effc2631c1a7f2e4a2fdf4"
+     "05f1ee9db2c66cd715ab6d36ff949386c47dfff91a7df1f203d015b3ea304dbb"
      "953a4391d91a93ac734777a53001d1b514c22c4b7233c932ae029a5b01cdf3f7"
      "2dd2fe7575d76094652d9e04de604db1cd1cdf1582e1494bc646b2a6e402afb0"
      "bb18b6d5982beeb76a37ced9211e972f84e8e76af9579456aa8cef794ae0bcb9"
@@ -38,16 +43,18 @@
      "https://planet.emacslife.com/atom.xml"
      "https://www.abc.net.au/news/feed/1948/rss.xml") t)
  '(package-selected-packages
-   '(anti-zenburn-theme avy cape company corfu dashboard docker
-			doom-themes eat ef-themes elfeed elpher emms
-			eradio evil exec-path-from-shell flycheck
-			kanagawa-themes magit marginalia markdown-mode
-			melpa-upstream-visit meow moe-theme
-			multiple-cursors nerd-icons-completion
-			nerd-icons-corfu nerd-icons-dired nix-mode
-			nix-ts-mode orderless pet projectile radio
-			ripgrep rust-mode treesit-auto
-			vertico-posframe zenburn-theme))
+   '(anti-zenburn-theme avy cape cmake-mode company consult corfu
+			dashboard docker doom-themes eat ef-themes
+			elfeed elpher emms eradio evil
+			exec-path-from-shell flycheck
+			gruber-darker-theme kanagawa-themes magit
+			marginalia markdown-mode melpa-upstream-visit
+			meow moe-theme multiple-cursors
+			nerd-icons-completion nerd-icons-corfu
+			nerd-icons-dired nix-mode nix-ts-mode
+			orderless pet projectile radio ripgrep
+			rust-mode treesit-auto vertico-posframe
+			zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

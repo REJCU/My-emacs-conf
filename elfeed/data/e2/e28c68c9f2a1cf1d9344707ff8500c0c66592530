@@ -1,0 +1,56 @@
+<p>The built-in <code class="language-plaintext highlighter-rouge">completion-preview-mode</code> lets us expand what we type in
+a minimalist, distraction-free way. It can also be combined with the
+default Completions buffer to show all the available options. The
+Completions buffer has several nice features, starting with Emacs 31,
+which make this an excellent combination that does not require any
+third party packages (though packages can still augment the overall
+experience). I also mention the Emacs 31 ‘newcomers-presets’ theme,
+which configures some of these options as well: it is a great way to
+start your Emacs configuration.</p>
+
+<h2>Sample configuration</h2>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">completion-preview</span>
+  <span class="ss">:ensure</span> <span class="no">nil</span>
+  <span class="ss">:demand</span> <span class="no">t</span>
+  <span class="ss">:bind</span>
+  <span class="p">(</span> <span class="ss">:map</span> <span class="nv">completion-preview-active-mode-map</span>
+    <span class="p">(</span><span class="s">"M-i"</span> <span class="o">.</span> <span class="nv">completion-preview-insert-word</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-n"</span> <span class="o">.</span> <span class="nv">completion-preview-next-candidate</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-p"</span> <span class="o">.</span> <span class="nv">completion-preview-prev-candidate</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-&lt;return&gt;"</span> <span class="o">.</span> <span class="nv">completion-preview-insert</span><span class="p">)</span>
+    <span class="c1">;; With TAB we effectively defer to the *Completions* buffer to</span>
+    <span class="c1">;; show more completion candidates at once.</span>
+    <span class="p">(</span><span class="s">"&lt;tab&gt;"</span> <span class="o">.</span> <span class="nv">completion-preview-complete</span><span class="p">))</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-minimum-symbol-length</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">with-eval-after-load</span> <span class="ss">'org</span>
+    <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'completion-preview-commands</span> <span class="nf">#'</span><span class="nv">org-self-insert-command</span><span class="p">))</span>
+  <span class="p">(</span><span class="nv">global-completion-preview-mode</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1">;; I have a more detailed configuration (and explanation) that works</span>
+<span class="c1">;; with Emacs 31 built-in completion capabilities:</span>
+<span class="c1">;; https://protesilaos.com/codelog/2026-07-29-emacs-default-minibuffer-completion-overview/.</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">minibuffer</span>
+  <span class="ss">:ensure</span> <span class="no">nil</span>
+  <span class="ss">:demand</span> <span class="no">t</span>
+  <span class="ss">:bind</span>
+  <span class="p">(</span> <span class="ss">:map</span> <span class="nv">completion-in-region-mode-map</span>
+    <span class="p">(</span><span class="s">"M-i"</span> <span class="o">.</span> <span class="nv">minibuffer-choose-completion</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-n"</span> <span class="o">.</span> <span class="nv">minibuffer-next-completion</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-p"</span> <span class="o">.</span> <span class="nv">minibuffer-previous-completion</span><span class="p">))</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completions-format</span> <span class="ss">'one-column</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completions-max-height</span> <span class="mi">12</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-auto-help</span> <span class="no">t</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-auto-select</span> <span class="no">nil</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">minibuffer-visible-completions</span> <span class="no">t</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-eager-update</span> <span class="no">t</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Finally, the <code class="language-plaintext highlighter-rouge">newcomers-presets</code> theme is an excellent way to start
+your configuration. It is available as part of Emacs 31. Put this at
+the top of your <code class="language-plaintext highlighter-rouge">init.el</code>:</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">load-theme</span> <span class="ss">'newcomers-presets</span><span class="p">)</span>
+</code></pre></div></div>

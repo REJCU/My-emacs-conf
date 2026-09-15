@@ -17,8 +17,15 @@
 (setq custom-file "~/.emacs.d/extend/eww-conf.el")
 (load custom-file)
 
-(setq custom-file "~/.emacs.d/external/meowconf.el")
+(setq custom-file "~/.emacs.d/external/consult.el")
 (load custom-file)
+
+(setq custom-file "~/.emacs.d/extend/diredconf.el")
+(load custom-file)
+
+;; debated on whether or not to activate it 
+;;(setq custom-file "~/.emacs.d/external/meowconf.el")
+;;(load custom-file)
 
 ;; QOL
 (global-display-line-numbers-mode 1)
@@ -275,26 +282,8 @@
   :config
   (modus-themes-load-theme 'ef-arbutus))
 
-
-;(load-theme 'modus-vivendi)
-
-; stop highlight when changing theme
-;; (dolist (face '(font-lock-keyword-face
-;; 		font-lock-function-name-face
-;; 		font-lock-variable-name-face
-;; 		font-lock-type-face
-;; 		font-lock-constant-face
-;; 		font-lock-builtin-face
-;; 		font-lock-preprocessor-face
-;; 		font-lock-string-face
-;; 		font-lock-comment-face
-;; 		font-lock-doc-face
-;; 		elisp-shorthand-font-lock-face
-;; 		highlight-quoted-symbol
-;; 		highlight-quoted-keyword
-;; 		highlight-numbers-number))
-;;   (when (facep face)
-;;     (set-face-attribute face nil :background 'unspecified :box nil)))
+;; when applying theme, disable previous ones, as it affects the loaded one
+;; (load-theme 'gruber-darker)
 
 
 (use-package exec-path-from-shell
@@ -404,14 +393,14 @@
 (projectile-mode +1)
 ;; Recommended keymap prefix on Windows/Linux
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/" "~/ryquick/"))
+(setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/" "~/rococo/"))
 				       
 ;; avy movement
 (use-package avy
   :ensure t
   :bind
-  ;; Jump to any character (Type C-s, then the char, then the avy-key)
-  ("C-;" . avy-goto-char-timer)
+  ;; changed from defualt because of pc issues of C-; not working - maybe terminal
+  ("C-z" . avy-goto-char-timer)
   ;; Jump to any line
   ("M-g g" . avy-goto-line)
   ;; Jump to a word
@@ -509,3 +498,4 @@
 
 (with-eval-after-load 'recentf
   (add-to-list 'recentf-exclude ".*viminfo.*"))
+

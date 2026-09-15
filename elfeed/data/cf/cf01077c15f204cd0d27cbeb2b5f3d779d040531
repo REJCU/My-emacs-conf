@@ -1,0 +1,32 @@
+<p>In this ~15-minute video I show how to add conditions to <code class="language-plaintext highlighter-rouge">abbrev-mode</code>
+abbreviations that you define. The idea is to have those abbrevs
+expand only in certain cases. I use three examples, which I think
+cover the common needs.</p>
+
+<h2>Code samples</h2>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">my-french-p</span> <span class="p">()</span>
+  <span class="s">"Return non-nil if `current-input-method' is French."</span>
+  <span class="p">(</span><span class="nb">and</span> <span class="nv">current-input-method</span>
+       <span class="p">(</span><span class="nv">string-match-p</span> <span class="s">"french"</span> <span class="nv">current-input-method</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nv">define-abbrev</span> <span class="nv">global-abbrev-table</span> <span class="s">"welcome"</span> <span class="s">"je t'en prie"</span> <span class="no">nil</span> <span class="ss">:enable-function</span> <span class="nf">#'</span><span class="nv">my-french-p</span><span class="p">)</span>
+
+
+<span class="p">(</span><span class="nb">defvar</span> <span class="nv">my-notes-directory</span> <span class="p">(</span><span class="nv">expand-file-name</span> <span class="s">"~/.emacs.d/abbrev-test/"</span><span class="p">)</span>
+  <span class="s">"Directory where my notes are."</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">my-notes-directory-p</span> <span class="p">()</span>
+  <span class="s">"Return non-nil if we are in `my-notes-directory' or its subdirectories."</span>
+  <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">current-directory</span> <span class="p">(</span><span class="nv">expand-file-name</span> <span class="nv">default-directory</span><span class="p">)))</span>
+    <span class="p">(</span><span class="nv">string-prefix-p</span> <span class="nv">my-notes-directory</span> <span class="nv">current-directory</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nv">define-abbrev</span> <span class="nv">global-abbrev-table</span> <span class="s">"prot"</span> <span class="s">"p’rǒt"</span> <span class="no">nil</span> <span class="ss">:enable-function</span> <span class="nf">#'</span><span class="nv">my-notes-directory-p</span><span class="p">)</span>
+
+
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">my-notes-keycast-mode-p</span> <span class="p">()</span>
+  <span class="s">"Return non-nil if `keycast-mode-line-mode' is enabled."</span>
+  <span class="p">(</span><span class="nv">bound-and-true-p</span> <span class="nv">keycast-mode-line-mode</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nv">define-abbrev</span> <span class="nv">global-abbrev-table</span> <span class="s">"prot"</span> <span class="s">"Protesilaos, also known as Prot"</span> <span class="no">nil</span> <span class="ss">:enable-function</span> <span class="nf">#'</span><span class="nv">my-notes-keycast-mode-p</span><span class="p">)</span>
+</code></pre></div></div>

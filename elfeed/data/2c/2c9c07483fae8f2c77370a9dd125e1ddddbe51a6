@@ -1,0 +1,472 @@
+<h1>Artix + OpenRC Installation Guide</h1>
+<p>Good morning, good afternoon or good evening, wherever you are reading this from. These installation instructions form the foundation of the Artix system that I use on my own Librebooted T480.</p>
+<div class="callout callout--resources"><div class="callout__header"><span class="callout__type">resources</span><span class="callout__title"><strong>Supporting links:</strong></span></div><div class="callout__body"><ul>
+<li><a href="https://wiki.artixlinux.org/Main/Installation">Artix Linux documentation</a></li>
+<li><a href="https://github.com/radleylewis/technical_guides">GitHub guides (including this one)</a></li>
+<li><a href="https://youtu.be/kX4wGhn949I?si=hs6RXrM-wzAIFO2b">YouTube tutorial</a></li>
+</ul></div></div>
+<p>This guide uses the following stack:</p>
+<ul>
+<li><a href="https://wiki.gentoo.org/wiki/OpenRC">OpenRC</a>: A dependency-based init system (Artix is systemd-free).</li>
+<li><a href="https://btrfs.readthedocs.io/en/latest/">btrfs</a>: A feature-rich, copy-on-write filesystem for Linux.</li>
+<li><a href="https://gitlab.com/cryptsetup/cryptsetup/">LUKS</a>: Full disk encryption based on the dm-crypt kernel module.</li>
+<li><a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html">zswap</a>: A kernel-level compressed cache that sits in front of swap, built into the Linux kernel.</li>
+<li><a href="https://qtile.org/">Qtile</a>: A full-featured, hackable tiling window manager built/configured with Python.</li>
+<li><a href="https://github.com/fairyglade/ly">ly</a>: A lightweight TUI display manager.</li>
+</ul>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>BIOS vs UEFI</strong></span></div><div class="callout__body"><p>This guide includes instructions for both BIOS/SeaBIOS and UEFI systems. Steps that differ between the two are clearly marked with <strong>[BIOS]</strong> and <strong>[UEFI]</strong> labels.</p></div></div>
+<p>Let's get started!</p>
+<hr />
+<h3>Step 1: Creating a Bootable Artix Media Device</h3>
+<p>Here we will follow the Artix documentation:</p>
+<p><strong>i.</strong> Acquire an installation image <a href="https://iso.artixlinux.org/isos.php">here</a> - select the <strong>OpenRC</strong> variant;</p>
+<p><strong>ii.</strong> Verify the signature on the downloaded ISO image;</p>
+<p><strong>iii.</strong> Write your ISO to a USB (check out <a href="https://www.scaler.com/topics/burn-linux-iso-to-usb/">this</a> guide); and,</p>
+<p><strong>iv.</strong> Insert the USB into your target device and boot into it. Log in as <code>root</code>.</p>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">tip</span><span class="callout__title">OPTIONAL: Increase the console font size</span></div><div class="callout__body"><pre><code class="language-bash">setfont latarcyrheb-sun32
+</code></pre></div></div>
+<hr />
+<h3>Step 2: Setting Up Our System with the Artix ISO</h3>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">tip</span><span class="callout__title">OPTIONAL: SSH into your target machine</span></div><div class="callout__body"><ul>
+<li>Set a password for the ISO root user with <code>passwd</code>;</li>
+<li>Start the ssh service with <code>rc-service sshd start</code>; and,</li>
+<li>Obtain your IP address with <code>ip addr show</code> (you can now ssh in from another machine).</li>
+</ul></div></div>
+<p><strong>i.</strong> Set the console keyboard layout (US by default):</p>
+<ul>
+<li>list available keymaps with <code>ls -R /usr/share/kbd/keymaps</code>; and,</li>
+<li>load your keymap with <code>loadkeys &lt;your-keymap&gt;</code>.</li>
+</ul>
+<p><strong>ii.</strong> Verify your boot mode: the following returns nothing or an error on BIOS, and a list of variables on UEFI:</p>
+<pre><code class="language-bash">ls /sys/firmware/efi/efivars
+</code></pre>
+<p><strong>iii.</strong> Connect to the internet:</p>
+<ul>
+<li>the Artix ISO ships with <code>connman</code> already running (wired connections are automatic); and,</li>
+<li>confirm your connection with <code>ping -c 2 artixlinux.org</code>.</li>
+</ul>
+<p><strong>iv.</strong> Update the system clock:</p>
+<pre><code class="language-bash">rc-service ntpd start
+</code></pre>
+<p><strong>v.</strong> Partition your disk:</p>
+<ul>
+<li>list your disks with <code>lsblk</code>; and,</li>
+<li>open your target disk with <code>cfdisk /dev/nvme0n1</code>.</li>
+</ul>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">warning</span><span class="callout__title">The following step will delete all data on the target disk. Ensure you have selected the correct disk before proceeding.</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>Partition labels and LUKS</strong></span></div><div class="callout__body"><p>The official Artix docs use partition labels (ROOT, HOME, SWAP) for unencrypted setups. Since this guide uses LUKS, the encrypted container is opaque from the outside and labels are not meaningful. The boot process relies on the LUKS UUID in the GRUB cmdline instead.</p></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>Swap</strong></span></div><div class="callout__body"><p>This guide does not use a dedicated swap partition. Swap is handled via a btrfs swap file on an <code>@swap</code> subvolume, set up after the first boot (see Step 4).</p></div></div>
+<p><strong>[BIOS]</strong> Select <code>dos</code> label type and create the following partitions:</p>
+<table><thead><tr><th>Partition</th><th>Size</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>/dev/nvme0n1p1</code></td><td>2MB</td><td>BIOS Boot</td></tr>
+<tr><td><code>/dev/nvme0n1p2</code></td><td>Remaining space</td><td>Linux filesystem</td></tr>
+</tbody></table>
+<p><strong>[UEFI]</strong> Select <code>gpt</code> label type and create the following partitions:</p>
+<table><thead><tr><th>Partition</th><th>Size</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>/dev/nvme0n1p1</code></td><td>1GB</td><td>EFI System</td></tr>
+<tr><td><code>/dev/nvme0n1p2</code></td><td>Remaining space</td><td>Linux filesystem</td></tr>
+</tbody></table>
+<p>Then <strong>Write</strong> and <strong>Quit</strong>.</p>
+<p><strong>vi.</strong> Format your partitions:</p>
+<p><strong>[UEFI only]</strong> Format the EFI System Partition (ESP):</p>
+<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
+fatlabel /dev/nvme0n1p1 ESP
+</code></pre>
+<pre><code class="language-bash"># set up LUKS encryption
+cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup luksOpen /dev/nvme0n1p2 main
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">If you are on a librebooted system and want to leverage Full-Disk Encryption (including <code>/boot</code>) you need to ensure it is of type <code>luks2</code> and use <code>argon2id</code> (libreboot documentation <a href="https://libreboot.org/docs/linux/#encrypted-boot-via-luks2-with-argon2">here</a>).</span></div><div class="callout__body"><pre><code class="language-bash">cryptsetup luksFormat --type luks2 --pbkdf argon2id /dev/nvme0n1p3
+</code></pre></div></div>
+<pre><code class="language-bash"># format as btrfs inside the LUKS container
+mkfs.btrfs -L MAIN /dev/mapper/main
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>btrfs subvolumes</strong></span></div><div class="callout__body"><p>This guide creates the following subvolumes:</p><table><thead><tr><th>Subvolume</th><th>Mount point</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>@</code></td><td><code>/</code></td><td>root</td></tr>
+<tr><td><code>@home</code></td><td><code>/home</code></td><td>user files survive a root rollback</td></tr>
+<tr><td><code>@snapshots</code></td><td><code>/.snapshots</code></td><td>required by snapper as its own subvolume</td></tr>
+<tr><td><code>@log</code></td><td><code>/var/log</code></td><td>logs persist across rollbacks</td></tr>
+<tr><td><code>@cache</code></td><td><code>/var/cache</code></td><td>package cache, excluded from snapshots</td></tr>
+<tr><td><code>@swap</code></td><td><code>/swap</code></td><td>btrfs swap file, excluded from snapshots</td></tr>
+</tbody></table></div></div>
+<p><strong>vii.</strong> Create btrfs subvolumes:</p>
+<pre><code class="language-bash">mount /dev/mapper/main /mnt
+cd /mnt
+
+btrfs subvolume create @
+btrfs subvolume create @home
+btrfs subvolume create @snapshots
+btrfs subvolume create @log
+btrfs subvolume create @cache
+btrfs subvolume create @swap
+
+cd -
+umount /mnt
+</code></pre>
+<p><strong>viii.</strong> Mount subvolumes:</p>
+<pre><code class="language-bash"># create mount points
+mkdir -p /mnt/{home,.snapshots,var/log,var/cache,swap}
+
+# root
+mount -o noatime,compress=zstd,discard=async,subvol=@ /dev/mapper/main /mnt
+
+# home
+mount -o noatime,compress=zstd,discard=async,subvol=@home /dev/mapper/main /mnt/home
+
+# snapshots
+mount -o noatime,compress=zstd,discard=async,subvol=@snapshots /dev/mapper/main /mnt/.snapshots
+
+# log
+mount -o noatime,compress=zstd,discard=async,subvol=@log /dev/mapper/main /mnt/var/log
+
+# cache
+mount -o noatime,compress=zstd,discard=async,subvol=@cache /dev/mapper/main /mnt/var/cache
+
+# swap (nodatacow required for swap files on btrfs)
+mount -o noatime,nodatacow,subvol=@swap /dev/mapper/main /mnt/swap
+</code></pre>
+<p><strong>ix.</strong> <strong>[UEFI only]</strong> Mount the EFI partition:</p>
+<pre><code class="language-bash">mkdir /mnt/boot
+mount /dev/nvme0n1p1 /mnt/boot
+</code></pre>
+<p><strong>x.</strong> Install the base system:</p>
+<pre><code class="language-bash">basestrap /mnt base base-devel openrc elogind-openrc linux linux-firmware
+</code></pre>
+<p><strong>xi.</strong> Generate the filesystem table:</p>
+<pre><code class="language-bash">fstabgen -U /mnt &gt;&gt; /mnt/etc/fstab
+</code></pre>
+<ul>
+<li>Verify with <code>cat /mnt/etc/fstab</code> that all subvolumes and boot entries are present and correct before continuing.</li>
+</ul>
+<p><strong>xii.</strong> Change root into the new system:</p>
+<pre><code class="language-bash">artix-chroot /mnt
+</code></pre>
+<p>You are now working within your new Artix base system (i.e. not from the ISO) and you will now see that your prompt starts with <code>#</code>. Great work so far!</p>
+<hr />
+<h3>Step 3: Working Within Our New Base System</h3>
+<p>We are now working within our new Artix system, chrooted in from the ISO. Let's continue with a few steps that we need to repeat (such as setting our root password, timezone, keymaps and language).</p>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">warning</span><span class="callout__title">Do not reboot yet. Complete all steps in this section before rebooting.</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">You are now running as root inside the chroot (i.e. no <code>sudo</code>).</span></div></div>
+<p><strong>i.</strong> Configure the timezone (replace Asia/Bangkok with your city/timezone):</p>
+<pre><code class="language-bash">ln -sf /usr/share/zoneinfo/Asia/Bangkok /etc/localtime
+</code></pre>
+<p><strong>ii.</strong> Configure the hardware clock:</p>
+<pre><code class="language-bash">hwclock --systohc
+</code></pre>
+<p><strong>iii.</strong> Configure locales - in <code>nvim /etc/locale.gen</code> uncomment your locale (e.g. <code>en_US.UTF-8</code>), write and exit, then run:</p>
+<pre><code class="language-bash">locale-gen
+echo "LANG=en_US.UTF-8" &gt;&gt; /etc/locale.conf
+echo "KEYMAP=us" &gt;&gt; /etc/vconsole.conf
+</code></pre>
+<p><strong>iv.</strong> Configure the hostname:</p>
+<pre><code class="language-bash"># T480 will be my hostname, swap in yours
+echo "T480" &gt; /etc/hostname
+</code></pre>
+<p>Then add it to <code>/etc/conf.d/hostname</code>:</p>
+<pre><code class="language-bash">nvim /etc/conf.d/hostname
+hostname="T480"
+</code></pre>
+<p>And add matching entries to <code>/etc/hosts</code>:</p>
+<pre><code class="language-bash">nvim /etc/hosts
+127.0.0.1    localhost
+::1          localhost
+127.0.1.1    T480.localdomain T480
+</code></pre>
+<p><strong>v.</strong> Set the root password:</p>
+<pre><code class="language-bash">passwd
+</code></pre>
+<p><strong>vi.</strong> Create a user (replace <code>rad</code> with your preferred username):</p>
+<pre><code class="language-bash">useradd -m -G wheel rad
+passwd rad
+mkdir /etc/sudoers.d
+chmod 755 /etc/sudoers.d   # readable, executable by all; writable by root only
+echo "rad ALL=(ALL) ALL" &gt;&gt; /etc/sudoers.d/rad
+chmod 0440 /etc/sudoers.d/rad   # read-only for root and group; visudo will refuse otherwise
+</code></pre>
+<p><strong>vii.</strong> Set the mirrorlist (substitute Singapore with your best location/country):</p>
+<pre><code class="language-bash">pacman -S reflector
+reflector -c Singapore -a 12 --sort rate --save /etc/pacman.d/mirrorlist
+</code></pre>
+<p><strong>viii.</strong> Enable the Arch Linux repositories:</p>
+<p>Artix does not mirror every Arch package. Adding the Arch repos gives access to packages like <code>qtile</code> that are not yet in the Artix repos.</p>
+<pre><code class="language-bash">pacman -S artix-archlinux-support
+</code></pre>
+<p>Append the following to <code>/etc/pacman.conf</code> after your existing Artix repos (at the bottom):</p>
+<pre><code class="language-ini">[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist-arch
+</code></pre>
+<p>Then update:</p>
+<pre><code class="language-bash">pacman -Syu
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>OpenRC service packages</strong></span></div><div class="callout__body"><p>On Artix, many packages require a separate <code>-openrc</code> package to include the OpenRC service file. The base package alone will not register a service.</p></div></div>
+<p><strong>ix.</strong> Install core packages:</p>
+<pre><code class="language-bash">pacman -Syu \
+  linux-headers \           # kernel build headers
+  btrfs-progs \             # btrfs utilities
+  btrfs-assistant           # GUI for managing btrfs snapshots
+  cryptsetup \              # LUKS encryption
+  networkmanager \          # network management
+  networkmanager-openrc \   # OpenRC service file
+  network-manager-applet \  # system tray applet
+  openssh \                 # SSH server/client
+  openssh-openrc \          # OpenRC service file
+  sudo \                    # privilege escalation
+  neovim \                  # text editor
+  git \                     # version control
+  firewalld \               # firewall frontend
+  firewalld-openrc \        # OpenRC service file
+  reflector \               # mirror ranking
+  acpid \                   # ACPI event daemon
+  acpid-openrc \            # OpenRC service file
+  cronie \                  # cron scheduler
+  cronie-openrc \           # OpenRC service file
+  grub \                    # bootloader
+  elogind \                 # login session manager
+  dbus \                    # inter-process messaging
+  dbus-openrc \             # OpenRC service file
+  polkit \                  # privilege authorisation
+  xdg-user-dirs             # standard home directories
+</code></pre>
+<p><strong>[UEFI only]</strong> Also install:</p>
+<pre><code class="language-bash">pacman -S efibootmgr       # EFI boot manager
+</code></pre>
+<p><strong>x.</strong> Install CPU microcode:</p>
+<ul>
+<li><strong>Intel:</strong> <code>pacman -S intel-ucode</code></li>
+<li><strong>AMD:</strong> <code>pacman -S amd-ucode</code></li>
+</ul>
+<p><strong>xi.</strong> Install audio:</p>
+<pre><code class="language-bash">pacman -S \
+  pipewire \             # audio server
+  pipewire-audio \       # audio support
+  pipewire-alsa \        # ALSA routing
+  pipewire-pulse \       # PulseAudio replacement
+  pipewire-jack \        # JACK replacement
+  wireplumber \          # session manager
+  alsa-utils \           # ALSA utilities
+  sof-firmware           # sound card firmware
+</code></pre>
+<p><strong>xii.</strong> Install Bluetooth:</p>
+<pre><code class="language-bash">pacman -S \
+  bluez \                # Bluetooth stack
+  bluez-utils \          # Bluetooth utilities
+  bluez-openrc           # OpenRC service file
+</code></pre>
+<p><strong>xiii.</strong> Install Qtile, ly, and Wayland dependencies:</p>
+<pre><code class="language-bash">pacman -S \
+  ly \                      # display manager
+  ly-openrc \               # OpenRC service file
+  qtile \                   # window manager
+  python-pywlroots \        # Wayland backend
+  python-pywayland \        # Wayland bindings
+  python-xkbcommon \        # keyboard handling
+  xorg-xwayland \           # X11 compatibility
+  wlr-randr \               # display management
+  swaylock \                # screen locker
+  swaybg \                  # wallpaper setter
+  lxqt-policykit \          # polkit auth agent
+  xdg-desktop-portal \      # portal base layer
+  xdg-desktop-portal-wlr \  # screen sharing, file pickers
+  xdg-desktop-portal-gtk \  # screen sharing, file pickers
+  python-psutil \           # system stats widgets
+  qt5-wayland \             # Qt5 Wayland support
+  qt6-wayland \             # Qt6 Wayland support
+  grim \                    # screenshot tool
+  slurp \                   # region selector
+  wl-clipboard \            # Wayland clipboard
+  mako \                    # notification daemon
+  brightnessctl \           # brightness control
+  power-profiles-daemon \   # power profile management
+  playerctl \               # media key support
+  swayidle \                # idle/lock
+  kanshi                    # display management
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">If <code>qtile</code> is not found, ensure the Arch repos were added correctly in Step 3 (viii) and run <code>pacman -Syu</code> before retrying.</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">To verify the correct path for the polkit agent after installation, run <code>find /usr -name "lxqt-policykit-agent"</code> and update your Qtile autostart accordingly.</span></div></div>
+<p><strong>xiv.</strong> Install a file manager and supporting utilities:</p>
+<pre><code class="language-bash">pacman -S \
+  thunar \               # file manager
+  gvfs \                 # trash, USB mounting
+  gvfs-mtp \             # Android device support
+  pavucontrol            # audio volume control
+</code></pre>
+<p><strong>xv.</strong> Install fonts, terminal, window switcher (rofi) and browser:</p>
+<pre><code class="language-bash">pacman -S \
+  man-db \               # manual pages
+  man-pages \            # manual content
+  texinfo \              # info pages
+  ttf-firacode-nerd \    # nerd font
+  noto-fonts-cjk \       # Chinese, Japanese, Korean characters
+  noto-fonts-emoji \     # emoji support
+  alacritty \            # terminal emulator
+  firefox \              # web browser
+  rofi \                 # rofi now supports wayland
+  lf                     # terminal file manager
+</code></pre>
+<p><strong>xvi.</strong> Configure the firewall:</p>
+<pre><code class="language-bash">rc-update add firewalld default
+rc-service firewalld start
+firewall-cmd --permanent --add-service=ssh
+firewall-cmd --reload
+</code></pre>
+<p><strong>xvii.</strong> Configure mkinitcpio for LUKS + btrfs:</p>
+<p>Edit <code>/etc/mkinitcpio.conf</code> and set your MODULES and HOOKS lines to:</p>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">tip</span><span class="callout__title">OPTIONAL: If you use an external USB keyboard and need it available at the LUKS prompt, add <code>usbhid</code> and <code>atkbd</code> to MODULES:</span></div><div class="callout__body"><pre><code class="language-bash">MODULES=(btrfs usbhid atkbd)
+</code></pre></div></div>
+<pre><code class="language-bash">MODULES=(btrfs)
+HOOKS=(base udev autodetect modconf kms keyboard keymap block encrypt filesystems)
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><code>fsck</code> is removed from HOOKS (it is not required for btrfs). <code>consolefont</code> is removed as it requires <code>terminus-font</code> and serves no purpose at the LUKS prompt. This guide uses a <code>udev</code>-based initramfs. If you are using a <code>systemd</code>-based initramfs, replace <code>encrypt</code> with <code>sd-encrypt</code>.</span></div></div>
+<p>Regenerate the initramfs:</p>
+<pre><code class="language-bash">mkinitcpio -P
+</code></pre>
+<p><strong>xviii.</strong> Configure GRUB:</p>
+<p><strong>[BIOS]</strong> Install GRUB to the LUKS encrypted partition:</p>
+<pre><code class="language-bash">grub-install --recheck /dev/nvme0n1
+</code></pre>
+<p><strong>[UEFI]</strong> Install GRUB to the EFI partition:</p>
+<pre><code class="language-bash">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+</code></pre>
+<p>Get the UUID of your LUKS partition and append it to the grub defaults file for reference:</p>
+<pre><code class="language-bash">blkid -s UUID -o value /dev/nvme0n1p2 &gt;&gt; /etc/default/grub
+</code></pre>
+<p>Edit <code>/etc/default/grub</code> and set the following - replacing <code>&lt;uuid&gt;</code> with the value appended at the bottom of the file, then delete that line:</p>
+<pre><code class="language-bash">GRUB_ENABLE_CRYPTODISK=y
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet zswap.enabled=1 cryptdevice=UUID=&lt;uuid&gt;:main root=/dev/mapper/main"
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><code>GRUB_ENABLE_CRYPTODISK=y</code> is required because <code>/boot</code> resides inside the LUKS-encrypted partition. Without it, GRUB cannot read the kernel and initramfs at boot. This means you will be prompted for your LUKS password <strong>twice</strong> on boot (once by GRUB to load the kernel, and once by the initramfs to mount root).</span></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><strong>zswap vs zram</strong></span></div><div class="callout__body"><p><code>zswap.enabled=1</code> enables zswap, a kernel-level compressed cache that sits in front of your swap file, compressing pages in RAM before they are written to disk. It requires no additional packages. zswap and zram are <strong>not compatible</strong> - do not enable both.</p></div></div>
+<p>Generate the GRUB config:</p>
+<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p><strong>xix.</strong> Enable services:</p>
+<pre><code class="language-bash">rc-update add NetworkManager default            # network management
+rc-update add bluetoothd default                # Bluetooth
+rc-update add sshd default                      # SSH server
+rc-update add ly default                        # display manager
+rc-update add firewalld default                 # firewall
+rc-update add acpid default                     # ACPI events
+rc-update add cronie default                    # cron scheduler
+rc-update add dbus default                      # inter-process messaging
+rc-update add power-profiles-daemon default     # power profile management
+</code></pre>
+<p><strong>xx.</strong> Set up cron jobs for periodic maintenance:</p>
+<pre><code class="language-bash"># weekly SSD trim
+echo "@weekly root fstrim -av" &gt;&gt; /etc/cron.d/fstrim
+
+# weekly mirrorlist update - substitute Singapore with your location
+echo "@weekly root reflector -c Singapore -a 12 --sort rate --save /etc/pacman.d/mirrorlist" &gt;&gt; /etc/cron.d/reflector
+</code></pre>
+<p><strong>xxi.</strong> Reboot:</p>
+<pre><code class="language-bash">exit
+umount -R /mnt
+reboot
+</code></pre>
+<hr />
+<h3>Step 4: Tweaking Our New Artix System</h3>
+<p>Upon successful decryption, ly will start. Log in with the user you created earlier and select the Qtile Wayland session.</p>
+<p><strong>i.</strong> Connect to WiFi if needed:</p>
+<pre><code class="language-bash">nmtui
+</code></pre>
+<p><strong>ii.</strong> Set up standard home directories for your user:</p>
+<pre><code class="language-bash">xdg-user-dirs-update
+</code></pre>
+<p><strong>iii.</strong> Install <a href="https://github.com/Morganamilo/paru">paru</a>:</p>
+<pre><code class="language-bash">sudo pacman -S --needed base-devel
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+</code></pre>
+<p><strong>iv.</strong> Refresh the font cache:</p>
+<pre><code class="language-bash">fc-cache -fv
+</code></pre>
+<p><strong>v.</strong> Install AUR packages:</p>
+<pre><code class="language-bash">paru -S bluetuith          # bluetooth TUI manager
+paru -S libinput-gestures  # touchpad gesture support
+</code></pre>
+<p>Add your user to the <code>input</code> group for gesture support and log out and back in:</p>
+<pre><code class="language-bash">sudo usermod -aG input $USER
+</code></pre>
+<p>Enable gestures:</p>
+<pre><code class="language-bash">libinput-gestures-setup autostart start
+</code></pre>
+<p><strong>vi.</strong> Set up the btrfs swap file:</p>
+<pre><code class="language-bash">sudo btrfs filesystem mkswapfile --size 8g /swap/swapfile
+sudo swapon /swap/swapfile
+</code></pre>
+<p>Verify swap is active:</p>
+<pre><code class="language-bash">swapon --show
+</code></pre>
+<p>OpenRC's <code>swap</code> service runs before <code>localmount</code>, meaning it activates before <code>/swap</code> is mounted. To fix this, create a dedicated service that runs after <code>localmount</code>:</p>
+<pre><code class="language-bash">sudo nvim /etc/init.d/swapfile
+</code></pre>
+<pre><code class="language-bash">#!/usr/bin/openrc-run
+
+depend()
+{
+    after localmount
+}
+
+start()
+{
+    ebegin "Activating swap file"
+    swapon /swap/swapfile
+    eend $?
+}
+
+stop()
+{
+    ebegin "Deactivating swap file"
+    swapoff /swap/swapfile
+    eend $?
+}
+</code></pre>
+<pre><code class="language-bash">sudo chmod +x /etc/init.d/swapfile
+sudo rc-update add swapfile default
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">Do not add <code>/swap/swapfile</code> to <code>/etc/fstab</code> — the <code>swapfile</code> service handles activation. The <code>/swap</code> subvolume mount entry in <code>/etc/fstab</code> must remain so the subvolume is available at boot. Adjust the size (<code>8g</code>) to suit your RAM.</span></div></div>
+<p><strong>vii.</strong> Configure Qtile:</p>
+<p>Qtile's config lives at <code>~/.config/qtile/config.py</code>. Create the directory if it does not exist:</p>
+<pre><code class="language-bash">mkdir -p ~/.config/qtile
+</code></pre>
+<p>On first login Qtile will use its built-in default config if none is present, which is functional but minimal. Check out my config <a href="https://github.com/radleylewis/qtile">here</a>.</p>
+<hr />
+<h3>Recovery</h3>
+<p>If you cannot boot into your system, boot from your Artix USB, open the encrypted partition and chroot back in:</p>
+<pre><code class="language-bash">cryptsetup luksOpen /dev/nvme0n1p2 main
+mount -o noatime,compress=zstd,discard=async,subvol=@ /dev/mapper/main /mnt
+mount -o noatime,compress=zstd,discard=async,subvol=@home /dev/mapper/main /mnt/home
+artix-chroot /mnt
+</code></pre>
+<p>From here you can fix your GRUB config, reinstall packages, or regenerate the initramfs as needed.</p>
+<p><strong>Recovering from a snapshot</strong> (requires snapper and grub-btrfs from Optional Further Steps):</p>
+<p>At boot, select <code>Arch Linux Snapshots</code> from the GRUB menu and choose a snapshot to boot into read-only. Once booted, you have two options:</p>
+<p>Option 1 - surgical rollback (reverts only changed files):</p>
+<pre><code class="language-bash">sudo snapper -c root undochange &lt;snapshot&gt;..0
+</code></pre>
+<p>Option 2 - full root rollback (replaces <code>@</code> entirely):</p>
+<pre><code class="language-bash">sudo btrfs subvolume delete /@
+sudo btrfs subvolume snapshot /.snapshots/&lt;snapshot&gt;/snapshot /@
+</code></pre>
+<p>Then reboot. Your <code>/home</code> subvolume is never affected by a root rollback.</p>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><code>snap-pac</code> creates numbered pre/post snapshot pairs around every pacman transaction. If an update breaks something, reboot into the pre-update snapshot from GRUB, run <code>snapper undochange</code>, and reboot normally.</span></div></div>
+<hr />
+<h3>Optional Further Steps</h3>
+<p><strong>i.</strong> Install <code>brave-browser</code>:</p>
+<pre><code class="language-bash">paru -S brave-browser
+</code></pre>
+<p><strong>ii.</strong> Add snapper for btrfs snapshots (when ready):</p>
+<pre><code class="language-bash">sudo pacman -S snapper snap-pac grub-btrfs
+sudo snapper -c root create-config /
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title">Snapper expects to manage <code>/.snapshots</code> itself. If it complains that <code>/.snapshots</code> already exists, run the following to let snapper create and own the subvolume itself:</span></div><div class="callout__body"><pre><code class="language-bash">umount /.snapshots
+btrfs subvolume delete /.snapshots
+snapper -c root create-config /
+</code></pre></div></div>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">note</span><span class="callout__title"><code>snap-pac</code> creates a pre and post snapshot automatically around every pacman transaction (installs, upgrades and removals). <code>grub-btrfs</code> makes snapshots available as boot options. The final <code>grub-mkconfig</code> populates the GRUB menu immediately. Arch snapper docs <a href="https://wiki.archlinux.org/title/Snapper">here</a>.</span></div></div>
+<hr />
+<p>That's all folks!</p>

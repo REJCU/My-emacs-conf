@@ -1,0 +1,94 @@
+<h1>T480 ThinkPad + EDK2 Payload</h1>
+<blockquote>
+<p>GitHub: <a href="https://www.github.com/radleylewis/t480_coreboot">radleylewis/t480_coreboot</a></p>
+</blockquote>
+<p>Clone the repo first — all steps below assume you are working from within it:</p>
+<pre><code class="language-bash">git clone https://www.github.com/radleylewis/t480_coreboot
+cd t480_coreboot
+</code></pre>
+<p>Builds coreboot with MrChromebox EDK2 for the ThinkPad T480. Uses lbmk (libreboot's build toolchain) to prepare the ME and GbE blobs in a first stage, then compiles coreboot with a full UEFI payload in a second stage. Everything runs in a container (no host dependencies beyond Podman).</p>
+<h2>What you need</h2>
+<ul>
+<li>Podman (preferred) or Docker</li>
+<li>A SPI programmer (e.g. CH341A) with a SOIC-8 clip</li>
+<li>Your T480's MAC address (<code>ip link show</code> on the running machine, or check your router)</li>
+<li><code>libreboot-26.01rev1_t480_vfsp_16mb.tar.xz</code> from the <a href="https://libreboot.org/download.html">libreboot releases page</a></li>
+</ul>
+<hr />
+<h2>Prepare</h2>
+<p><strong>1. Download the libreboot ROM</strong></p>
+<p>Download <code>libreboot-26.01rev1_t480_vfsp_16mb.tar.xz</code> from the <a href="https://libreboot.org/download.html">libreboot releases page</a> and place it in a <code>libreboot/</code> directory in the repo root.</p>
+<p><strong>2. Read &amp; backup your OEM ROM</strong></p>
+<p>Clip your SPI programmer (e.g. CH341A) onto the chip and read it twice. Only proceed if <code>diff</code> produces no output (this confirms the reads are identical):</p>
+<pre><code class="language-bash">mkdir -p oem
+flashrom -p ch341a_spi -r oem/T480.img
+flashrom -p ch341a_spi -r oem/diff.img
+diff oem/T480.img oem/diff.img &amp;&amp; rm oem/diff.img
+</code></pre>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">WARNING</span><span class="callout__title">Keep this somewhere in case you want to restore.</span></div></div>
+<p><strong>3. Get your MAC address</strong></p>
+<p>Find it via <code>ip link show</code> on the running machine, or from your router's DHCP table. You will pass it as a build arg in the next step.</p>
+<hr />
+<h2>Layout</h2>
+<pre><code>t480_coreboot/
+|-- Dockerfile
+|-- defconfig
+|-- splash.bmp          &lt;- optional boot splash (see below)
+|-- README.md
+</code></pre>
+<p><strong>Optional: custom boot splash</strong></p>
+<p>If <code>splash.bmp</code> is present it will be included. If not, the build falls back to the coreboot default. Must be a 24-bit uncompressed BMP under ~700KB. To convert from PNG:</p>
+<pre><code class="language-bash">magick splash.png -type TrueColor -compress None BMP3:splash.bmp
+</code></pre>
+<div class="callout callout--warning"><div class="callout__header"><span class="callout__type">WARNING</span><span class="callout__title">If the splash image is too large the EDK2 firmware volume will overflow and the build will fail.</span></div></div>
+<hr />
+<h2>Build</h2>
+<pre><code class="language-bash"># NOTE: add your MAC_ADDRESS here as per your specific machine
+podman build --build-arg MAC_ADDRESS="xx:xx:xx:xx:xx:xx" -t coreboot-libreboot-t480 .
+</code></pre>
+<p><strong>Stage 1:</strong> clones lbmk, injects the MAC address into the libreboot ROM, and produces a ROM with a correctly deguarded ME and correct GbE.
+<strong>Stage 2:</strong> clones coreboot, extracts the blobs from that ROM, and compiles the final image with EDK2. Expect 30-60 minutes on first run. Subsequent builds use the layer cache so only changed steps re-run.</p>
+<div class="callout callout--tip"><div class="callout__header"><span class="callout__type">TIP</span><span class="callout__title">Podman is preferred over Docker on Linux (its a drop in Docker replacement which is rootless by default and doesn't run a daemon). The <code>:z</code> label on volume mounts handles SELinux correctly (you can remove it using Docker).</span></div></div>
+<hr />
+<h2>Copy the ROM from the container to the local directory we are working in</h2>
+<pre><code class="language-bash">mkdir -p roms
+podman run --rm -v $(pwd)/roms:/out:z --user root coreboot-libreboot-t480 \
+  bash -c "cp /opt/coreboot/build/coreboot.rom /out/"
+</code></pre>
+<p>Verify it is approximately 16.7 MB:</p>
+<pre><code class="language-bash">ls -lh roms/coreboot.rom
+</code></pre>
+<hr />
+<h2>Flash</h2>
+<p>Flash the ROM to the chip (red wire lines up with the dot on the chip):</p>
+<pre><code class="language-bash">flashrom -p ch341a_spi -w roms/coreboot.rom
+</code></pre>
+<hr />
+<h2>Config</h2>
+<p>The <code>defconfig</code> file controls what gets built. Notable options:</p>
+<ul>
+<li><code>CONFIG_POWER_STATE_ON_AFTER_FAILURE=y</code> - powers on automatically after AC loss (I've added this for an always on Home Server)</li>
+<li><code>CONFIG_EDK2_BOOTSPLASH_FILE</code> - path to the boot splash inside the container (stripped automatically if <code>splash.bmp</code> is absent)</li>
+<li><code>CONFIG_CBFS_SIZE=0xE0C000</code> - sized to fit the libreboot IFD region layout</li>
+</ul>
+<p>To add iPXE network boot, append these two lines to <code>defconfig</code> and rebuild:</p>
+<pre><code>CONFIG_EDK2_ENABLE_IPXE=y
+CONFIG_EDK2_DEBUG=y
+</code></pre>
+<div class="callout callout--note"><div class="callout__header"><span class="callout__type">NOTE</span><span class="callout__title"><code>CONFIG_EDK2_DEBUG=y</code> is required because the release FV is too small to include iPXE.</span></div></div>
+<hr />
+<h2>After flashing</h2>
+<p>Add <code>reboot=pci</code> to your kernel command line or soft reboots will hang:</p>
+<pre><code class="language-bash"># /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="quiet reboot=pci"
+sudo update-grub
+</code></pre>
+<hr />
+<h2>Notes</h2>
+<ul>
+<li>ME is deguarded via lbmk's pre-computed T480 delta and the HAP bit is set to halt ME after hardware init</li>
+<li>GbE MAC address is injected at build time via the <code>MAC_ADDRESS</code> build arg</li>
+<li>coreboot is pinned to commit <code>2a2ab9e0</code> (known-good with MrChromebox EDK2 <code>uefipayload_2603</code>)</li>
+<li>No CPU whitelist under coreboot (any Kaby Lake Refresh CPU works)</li>
+<li>The power-on-AC setting is also exposed in the UEFI setup menu under System &gt; Restore AC power after loss (along with other options like hyperthreading which Libreboot disables for what they state to be security reasons)</li>
+</ul>

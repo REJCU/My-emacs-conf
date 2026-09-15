@@ -1,0 +1,48 @@
+<p>I just added two new themes to my minimalist <code class="language-plaintext highlighter-rouge">doric-themes</code> package.
+<code class="language-plaintext highlighter-rouge">doric-tiger</code> is a light theme, while <code class="language-plaintext highlighter-rouge">doric-lion</code> is dark. Both use
+orange and yellow colours. Below are sample screenshots.</p>
+
+<h2>doric-tiger</h2>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-tiger.png"><img alt="doric-tiger theme sample" src="https://protesilaos.com/assets/images/doric/doric-tiger.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-tiger-org.png"><img alt="doric-tiger theme sample" src="https://protesilaos.com/assets/images/doric/doric-tiger-org.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-tiger-message.png"><img alt="doric-tiger theme sample" src="https://protesilaos.com/assets/images/doric/doric-tiger-message.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-tiger-magit.png"><img alt="doric-tiger theme sample" src="https://protesilaos.com/assets/images/doric/doric-tiger-magit.png" /></a></p>
+
+<h2>doric-lion</h2>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-lion.png"><img alt="doric-lion theme sample" src="https://protesilaos.com/assets/images/doric/doric-lion.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-lion-org.png"><img alt="doric-lion theme sample" src="https://protesilaos.com/assets/images/doric/doric-lion-org.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-lion-message.png"><img alt="doric-lion theme sample" src="https://protesilaos.com/assets/images/doric/doric-lion-message.png" /></a></p>
+
+<p><a href="https://protesilaos.com/assets/images/doric/doric-lion-magit.png"><img alt="doric-lion theme sample" src="https://protesilaos.com/assets/images/doric/doric-lion-magit.png" /></a></p>
+
+<h2>Part of development</h2>
+
+<p>The new themes will be available in version <code class="language-plaintext highlighter-rouge">1.2.0</code>. I think they
+already are well defined and may not need furter changes. Though I
+will continue to test—and possibly tweak—them over the course of
+the next two weeks or so.</p>
+
+<h2>Sources</h2>
+
+<p>The Doric themes use few colours and will appear monochromatic in many
+contexts. They are my most minimalist themes. Styles involve the
+careful use of typographic features and subtleties in colour gradients
+to establish a consistent rhythm.</p>
+
+<p>If you want maximalist themes in terms of colour, check my <code class="language-plaintext highlighter-rouge">ef-themes</code>
+package. For something in-between, which I would consider the best
+“default theme” for a text editor, opt for my <code class="language-plaintext highlighter-rouge">modus-themes</code>.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">doric-themes</code></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/doric-themes-pictures">https://protesilaos.com/emacs/doric-themes-pictures</a></li>
+  <li>Git repository: <a href="https://github.com/protesilaos/doric-themes">https://github.com/protesilaos/doric-themes</a></li>
+  <li>Backronym: Doric Only Really Intensifies Conservatively … themes.</li>
+</ul>

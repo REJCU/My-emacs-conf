@@ -1,0 +1,45 @@
+<p>I have been working on two new themes for my minimalist <code class="language-plaintext highlighter-rouge">doric-themes</code>
+package. The original plan was to publish them together as part of the
+version <code class="language-plaintext highlighter-rouge">1.2.0</code> from a few days ago (the version that also brought
+<code class="language-plaintext highlighter-rouge">doric-tiger</code> and <code class="language-plaintext highlighter-rouge">doric-lion</code>), but then I decided to refine them
+further.</p>
+
+<p><code class="language-plaintext highlighter-rouge">doric-lilac</code> is a light theme, while <code class="language-plaintext highlighter-rouge">doric-borage</code> is dark. I am
+still testing them, though in the screenshots below you can get a
+first look.</p>
+
+<p>Borage, by the way, occurs naturally in the mountains and there even
+is some in my land: all sorts of bees love it. I have seen lilac
+around, so I will need to transplant some of it here.</p>
+
+<h2>doric-lilac</h2>
+
+<p><a href="https://protesilaos.com/assets/images/attachments/2026-07-16-doric-lilac.png"><img alt="doric-lilac theme sample" src="https://protesilaos.com/assets/images/attachments/2026-07-16-doric-lilac.png" /></a></p>
+
+<h2>doric-borage</h2>
+
+<p><a href="https://protesilaos.com/assets/images/attachments/2026-07-16-doric-borage.png"><img alt="doric-borage theme sample" src="https://protesilaos.com/assets/images/attachments/2026-07-16-doric-borage.png" /></a></p>
+
+<h2>Part of development</h2>
+
+<p>The new themes will be available in version <code class="language-plaintext highlighter-rouge">1.3.0</code>. They already have
+the character I want from them, though I may still tweak some colour
+values.</p>
+
+<h2>Sources</h2>
+
+<p>The Doric themes use few colours and will appear monochromatic in many
+contexts. They are my most minimalist themes. Styles involve the
+careful use of typographic features and subtleties in colour gradients
+to establish a consistent rhythm.</p>
+
+<p>If you want maximalist themes in terms of colour, check my <code class="language-plaintext highlighter-rouge">ef-themes</code>
+package. For something in-between, which I would consider the best
+“default theme” for a text editor, opt for my <code class="language-plaintext highlighter-rouge">modus-themes</code>.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">doric-themes</code></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/doric-themes-pictures">https://protesilaos.com/emacs/doric-themes-pictures</a></li>
+  <li>Git repository: <a href="https://github.com/protesilaos/doric-themes">https://github.com/protesilaos/doric-themes</a></li>
+  <li>Backronym: Doric Only Really Intensifies Conservatively … themes.</li>
+</ul>

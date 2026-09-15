@@ -1,0 +1,55 @@
+<p>The <code class="language-plaintext highlighter-rouge">ef-themes</code> are a collection of light and dark themes for GNU
+Emacs that provide colourful (“pretty”) yet legible options for users
+who want something with a bit more flair than the <code class="language-plaintext highlighter-rouge">modus-themes</code> (also
+designed by me).</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">ef-themes</code></li>
+  <li>Official manual: <a href="https://protesilaos.com/emacs/ef-themes">https://protesilaos.com/emacs/ef-themes</a></li>
+  <li>Change log: <a href="https://protesilaos.com/emacs/ef-themes-changelog">https://protesilaos.com/emacs/ef-themes-changelog</a></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/ef-themes-pictures">https://protesilaos.com/emacs/ef-themes-pictures</a></li>
+  <li>Git repositories:
+    <ul>
+      <li>GitHub: <a href="https://github.com/protesilaos/ef-themes">https://github.com/protesilaos/ef-themes</a></li>
+      <li>GitLab: <a href="https://gitlab.com/protesilaos/ef-themes">https://gitlab.com/protesilaos/ef-themes</a></li>
+    </ul>
+  </li>
+  <li>Backronym: Eclectic Fashion in Themes Hides Exaggerated Markings,
+Embellishments, and Sparkles.</li>
+</ul>
+
+<p>Below are the release notes.</p>
+
+<hr />
+
+<h2>Version 2.2.0 on 2026-06-21</h2>
+
+<p>This version contains two new themes and several stylistic refinements
+to existing items in the collection.</p>
+
+<h3>Enjoy <code class="language-plaintext highlighter-rouge">ef-arcadia</code> and <code class="language-plaintext highlighter-rouge">ef-atlantis</code> themes</h3>
+
+<p><code class="language-plaintext highlighter-rouge">ef-arcadia</code> is a light theme with a green, humid feel. <code class="language-plaintext highlighter-rouge">ef-atlantis</code>
+is a dark theme with aquatic colours.</p>
+
+<h3>Improved style for <code class="language-plaintext highlighter-rouge">company</code> and <code class="language-plaintext highlighter-rouge">corfu</code> popups</h3>
+
+<p>I have revised the colour that each theme applies to the popup
+background. It should now be more consistent with all other elements
+on display.</p>
+
+<p>Thanks to aikrahguzar for suggesting a review in issue 70:
+<a href="https://github.com/protesilaos/ef-themes/issues/70">https://github.com/protesilaos/ef-themes/issues/70</a>.</p>
+
+<h3>The current line highlight for completions is easier to spot</h3>
+
+<p>This is the background of the selected candidate in the minibuffer
+while using the <code class="language-plaintext highlighter-rouge">vertico</code> package (among other similar interfaces).
+The colours I am now using are more consistent with their context and
+also work better as part of a popup completion interface, as noted
+above.</p>
+
+<h3>Palette refinements for several themes</h3>
+
+<p>I have made subtle changes to a few colour values. These are fine
+details. The overarching goal is to be consistent throughout.</p>

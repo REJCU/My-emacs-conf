@@ -1,0 +1,121 @@
+<p>This is a small Emacs package that automatically highlights the current
+line after certain functions are invoked. It can also highlight a line
+or region on demand. The idea is to make it easier to find where the
+point is, what was affected, and also to bring attention to something
+in a buffer. <a href="https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/">Watch the original demo</a> (2022-03-14).</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">pulsar</code></li>
+  <li>Official manual: <a href="https://protesilaos.com/emacs/pulsar">https://protesilaos.com/emacs/pulsar</a></li>
+  <li>Change log: <a href="https://protesilaos.com/emacs/pulsar-changelog">https://protesilaos.com/emacs/pulsar-changelog</a></li>
+  <li>Git repositories:
+    <ul>
+      <li>GitHub: <a href="https://github.com/protesilaos/pulsar">https://github.com/protesilaos/pulsar</a></li>
+      <li>GitLab: <a href="https://gitlab.com/protesilaos/pulsar">https://gitlab.com/protesilaos/pulsar</a></li>
+    </ul>
+  </li>
+  <li>Backronym: Pulsar Unquestionably Luminates, Strictly Absent the Radiation.</li>
+</ul>
+
+<p>Below are the release notes.</p>
+
+<hr />
+
+<h2>Version 1.4.0 on 2026-07-22</h2>
+
+<p>This version fixes a few bugs and brings quality-of-life improvements
+to an already stable package.</p>
+
+<h3>Correctly pulse the full line even in <code class="language-plaintext highlighter-rouge">M-x shell</code> and related</h3>
+
+<p>In certain buffers, we cannot use regular motions to reach a portion
+of text. This is done by text properties that make the propertized
+text inaccessible. One use-case is to prevent the user from deleting
+the shell prompt in <code class="language-plaintext highlighter-rouge">M-x shell</code>.</p>
+
+<p>Pulsar is now designed to handle <code class="language-plaintext highlighter-rouge">inhibit-field-text-motion</code> correctly
+so that it works as intended in all relevant cases.</p>
+
+<p>Thanks to Jake Miles for telling me that the shell buffer was not
+pulsing, which made me investigate the underlying problem. This was
+done in issue 40: <a href="https://github.com/protesilaos/pulsar/issues/40">https://github.com/protesilaos/pulsar/issues/40</a>.</p>
+
+<h3>The pulsing behaviour of Evil commands is more refined</h3>
+
+<p>In short:</p>
+
+<ul>
+  <li>editing commands should pulse the region, not the entire line;</li>
+  <li><code class="language-plaintext highlighter-rouge">evil-delete-char</code> should not produce a pulse;</li>
+  <li><code class="language-plaintext highlighter-rouge">evil-delete-marks</code> is not an editing command, as it removes invisible marks
+from the buffer.</li>
+</ul>
+
+<p>Thanks to Steven Allen from modifying the relevant variables in pull
+request 39: <a href="https://github.com/protesilaos/pulsar/pull/39">https://github.com/protesilaos/pulsar/pull/39</a>. Steven
+has assigned copyright to the Free Software Foundation.</p>
+
+<p>Also thanks to Javier Pacheco for adding more Evil-related commands to
+the list, in pull requests 37 and 38:</p>
+
+<ul>
+  <li><a href="https://github.com/protesilaos/pulsar/pull/37">https://github.com/protesilaos/pulsar/pull/37</a></li>
+  <li><a href="https://github.com/protesilaos/pulsar/pull/38">https://github.com/protesilaos/pulsar/pull/38</a></li>
+</ul>
+
+<h3>The <code class="language-plaintext highlighter-rouge">pulsar-face</code> is no longer hardcoded in one case</h3>
+
+<p>It is always meant to be a variable, specifically a user option,
+meaning that we want to use its value as defined by the user.</p>
+
+<p>Thanks to irisjae for reporting the bug in issue 36:
+<a href="https://github.com/protesilaos/pulsar/issues/36">https://github.com/protesilaos/pulsar/issues/36</a>.</p>
+
+<h3>Pulsing is done correctly on the TTY and other frames</h3>
+
+<p>The technicalities are covered in issue 33:
+<a href="https://github.com/protesilaos/pulsar/issues/33">https://github.com/protesilaos/pulsar/issues/33</a>. Thanks to the
+participation of Sébastien Delafond who provided feedback about their
+Emacs environment and helped me test the snippets I had provided.</p>
+
+<p>In a TTY we cannot use what we normally do, so I arrange for a
+standard colour to be used instead. My rationale for the choice of
+colour is this:</p>
+
+<ul>
+  <li>we are in an environment which does not guarantee accurate colour reproduction;</li>
+  <li>it is almost a given that the frame supports at least 8 colours;</li>
+  <li>of those 8 colours we have black, red, green, yellow, blue, magenta, cyan, white;</li>
+  <li>excluding black and white, the colour that contrasts best against both black and white is red;</li>
+  <li>picking red means we do not need to know the background-mode of the frame, which saves us the extra computations.</li>
+</ul>
+
+<p>The contrast table for the six colours, using Org, where <code class="language-plaintext highlighter-rouge">Λ</code> is an alias for <code class="language-plaintext highlighter-rouge">modus-themes-contrast</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>|         | #000000 | #ffffff |
+|---------+---------+---------|
+| #ff0000 |    5.25 |    4.00 |
+| #00ff00 |   15.30 |    1.37 |
+| #0000ff |    2.44 |    8.59 |
+| #ffff00 |   19.56 |    1.07 |
+| #ff00ff |    6.70 |    3.14 |
+| #00ffff |   16.75 |    1.25 |
+#+TBLFM: $2='(Λ $1 @1$2);%.2f :: $3='(Λ $1 @1$3);%.2f
+</code></pre></div></div>
+
+<h3>Pulsing is consistent even when the Emacs daemon is involved</h3>
+
+<p>In short, things should work as intended in all sorts of
+configurations.</p>
+
+<p>Thanks to Koloszár Gergely, Mehrad Mahmoudian, and Nikolaos
+Bezirgiannis for reporting that the Emacs daemon would produce static
+highlights instead of pulsing them in and out of effect. This was done
+in issue 32: <a href="https://github.com/protesilaos/pulsar/issues/32">https://github.com/protesilaos/pulsar/issues/32</a>.</p>
+
+<p>In this context, also thanks to Gautier Ponsinet for removing an
+unnecessary <code class="language-plaintext highlighter-rouge">let</code> binding. This was sent to me as a patch via email.</p>
+
+<h3>The <code class="language-plaintext highlighter-rouge">ace-window</code> command is added to the default value of <code class="language-plaintext highlighter-rouge">pulsar-pulse-functions</code></h3>
+
+<p>This means that it will produce a pulse effect after it is invoked.</p>

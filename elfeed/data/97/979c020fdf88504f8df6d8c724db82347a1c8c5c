@@ -1,0 +1,44 @@
+<p>Fontaine allows the user to define detailed font configurations and set
+them on demand.  For example, one can have a <code class="language-plaintext highlighter-rouge">regular-editing</code> preset
+and another for <code class="language-plaintext highlighter-rouge">presentation-mode</code> (these are arbitrary, user-defined
+symbols): the former uses small fonts which are optimised for writing,
+while the latter applies typefaces that are pleasant to read at
+comfortable point sizes.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">fontaine</code></li>
+  <li>Official manual: <a href="https://protesilaos.com/emacs/fontaine">https://protesilaos.com/emacs/fontaine</a></li>
+  <li>Change log: <a href="https://protesilaos.com/emacs/fontaine-changelog">https://protesilaos.com/emacs/fontaine-changelog</a></li>
+  <li>Git repositories:
+    <ul>
+      <li>GitHub: <a href="https://github.com/protesilaos/fontaine">https://github.com/protesilaos/fontaine</a></li>
+      <li>GitLab: <a href="https://gitlab.com/protesilaos/fontaine">https://gitlab.com/protesilaos/fontaine</a></li>
+    </ul>
+  </li>
+  <li>Backronym: Fonts, Ornaments, and Neat Typography Are Irrelevant in Non-graphical Emacs.</li>
+</ul>
+
+<p>Below are the release notes.</p>
+
+<hr />
+
+<h2>Version 3.1.0 on 2026-06-29</h2>
+
+<p>This is a small release that includes internal refinements as well as
+two user-facing changes:</p>
+
+<ol>
+  <li>
+    <p>The user option <code class="language-plaintext highlighter-rouge">fontaine-presets</code> accepts an optional
+<code class="language-plaintext highlighter-rouge">:line-spacing</code> entry, which corresponds to the <code class="language-plaintext highlighter-rouge">line-spacing</code>
+variable. As of Emacs version 31, <code class="language-plaintext highlighter-rouge">line-spacing</code> can be bound to a
+cons cell to set the space above and below. Fontaine now handles
+this as intended.</p>
+  </li>
+  <li>
+    <p>By default, changing the font size has the effect of resizing the
+frame. This is because of the original value of the variable
+<code class="language-plaintext highlighter-rouge">frame-inhibit-implied-resize</code>. Fontaine is now designed to always
+inhibit frame resizing, regardless of <code class="language-plaintext highlighter-rouge">frame-inhibit-implied-resize</code>.</p>
+  </li>
+</ol>

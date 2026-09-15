@@ -1,0 +1,40 @@
+<p>In this video I demonstrate how to define key bindings that have a
+global overriding effect so that major modes cannot change them. This
+is important if you want to redefine keys that are not meant to be
+configured by the user.</p>
+
+<p>Below is the code I showed in the video:</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">custom-file</span> <span class="p">(</span><span class="nv">locate-user-emacs-file</span> <span class="s">"custom.el"</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">load</span> <span class="nv">custom-file</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">load-theme</span> <span class="ss">'modus-operandi-tinted</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">keycast</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">keycast-mode-line-mode</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">'default</span> <span class="no">nil</span> <span class="ss">:height</span> <span class="mi">180</span><span class="p">)</span>
+
+<span class="c1">;; Your only safe keys are documented here:</span>
+<span class="c1">;; (info "(elisp) Key Binding Conventions")</span>
+<span class="p">(</span><span class="nv">define-key</span> <span class="nv">global-map</span> <span class="p">(</span><span class="nv">kbd</span> <span class="s">"M-o"</span><span class="p">)</span> <span class="ss">'other-window</span><span class="p">)</span>
+
+<span class="c1">;; (define-key MAP KEY nil)</span>
+
+<span class="c1">;; There is also `defvar-keymap'...</span>
+<span class="p">(</span><span class="nb">defvar</span> <span class="nv">prot-overrides-mode-map</span> <span class="p">(</span><span class="nv">make-sparse-keymap</span><span class="p">)</span>
+  <span class="s">"Keymap for the `prot-overrides-mode'."</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">define-minor-mode</span> <span class="nv">prot-overrides-mode</span>
+  <span class="s">"Activate the `prot-overrides-mode-map'."</span>
+  <span class="ss">:global</span> <span class="no">t</span>
+  <span class="ss">:init-value</span> <span class="no">nil</span>
+  <span class="ss">:keymap</span> <span class="nv">prot-overrides-mode-map</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">define-key</span> <span class="nv">prot-overrides-mode-map</span> <span class="p">(</span><span class="nv">kbd</span> <span class="s">"M-o"</span><span class="p">)</span> <span class="ss">'other-window</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">define-key</span> <span class="nv">prot-overrides-mode-map</span> <span class="p">(</span><span class="nv">kbd</span> <span class="s">"C-&lt;return&gt;"</span><span class="p">)</span> <span class="ss">'find-file</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">prot-overrides-mode</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>

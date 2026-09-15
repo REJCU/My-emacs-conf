@@ -1,0 +1,54 @@
+<p>These are my minimalist themes. They use few colours and will appear
+mostly monochromatic in many contexts. Styles involve the careful use
+of typography, such as italics and bold italics.</p>
+
+<p>If you want maximalist themes in terms of colour, check my <code class="language-plaintext highlighter-rouge">ef-themes</code>
+package. For something in-between, which I would consider the best
+“default theme” for a text editor, opt for my <code class="language-plaintext highlighter-rouge">modus-themes</code>.</p>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">doric-themes</code></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/doric-themes-pictures">https://protesilaos.com/emacs/doric-themes-pictures</a></li>
+  <li>Git repository: <a href="https://github.com/protesilaos/doric-themes">https://github.com/protesilaos/doric-themes</a></li>
+  <li>Backronym: Doric Only Really Intensifies Conservatively … themes.</li>
+</ul>
+
+<p>Below are the release notes.</p>
+
+<hr />
+
+<h2>Version 1.2.0 on 2026-07-12</h2>
+
+<h3>Two new themes</h3>
+
+<p><code class="language-plaintext highlighter-rouge">doric-tiger</code> is a light theme, while <code class="language-plaintext highlighter-rouge">doric-lion</code> is dark. Both have
+warm colours.</p>
+
+<h3>Org agenda events are easier to spot</h3>
+
+<p>Events are entries which have an active timestamp but not a
+<code class="language-plaintext highlighter-rouge">SCHEDULED</code> or <code class="language-plaintext highlighter-rouge">DEADLINE</code> keyword associated with it. Those are now
+rendered in italics in addition to the faint foreground they already
+had (the faint foreground is there because an event is not as
+important as a</p>
+
+<h3>Support for <code class="language-plaintext highlighter-rouge">vc-dir-key-binding-hint-label</code> (Emacs 32)</h3>
+
+<p>This concerns a new option for VC Dir buffers to display their
+available key bindings. The face applies to the additional headings.
+They should now look like all the other headings in those buffers in
+the interest of stylistic consistency.</p>
+
+<h3>Some <code class="language-plaintext highlighter-rouge">package.el</code> faces stand out more</h3>
+
+<p>Those are present in the buffer that <code class="language-plaintext highlighter-rouge">M-x list-packages</code> produces.
+They concern certain status indicators and fit in better with the rest
+of the design.</p>
+
+<h3>The <code class="language-plaintext highlighter-rouge">nobreak-space</code> face is now underlined</h3>
+
+<p>This is one way to make that character visible. It is useful to know
+that a space is not the regular space. For example, in French
+orthography we are expected to include non-breaking spaces between the
+quotes and the words like « Protesilaos ». Whether you actually follow
+that guideline is another discussion—I happily ignore it.</p>

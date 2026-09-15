@@ -1,0 +1,73 @@
+<p>The <code class="language-plaintext highlighter-rouge">doric-themes</code> are the minimalist counterpart of my <code class="language-plaintext highlighter-rouge">modus-themes</code>
+and <code class="language-plaintext highlighter-rouge">ef-themes</code>. They define few colours and exercise restraint in how
+they customise faces. This means that there rarely is a context that
+has red, green, yellow, blue, magenta, and cyan. Those are reserved
+for cases where colour-coding is needed. Whereas with my other themes
+colour is used with the dual intent of establish rhythm and order in
+addition to any colour-coding.</p>
+
+<p>Because of this, it is difficult for me to test the relevant values.
+Each Doric theme defines entries in its palette like <code class="language-plaintext highlighter-rouge">fg-red</code> and
+<code class="language-plaintext highlighter-rouge">bg-blue</code>. So I decided to write a small snippet that shows text which
+uses those colours in context.</p>
+
+<p>The idea is to create faces that get the appropriate <code class="language-plaintext highlighter-rouge">:foreground</code> and
+<code class="language-plaintext highlighter-rouge">:background</code> attributes with their proper values. Then write text in
+a buffer that displays each face.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">defconst</span> <span class="nv">test-doric-accents</span>
+  <span class="o">'</span><span class="p">(</span> <span class="nv">fg-red</span> <span class="nv">fg-green</span> <span class="nv">fg-yellow</span> <span class="nv">fg-blue</span> <span class="nv">fg-magenta</span> <span class="nv">fg-cyan</span>
+     <span class="nv">bg-red</span> <span class="nv">bg-green</span> <span class="nv">bg-yellow</span> <span class="nv">bg-blue</span> <span class="nv">bg-magenta</span> <span class="nv">bg-cyan</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">dolist</span> <span class="p">(</span><span class="nv">accent</span> <span class="nv">test-doric-accents</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">custom-declare-face</span>
+   <span class="p">(</span><span class="nb">intern</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"test-doric-%s"</span> <span class="nv">accent</span><span class="p">))</span>
+   <span class="no">nil</span>
+   <span class="s">"Test."</span>
+   <span class="ss">:group</span> <span class="ss">'doric-themes</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">test-doric-set-accent-faces</span> <span class="p">()</span>
+  <span class="p">(</span><span class="nv">doric-themes-with-colors</span>
+    <span class="p">(</span><span class="k">let*</span> <span class="p">((</span><span class="nv">predicate</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nc">symbol</span><span class="p">)</span> <span class="p">(</span><span class="nv">string-prefix-p</span> <span class="s">"bg"</span> <span class="p">(</span><span class="nb">symbol-name</span> <span class="nc">symbol</span><span class="p">))))</span>
+           <span class="p">(</span><span class="nv">foregrounds</span> <span class="p">(</span><span class="nv">seq-remove</span> <span class="nv">predicate</span> <span class="nv">test-doric-accents</span><span class="p">))</span>
+           <span class="p">(</span><span class="nv">backgrounds</span> <span class="p">(</span><span class="nv">seq-filter</span> <span class="nv">predicate</span> <span class="nv">test-doric-accents</span><span class="p">))</span>
+           <span class="p">(</span><span class="nv">foreground-faces</span> <span class="p">(</span><span class="nb">mapcar</span>
+                              <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">accent</span><span class="p">)</span>
+                                <span class="o">`</span><span class="p">(</span><span class="o">,</span><span class="p">(</span><span class="nb">intern</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"test-doric-%s"</span> <span class="nv">accent</span><span class="p">))</span>
+                                  <span class="p">((</span><span class="no">t</span> <span class="ss">:foreground</span> <span class="o">,</span><span class="p">(</span><span class="nb">symbol-value</span> <span class="nv">accent</span><span class="p">)))))</span>
+                              <span class="nv">foregrounds</span><span class="p">))</span>
+           <span class="p">(</span><span class="nv">background-faces</span> <span class="p">(</span><span class="nb">mapcar</span>
+                              <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">accent</span><span class="p">)</span>
+                                <span class="o">`</span><span class="p">(</span><span class="o">,</span><span class="p">(</span><span class="nb">intern</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"test-doric-%s"</span> <span class="nv">accent</span><span class="p">))</span>
+                                  <span class="p">((</span><span class="no">t</span> <span class="ss">:background</span> <span class="o">,</span><span class="p">(</span><span class="nb">symbol-value</span> <span class="nv">accent</span><span class="p">)</span> <span class="ss">:foreground</span> <span class="o">,</span><span class="nv">fg-main</span><span class="p">))))</span>
+                              <span class="nv">backgrounds</span><span class="p">)))</span>
+      <span class="p">(</span><span class="nb">apply</span> <span class="nf">#'</span><span class="nv">custom-set-faces</span> <span class="p">(</span><span class="nb">append</span> <span class="nv">foreground-faces</span> <span class="nv">background-faces</span><span class="p">)))))</span>
+
+<span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'doric-themes-after-load-theme-hook</span> <span class="nf">#'</span><span class="nv">test-doric-set-accent-faces</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">test-doric-show-accents</span> <span class="p">()</span>
+  <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">buffer</span> <span class="p">(</span><span class="nv">get-buffer-create</span> <span class="s">"*test-doric-themes-accents*"</span><span class="p">)))</span>
+    <span class="p">(</span><span class="nv">with-current-buffer</span> <span class="nv">buffer</span>
+      <span class="p">(</span><span class="nv">erase-buffer</span><span class="p">)</span>
+      <span class="p">(</span><span class="nb">dolist</span> <span class="p">(</span><span class="nv">accent</span> <span class="nv">test-doric-accents</span><span class="p">)</span>
+        <span class="c1">;; Pangram from my `show-font' package...</span>
+        <span class="p">(</span><span class="k">let*</span> <span class="p">((</span><span class="nv">text</span> <span class="s">"Protesilaos may find zesty owls and quiet jays vexing the black cat"</span><span class="p">)</span>
+               <span class="p">(</span><span class="nv">styled</span> <span class="p">(</span><span class="nv">propertize</span> <span class="nv">text</span> <span class="ss">'face</span> <span class="p">(</span><span class="nb">intern</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"test-doric-%s"</span> <span class="nv">accent</span><span class="p">)))))</span>
+          <span class="p">(</span><span class="nv">insert</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"%s\n"</span> <span class="nv">styled</span><span class="p">)))))</span>
+    <span class="p">(</span><span class="nv">display-buffer</span> <span class="nv">buffer</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>Reload the theme for changes to take effect.</p>
+
+<p>And, yes, I had the motivation to write this because I am developing
+new themes.</p>
+
+<h2>Doric themes sources</h2>
+
+<ul>
+  <li>Package name (GNU ELPA): <code class="language-plaintext highlighter-rouge">doric-themes</code></li>
+  <li>Sample pictures: <a href="https://protesilaos.com/emacs/doric-themes-pictures">https://protesilaos.com/emacs/doric-themes-pictures</a></li>
+  <li>Git repository: <a href="https://github.com/protesilaos/doric-themes">https://github.com/protesilaos/doric-themes</a></li>
+  <li>Backronym: Doric Only Really Intensifies Conservatively … themes.</li>
+</ul>

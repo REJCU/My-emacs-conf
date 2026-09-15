@@ -1,0 +1,358 @@
+<p>In this ~22-minute video I explain how Emacs performs completion in a
+buffer. I cover what happens behind the scenes with the variable
+completion-at-point-functions. Then I also go to the frontends, which
+affects the modalities of interaction. I cover t built-in
+Completions buffer, the packages Corfu and Company, and the built-in
+completion-preview-mode. Finally, I comment at some further length on
+how to control the grouping of results in the
+completion-at-point-functions. In that context I also mention the Cape
+package, as well as some extra functionality that the Company package
+provide. I wrote an article which covers all of what is in the video
+as well as code samples. Its text is below.</p>
+
+<h2>Table of Contents</h2>
+
+<ol>
+  <li><a href="#org423cf05">Make <code class="language-plaintext highlighter-rouge">TAB</code> complete when it can</a></li>
+  <li><a href="#org600a610">The in-buffer completion backends (<code class="language-plaintext highlighter-rouge">completion-at-point-functions</code>)</a>
+    <ol>
+      <li><a href="#orgff700e2">Common providers of CAPFs</a></li>
+    </ol>
+  </li>
+  <li><a href="#org2bc4069">The completion frontends</a>
+    <ol>
+      <li><a href="#orgf435e66">Corfu for an in-buffer completion popup window</a>
+        <ol>
+          <li><a href="#org74094c3">My preferred <code class="language-plaintext highlighter-rouge">corfu</code> setup plus <code class="language-plaintext highlighter-rouge">cape</code></a></li>
+        </ol>
+      </li>
+      <li><a href="#orgfd63733">Company for an in-buffer completion popup window</a>
+        <ol>
+          <li><a href="#org2338c9d">My preferred Company setup</a></li>
+        </ol>
+      </li>
+      <li><a href="#org8a380be">The built-in <code class="language-plaintext highlighter-rouge">completion-preview-mode</code> for a minimalist single suggestion at a time</a>
+        <ol>
+          <li><a href="#org3eeaf41">My preferred setup for <code class="language-plaintext highlighter-rouge">completion-preview-mode</code></a></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<p><a id="org423cf05"></a></p>
+
+<h2>Make <code class="language-plaintext highlighter-rouge">TAB</code> complete when it can</h2>
+
+<p>By default, Emacs uses <code class="language-plaintext highlighter-rouge">TAB</code> to align the current line or selected
+region of text. It does so based on the relevant rules provided by the
+major mode (e.g. a programming mode may have specific requirements for
+how the body of a function definition is indented).</p>
+
+<p>We can tell Emacs to also use <code class="language-plaintext highlighter-rouge">TAB</code> to perform completion once no
+further alignment is possible in the given context.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">tab-always-indent</span> <span class="ss">'complete</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a id="org600a610"></a></p>
+
+<h2>The in-buffer completion backends (<code class="language-plaintext highlighter-rouge">completion-at-point-functions</code>)</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">completion-at-point-functions</code> is a variable (technically an
+abnormal hook) that takes as its value a list of functions. We can
+call those “CAPFs”, for “completion at point functions”. Those are
+used to perform completion in the buffer, with the text right before
+the cursor as their input.</p>
+
+<p>When we request completion for the text at point, either via <code class="language-plaintext highlighter-rouge">TAB</code> or
+the command <code class="language-plaintext highlighter-rouge">completion-at-point</code> (<code class="language-plaintext highlighter-rouge">C-M-i</code> by default), Emacs looks at
+the value of the <code class="language-plaintext highlighter-rouge">completion-at-point-functions</code>, and calls the
+functions found there in order from first to last (or left to right).</p>
+
+<p>Normally, once a function returns results, Emacs will display those
+and will not move to the remaining functions in the
+<code class="language-plaintext highlighter-rouge">completion-at-point-functions</code>. So if we have many functions, we may
+not see of them at once. To do so we need more advanced solutions,
+which I comment on further below.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">completion-at-point-functions</code> typically has a buffer-local
+value. This means that the functions we run in one buffer will likely
+be different than what we have in another buffer. For example, in a
+programming mode it makes sense to use the Language Server Protocol to
+get comprehensive suggestions for the language we are programming in,
+whereas in Org mode we may only wish to see the correct spelling of a
+word.</p>
+
+<p>When the <code class="language-plaintext highlighter-rouge">completion-at-point-functions</code> has a buffer-local value, it
+will typically include a <code class="language-plaintext highlighter-rouge">t</code>. This is a reference to its corresponding
+global value. So if Emacs tries to complete and reaches the <code class="language-plaintext highlighter-rouge">t</code>, it
+then goes through the list with the global CAPFs.</p>
+
+<p><a id="orgff700e2"></a></p>
+
+<h3>Common providers of CAPFs</h3>
+
+<ul>
+  <li>specialised minor modes;</li>
+  <li>the major mode;</li>
+  <li>the Language Server Protocol via its Emacs client (e.g. <code class="language-plaintext highlighter-rouge">eglot</code> or <code class="language-plaintext highlighter-rouge">lsp-mode</code>);</li>
+  <li>the <code class="language-plaintext highlighter-rouge">cape</code> package;</li>
+  <li>the <code class="language-plaintext highlighter-rouge">company</code> package;</li>
+  <li>other packages that may extend <code class="language-plaintext highlighter-rouge">company</code> or related.</li>
+</ul>
+
+<p><a id="org2bc4069"></a></p>
+
+<h2>The completion frontends</h2>
+
+<p>For a few years now Emacs has a unified infrastructure at its core for
+how completions are done. Users should not mess around with that. What
+they can do instead is choose how the completions are displayed as
+well as the relevant modalities for filtering and selecting
+candidates.</p>
+
+<p><a id="orgf435e66"></a></p>
+
+<h3>Corfu for an in-buffer completion popup window</h3>
+
+<p>A package by Daniel Mendler, the developer of <code class="language-plaintext highlighter-rouge">vertico</code> and <code class="language-plaintext highlighter-rouge">consult</code>,
+among others, which is built on top of the
+<code class="language-plaintext highlighter-rouge">completion-at-point-functions</code>. It is designed to be fast and
+effective, with a good out-of-the-box experience and reasonable
+extensions.</p>
+
+<p>By default, <code class="language-plaintext highlighter-rouge">corfu</code> does not automatically pop up its window. Users
+must manually invoke completion or opt in to the auto-completing
+functionality.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;; Read the comprehensive documentation of Corfu for further customisation options.</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">corfu</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:init</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">tab-always-indent</span> <span class="ss">'complete</span><span class="p">)</span>
+  <span class="ss">:config</span>
+  <span class="c1">;; ;; If you want the popup window to appear automatically as you type:</span>
+  <span class="c1">;;</span>
+  <span class="c1">;; (setq corfu-auto t)</span>
+  <span class="p">(</span><span class="nv">global-corfu-mode</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><a id="org74094c3"></a></p>
+
+<h4>My preferred <code class="language-plaintext highlighter-rouge">corfu</code> setup plus <code class="language-plaintext highlighter-rouge">cape</code></h4>
+
+<p>This is just for your information. It fits my use-case, but I do not
+recommend it as a starting point. The <code class="language-plaintext highlighter-rouge">cape</code> package is also developed
+by Daniel Mendler.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">corfu</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:init</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">tab-always-indent</span> <span class="ss">'complete</span><span class="p">)</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">corfu-preview-current</span> <span class="no">nil</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">corfu-min-width</span> <span class="mi">20</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">corfu-popupinfo-delay</span> <span class="o">'</span><span class="p">(</span><span class="mf">1.25</span> <span class="o">.</span> <span class="mf">0.5</span><span class="p">))</span>
+  <span class="p">(</span><span class="nv">corfu-popupinfo-mode</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">; shows documentation after `corfu-popupinfo-delay'</span>
+
+  <span class="p">(</span><span class="nv">global-corfu-mode</span> <span class="mi">1</span><span class="p">)</span>
+
+  <span class="c1">;; I also have (setq tab-always-indent 'complete) for TAB to complete</span>
+  <span class="c1">;; when it does not need to perform an indentation change.</span>
+  <span class="p">(</span><span class="nv">define-key</span> <span class="nv">corfu-map</span> <span class="p">(</span><span class="nv">kbd</span> <span class="s">"&lt;tab&gt;"</span><span class="p">)</span> <span class="nf">#'</span><span class="nv">corfu-complete</span><span class="p">)</span>
+
+  <span class="c1">;; Sort by input history (no need to modify `corfu-sort-function').</span>
+  <span class="p">(</span><span class="nv">with-eval-after-load</span> <span class="ss">'savehist</span>
+    <span class="p">(</span><span class="nv">corfu-history-mode</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'savehist-additional-variables</span> <span class="ss">'corfu-history</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">cape</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:after</span> <span class="nv">corfu</span>
+  <span class="ss">:config</span>
+  <span class="c1">;; This is for the global value.</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-at-point-functions</span> <span class="o">'</span><span class="p">(</span><span class="nv">cape-dabbrev</span> <span class="nv">cape-file</span><span class="p">))</span>
+
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">prot/cape-super-set-local</span> <span class="p">(</span><span class="nv">capfs</span> <span class="k">&amp;optional</span> <span class="nv">individual-capfs</span><span class="p">)</span>
+    <span class="s">"Set `completion-at-point-functions' to current value plus CAPFS.
+Treat CAPFS and the default value as a super CAPF.  Then append the
+INDIVIDUAL-CAPFS to the list."</span>
+    <span class="p">(</span><span class="k">let*</span> <span class="p">((</span><span class="nv">all-for-super</span> <span class="p">(</span><span class="nb">append</span> <span class="nv">completion-at-point-functions</span> <span class="nv">capfs</span><span class="p">))</span>
+           <span class="p">(</span><span class="nv">all-minus-global</span> <span class="p">(</span><span class="nv">delq</span> <span class="no">t</span> <span class="nv">all-for-super</span><span class="p">))</span>
+           <span class="p">(</span><span class="nv">cape-super</span> <span class="p">(</span><span class="nb">apply</span> <span class="nf">#'</span><span class="nv">cape-capf-super</span> <span class="nv">all-minus-global</span><span class="p">)))</span>
+      <span class="p">(</span><span class="nv">setq-local</span> <span class="nv">completion-at-point-functions</span> <span class="p">(</span><span class="nb">append</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">cape-super</span><span class="p">)</span> <span class="nv">individual-capfs</span> <span class="p">(</span><span class="nb">list</span> <span class="no">t</span><span class="p">)))))</span>
+
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">prot/cape-prog-setup</span> <span class="p">()</span>
+    <span class="s">"Set up Cape for programming."</span>
+    <span class="p">(</span><span class="nv">prot/cape-super-set-local</span> <span class="o">'</span><span class="p">(</span><span class="nv">cape-dabbrev</span><span class="p">)</span> <span class="o">'</span><span class="p">(</span><span class="nv">cape-file</span><span class="p">)))</span>
+
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'prog-mode-hook</span> <span class="nf">#'</span><span class="nv">prot/cape-prog-setup</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">prot/cape-text-setup</span> <span class="p">()</span>
+    <span class="s">"Set up Cape for prose."</span>
+    <span class="p">(</span><span class="nv">prot/cape-super-set-local</span> <span class="o">'</span><span class="p">(</span><span class="nv">cape-dict</span> <span class="nv">cape-dabbrev</span> <span class="nv">cape-emoji</span><span class="p">)</span> <span class="o">'</span><span class="p">(</span><span class="nv">cape-file</span><span class="p">)))</span>
+
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'text-mode-hook</span> <span class="nf">#'</span><span class="nv">prot/cape-text-setup</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><a id="orgfd63733"></a></p>
+
+<h3>Company for an in-buffer completion popup window</h3>
+
+<p>This package by Dmitry Gutov is older than <code class="language-plaintext highlighter-rouge">corfu</code> though remains in
+active development and has all the features of Corfu plus some extras.
+Fundamentally though, it does the same thing, so if you are already
+using one there is no pressing need to switch to the other.</p>
+
+<p>As of this writing (2026-07-19), <code class="language-plaintext highlighter-rouge">company</code> version <code class="language-plaintext highlighter-rouge">1.1.0</code> is still in
+development. It comes with many nice features, such as native support
+for <code class="language-plaintext highlighter-rouge">tab-always-indent</code>, child frames, and in-buffer completion in the
+minibuffer.</p>
+
+<p>By default, and unlike <code class="language-plaintext highlighter-rouge">corfu</code>, Company automatically pops up its
+window. You can opt out if you wish to.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;; Remember to read the comprehensive documentation of Company for all</span>
+<span class="c1">;; the customisation options and extra features.</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">company</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:init</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">tab-always-indent</span> <span class="ss">'complete</span><span class="p">)</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">global-company-mode</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><a id="org2338c9d"></a></p>
+
+<h4>My preferred Company setup</h4>
+
+<p>The <code class="language-plaintext highlighter-rouge">company</code> includes several CAPFs, unlike <code class="language-plaintext highlighter-rouge">corfu</code> which spins them
+out into the separate <code class="language-plaintext highlighter-rouge">cape</code> pacakge. Company CAPFs can easily be
+grouped to collect the results of many functions into a single popup
+window.</p>
+
+<p>This is what I am currently using. Again, I am sharing it for your
+information and do not meant to imply that it is useful in general.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">company</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:init</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">tab-always-indent</span> <span class="ss">'complete</span><span class="p">)</span>
+  <span class="ss">:config</span>
+  <span class="c1">;; NOTE 2026-07-19 with the next version of Company, which may be</span>
+  <span class="c1">;; 1.1.0, (setq tab-always-indent 'complete) is supported</span>
+  <span class="c1">;; out-of-the-box, which means that we disable the automatic popup</span>
+  <span class="c1">;; feature and rely on TAB to perform completion in the buffer.</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-idle-delay</span> <span class="no">nil</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-tooltip-limit</span> <span class="mi">6</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-tooltip-minimum-width</span> <span class="mi">25</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-tooltip-align-annotations</span> <span class="no">t</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-dabbrev-code-completion-styles</span> <span class="no">t</span><span class="p">)</span> <span class="c1">; use the `completion-styles'</span>
+
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-transformers</span> <span class="o">'</span><span class="p">(</span><span class="nv">company-sort-by-occurrence</span>
+                               <span class="nv">company-sort-by-backend-importance</span>
+                               <span class="nv">company-sort-prefer-same-case-prefix</span><span class="p">))</span>
+
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-frontends</span> <span class="o">'</span><span class="p">(</span><span class="nv">company-childframe-unless-just-one-frontend</span>
+                            <span class="nv">company-preview-if-just-one-frontend</span>
+                            <span class="nv">company-echo-metadata-frontend</span><span class="p">))</span>
+
+  <span class="c1">;; Notice the `(company-capf company-dabbrev)', which represents a</span>
+  <span class="c1">;; grouping of CAPFs, whereas `company-files' shows results of its own.</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">company-backends</span> <span class="o">'</span><span class="p">((</span><span class="nv">company-capf</span> <span class="nv">company-dabbrev</span><span class="p">)</span> <span class="nv">company-files</span><span class="p">))</span>
+
+  <span class="c1">;; IGNORE THIS AS IT IS RELEVANT ONLY FOR MY CONFIGURATION which</span>
+  <span class="c1">;; does a lot with the `display-buffer-alist'.</span>
+  <span class="p">(</span><span class="nv">define-advice</span> <span class="nv">company-show-doc-buffer</span> <span class="p">(</span><span class="ss">:around</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">args</span><span class="p">)</span> <span class="nv">prot</span><span class="p">)</span>
+    <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">help-window-select</span> <span class="no">nil</span><span class="p">)</span>
+          <span class="p">(</span><span class="nv">display-buffer-alist</span> <span class="no">nil</span><span class="p">)</span>
+          <span class="p">(</span><span class="nv">display-buffer-overriding-action</span>
+           <span class="o">'</span><span class="p">((</span><span class="nv">display-buffer-reuse-mode-window</span> <span class="nv">display-buffer-below-selected</span><span class="p">)</span>
+             <span class="p">(</span><span class="nv">window-height</span> <span class="o">.</span> <span class="mf">0.3</span><span class="p">)</span>
+             <span class="p">(</span><span class="nv">post-command-select-window</span> <span class="o">.</span> <span class="no">nil</span><span class="p">))))</span>
+      <span class="p">(</span><span class="nb">apply</span> <span class="nv">args</span><span class="p">)))</span>
+
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">prot/company-prog-backends</span> <span class="p">()</span>
+    <span class="s">"Set `company-backends' locally to my preferred value for `prog-mode' and derivatives."</span>
+    <span class="p">(</span><span class="nv">setq-local</span> <span class="nv">company-backends</span> <span class="o">'</span><span class="p">((</span><span class="nv">company-capf</span> <span class="nv">company-dabbrev-code</span><span class="p">)</span> <span class="nv">company-files</span><span class="p">)))</span>
+
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'prog-mode-hook</span> <span class="nf">#'</span><span class="nv">prot/company-prog-backends</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">prot/company-text-backends</span> <span class="p">()</span>
+    <span class="s">"Set `company-backends' locally to my preferred value for `text-mode' and derivatives."</span>
+    <span class="p">(</span><span class="nv">setq-local</span> <span class="nv">company-backends</span> <span class="o">'</span><span class="p">((</span><span class="nv">company-dabbrev</span> <span class="nv">company-ispell</span> <span class="nv">company-capf</span><span class="p">)</span> <span class="nv">company-files</span><span class="p">)))</span>
+
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'text-mode-hook</span> <span class="nf">#'</span><span class="nv">prot/company-text-backends</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="nv">global-company-mode</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">company-statistics</span>
+    <span class="ss">:ensure</span> <span class="no">t</span>
+    <span class="ss">:after</span> <span class="nv">company</span>
+    <span class="ss">:config</span>
+    <span class="p">(</span><span class="nv">company-statistics-mode</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><a id="org8a380be"></a></p>
+
+<h3>The built-in <code class="language-plaintext highlighter-rouge">completion-preview-mode</code> for a minimalist single suggestion at a time</h3>
+
+<p>Since Emacs 30, there is the <code class="language-plaintext highlighter-rouge">completion-preview-mode</code> by Eshel Yaron.
+Unlike the other options, it displays only one suggestion at a time.
+It does it inline as you type. You can still cycle through suggestions
+or display more of them with either the default <code class="language-plaintext highlighter-rouge">*Completions*</code> buffer
+or one of the aforementioned packages.</p>
+
+<p>Note that Company also has the equivalent of
+<code class="language-plaintext highlighter-rouge">completion-preview-mode</code>. Check the <code class="language-plaintext highlighter-rouge">company-frontends</code> for more.</p>
+
+<p><code class="language-plaintext highlighter-rouge">completion-preview-mode</code> does not provide its own CAPFs directly or
+through some companion package. You will have to use one of the
+previous options or simply rely on what other providers (major modes,
+LSP, …) give you.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;; Do M-x describe-package and then search for completion-preview to</span>
+<span class="c1">;; read its commentary, or M-x find-library and then</span>
+<span class="c1">;; completion-preview to go straight to its source code (where you can</span>
+<span class="c1">;; read the commentary and browse through all the options).</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">completion-preview</span>
+  <span class="ss">:ensure</span> <span class="no">nil</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">global-completion-preview-mode</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><a id="org3eeaf41"></a></p>
+
+<h4>My preferred setup for <code class="language-plaintext highlighter-rouge">completion-preview-mode</code></h4>
+
+<p>And here is what I have for this minor mode. Again, it is only for
+your information.</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">completion-preview</span>
+  <span class="ss">:ensure</span> <span class="no">nil</span>
+  <span class="ss">:demand</span> <span class="no">t</span>
+  <span class="ss">:bind</span>
+  <span class="p">(</span> <span class="ss">:map</span> <span class="nv">completion-preview-active-mode-map</span>
+    <span class="p">(</span><span class="s">"M-n"</span> <span class="o">.</span> <span class="nv">completion-preview-next-candidate</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-p"</span> <span class="o">.</span> <span class="nv">completion-preview-prev-candidate</span><span class="p">)</span>
+    <span class="p">(</span><span class="s">"M-&lt;return&gt;"</span> <span class="o">.</span> <span class="nv">completion-preview-insert</span><span class="p">)</span>
+    <span class="c1">;; This way you can combine it with another interface (like the</span>
+    <span class="c1">;; generic Completions buffer or `corfu-mode') to display more</span>
+    <span class="c1">;; candidates.</span>
+    <span class="p">(</span><span class="s">"&lt;tab&gt;"</span> <span class="o">.</span> <span class="nv">completion-preview-complete</span><span class="p">))</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-exact-match-only</span> <span class="no">nil</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-commands</span> <span class="o">'</span><span class="p">(</span><span class="nv">self-insert-command</span>
+                                      <span class="nv">insert-char</span>
+                                      <span class="nv">analyze-text-conversion</span>
+                                      <span class="nv">completion-preview-insert-word</span><span class="p">))</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-minimum-symbol-length</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-idle-delay</span> <span class="mf">0.3</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-ignore-case</span> <span class="no">t</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">completion-preview-sort-function</span> <span class="nf">#'</span><span class="nb">identity</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="nv">global-completion-preview-mode</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>

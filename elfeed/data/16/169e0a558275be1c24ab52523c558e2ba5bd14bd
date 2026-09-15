@@ -1,0 +1,5 @@
+<h1>Qtile Setup Guide [Wayland]</h1>
+<h3>Rofi</h3>
+<pre><code class="language-bash">pacman -S rofi
+paru -S rofi-calc
+</code></pre>
