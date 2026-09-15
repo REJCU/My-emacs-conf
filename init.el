@@ -23,6 +23,9 @@
 (setq custom-file "~/.emacs.d/extend/diredconf.el")
 (load custom-file)
 
+;(setq custom-file "~/.emacs.d/external/ivyconf.el")
+;(load custom-file)
+
 ;; debated on whether or not to activate it 
 ;;(setq custom-file "~/.emacs.d/external/meowconf.el")
 ;;(load custom-file)
@@ -277,13 +280,13 @@
 ;;(load-theme ')
 
 ; ef-themes 
-(use-package ef-themes
-  :ensure t
-  :config
-  (modus-themes-load-theme 'ef-arbutus))
+;; (use-package ef-themes
+;;   :ensure t
+;;   :config
+;;   (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-;; (load-theme 'gruber-darker)
+(load-theme 'gruber-darker)
 
 
 (use-package exec-path-from-shell
@@ -499,3 +502,8 @@
 (with-eval-after-load 'recentf
   (add-to-list 'recentf-exclude ".*viminfo.*"))
 
+(Use-package direnv
+  :ensure t
+  :config
+  (direnv-mode)
+  )					

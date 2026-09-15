@@ -43,17 +43,17 @@
      "https://planet.emacslife.com/atom.xml"
      "https://www.abc.net.au/news/feed/1948/rss.xml") t)
  '(package-selected-packages
-   '(anti-zenburn-theme avy cape cmake-mode company consult corfu
-			dashboard docker doom-themes eat ef-themes
-			elfeed elpher emms eradio evil
+   '(anti-zenburn-theme avy cape cmake-mode company consult corfu counsel
+			dashboard direnv docker doom-themes eat
+			ef-themes elfeed elpher emms eradio evil
 			exec-path-from-shell flycheck
-			gruber-darker-theme kanagawa-themes magit
+			gruber-darker-theme ivy kanagawa-themes magit
 			marginalia markdown-mode melpa-upstream-visit
 			meow moe-theme multiple-cursors
 			nerd-icons-completion nerd-icons-corfu
 			nerd-icons-dired nix-mode nix-ts-mode
 			orderless pet projectile radio ripgrep
-			rust-mode treesit-auto vertico-posframe
+			rust-mode swiper treesit-auto vertico-posframe
 			zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(warning-suppress-types '((use-package))))
