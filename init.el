@@ -1,101 +1,91 @@
 ;;; ...  -*- lexical-binding: t -*-
-;; package list 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 ;; el modules
 (setq custom-file "~/.emacs.d/external/container.el")
-(load custom-file)
+(load custom-file ':noerror)
 
 (setq custom-file "~/.emacs.d/extend/flyspell.el")
-(load custom-file)
+(load custom-file ':noerror)
 
 (setq custom-file "~/.emacs.d/extend/org-mode.el")
-(load custom-file)
+(load custom-file ':noerror)
 
 (setq custom-file "~/.emacs.d/extend/eww-conf.el")
-(load custom-file)
+(load custom-file ':noerror)
 
 (setq custom-file "~/.emacs.d/external/consult.el")
-(load custom-file)
+(load custom-file ':noerror)
 
 (setq custom-file "~/.emacs.d/extend/diredconf.el")
-(load custom-file)
+(load custom-file ':noerror)
 
-;(setq custom-file "~/.emacs.d/external/ivyconf.el")
-;(load custom-file)
+;; i already use vertico and i kinda like it 
+; (setq custom-file "~/.emacs.d/external/ivyconf.el")
+; (load custom-file)
 
 ;; debated on whether or not to activate it 
 ;;(setq custom-file "~/.emacs.d/external/meowconf.el")
 ;;(load custom-file)
 
-;; QOL
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file '
+      noerror 'nomessage)
+
+;; QOL - Gathered from newcomers preset
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
 (recentf-mode 1)
 (save-place-mode 1)
 (setq compilation-ask-about-save nil)
+(savehist-mode 1)
+(setopt delete-selection-mode t)
+(editorconfig-mode t ) ;relevant for group work and 
+(indent-tabs-mode nil)
+
 
 ;; auto closing brackets
 (electric-pair-mode t)
 
-;; visual line mode for text and derives - md, org 
 (setq-default truncate-lines t)
 (add-hook 'text-mode-hook #'visual-line-mode)
 
-; increase proccess output buffer for LSP
 (setq read-process-output-max (* 4 1024 1024))
 
-;; dont render cursors in non-focused windows
 (setq-default cursor-in-non-selected-windows nil)
 (setq highlight-nonselected-windows nil)
 
-;; save external clipboard content before killing
 (setq save-interprogram-paste-before-kill t)
 
-; dont save duplicates
 (setq kill-do-not-save-duplicates t)
 
-; bash shebang - auto-chmod scripts on save 
 (add-hook 'after-save-hook
 	  #'executable-make-buffer-file-executable-if-script-p)
 
-; sane syntax in re-builder - M-x  re-builder
 (setq reb-re-syntax 'string)
 
-;; minibuffer prompts
 (setq history-length 15)
 (savehist-mode 1)
 
-;; Windows
-; proportional window resizing 
 (setq window-combination-resize t)
 
-; makes popping repeated from c-u c-spc to just c-spc after one
-
-;; imenu-confs
 (setq use-package-enable-imenu-support t)
 
 (setq switch-to-buffer-obey-display-actions t)
 
-;; Isearch
 (setopt isearch-lazy-count t)
 
-; custom-file placement 
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file '
-      noerror 'nomessage)
-
-; refresh buffer when underlying file has changed 
 (global-auto-revert-mode t)
-; same for dired
 (setq global-auto-revert-non-file-buffers t)
-
-;ido-mode emacs
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
 (ido-mode 1)
+
+(etags-regen-mode t)
+
+
 
 ;; Make a whole list of custom keymaps 
 ;; TODO -
@@ -126,12 +116,6 @@
     map)
   "my keymap")
 
-;; --- Dashboard --- 
-
-;; Move Customization Variables To A Separate File And Load It
-;; (Setqtartup-Hook))
-
-;; Dashboard
 (use-package dashboard
   :ensure t
   :config
@@ -167,7 +151,6 @@
 
 
 
-;; fonts
 (set-frame-font "Iosevka")
 
 (add-to-list 'default-frame-alist '(font ."Iosevka"))
@@ -178,7 +161,6 @@
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'variable-pitch nil :family "Iosevka" :height 1.18))
 
-;; nerd-icons
 (use-package nerd-icons
   :ensure t)
 
@@ -193,70 +175,45 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-;; corfu
 (use-package corfu
-  ;; Optional customizations
   :ensure t 
   :custom
       (corfu-auto t)
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-cycle t)                
   (corfu-auto-prefix 2)
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
-
-  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
 
   :init
 
-  ;; Recommended: Enable Corfu globally.  Recommended since many modes provide
-  ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
-  ;; variable `global-corfu-modes' to exclude certain modes.
   (global-corfu-mode)
 
-  ;; Enable optional extension modes:
   (corfu-history-mode)
   (corfu-popupinfo-mode)
   )
 
-;; Enable Vertico for vertical minibuffer completion (M-x, C-x b, C-x C-f, etc.)
 (use-package vertico
   :ensure t
   :init
   (vertico-mode 1)
   :custom
-  (vertico-cycle t)            ; Enable cycling through candidates
-  (vertico-count 15))          ; Show 15 candidates at once
+  (vertico-cycle t)            
+  (vertico-count 15))          
 
-;; Add rich annotations/descriptions in the minibuffer margin (next to M-x options)
 (use-package marginalia
   :ensure t
+  :bind (:map minibuffer-local-map
+	      ("M-A" . marginalia-cycle))
   :init
   (marginalia-mode 1))
 
 
-;; A few more useful configurations...
 (use-package emacs
   :custom
-  ;; TAB cycle if there are only few candidates
   (completion-cycle-threshold 3)
 
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
   (tab-always-indent 'complete)
 
-  ;; Emacs 30 and newer: Disable Ispell completion function.
-  ;; Try `cape-dict' as an alternative.
   (text-mode-ispell-word-completion nil)
 
-  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-  ;; commands are hidden, since they are not used via M-x. This setting is
-  ;; useful beyond Corfu.
   (read-extended-command-predicate #'command-completion-default-include-p))
 
 (use-package orderless
@@ -266,7 +223,6 @@
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles . (partial-completion))))))
 
-;; which key
 (use-package which-key
   :ensure t
   :init (which-key-mode))
@@ -280,13 +236,13 @@
 ;;(load-theme ')
 
 ; ef-themes 
-;; (use-package ef-themes
-;;   :ensure t
-;;   :config
-;;   (modus-themes-load-theme 'ef-arbutus))
+(use-package ef-themes
+  :ensure t
+  :config
+  (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-(load-theme 'gruber-darker)
+; (load-theme 'gruber-darker)
 
 
 (use-package exec-path-from-shell
@@ -394,22 +350,17 @@
   :hook (python-base-mode . pet-mode))
 
 (projectile-mode +1)
-;; Recommended keymap prefix on Windows/Linux
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/" "~/rococo/"))
 				       
-;; avy movement
 (use-package avy
   :ensure t
   :bind
   ;; changed from defualt because of pc issues of C-; not working - maybe terminal
   ("C-z" . avy-goto-char-timer)
-  ;; Jump to any line
   ("M-g g" . avy-goto-line)
-  ;; Jump to a word
   ("M-g w" . avy-goto-word-1)
   :config
-  ;; Customization: Make the keys appear in the center of the screen
   (setq avy-all-windows t)
   
   (setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
@@ -440,8 +391,6 @@
 ;; examples - C-x ooo , C-x uuu
 (repeat-mode 1)
 (setq repeat-exit-timeout 5)
-
-;; can define own keymaps - maybe later
 
 ;; eww default browser
 (setq browse-url-browser-function 'eww-browse-url
@@ -502,8 +451,9 @@
 (with-eval-after-load 'recentf
   (add-to-list 'recentf-exclude ".*viminfo.*"))
 
-(Use-package direnv
+(use-package direnv
   :ensure t
   :config
   (direnv-mode)
   )					
+

@@ -11,6 +11,7 @@
 (setq mc/cmds-to-run-once
       '(
 	corfu-quit
+	markdown-outdent-or-delete
 	term-send-backspace
 	term-send-raw
 	))
