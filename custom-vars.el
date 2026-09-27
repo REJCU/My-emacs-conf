@@ -37,25 +37,29 @@
      "3b2ae1d19f5843cdc5833266b76e6367744932d96c5ddd713ede9797a2bd93fe"
      "daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077"
      default))
+ '(display-line-numbers-type 'relative)
  '(elfeed-feeds
    '("https://www.radleylewis.com/feed.xml"
      "https://nullprogram.com/feed/"
      "https://planet.emacslife.com/atom.xml"
-     "https://www.abc.net.au/news/feed/1948/rss.xml") t)
+     "https://www.abc.net.au/news/feed/1948/rss.xml"))
+ '(global-display-line-numbers-mode t)
+ '(menu-bar-mode nil)
  '(package-selected-packages
    '(anti-zenburn-theme avy cape cmake-mode company consult corfu counsel
-			dashboard direnv docker doom-themes eat
-			ef-themes elfeed elpher emms eradio evil
-			exec-path-from-shell flycheck
+			dashboard direnv docker doom-modeline
+			doom-themes eat ef-themes elfeed elpher emms
+			eradio evil exec-path-from-shell flycheck
 			gruber-darker-theme ivy kanagawa-themes magit
-			marginalia markdown-mode melpa-upstream-visit
-			meow moe-theme multiple-cursors
-			nerd-icons-completion nerd-icons-corfu
-			nerd-icons-dired nix-mode nix-ts-mode
-			orderless pet projectile radio ripgrep
-			rust-mode swiper treesit-auto vertico-posframe
-			zenburn-theme))
+			marginalia markdown-mode markdown-ts-mode
+			melpa-upstream-visit meow moe-theme
+			multiple-cursors nerd-icons-completion
+			nerd-icons-corfu nerd-icons-dired nix-mode
+			nix-ts-mode orderless pet projectile radio
+			ripgrep rust-mode swiper treesit-auto
+			vertico-posframe zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
+ '(tool-bar-mode nil)
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

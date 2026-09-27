@@ -44,7 +44,7 @@
 (setopt delete-selection-mode t)
 (editorconfig-mode t ) ;relevant for group work and 
 (indent-tabs-mode nil)
-
+(tab-bar-mode nil)
 
 ;; auto closing brackets
 (electric-pair-mode t)
@@ -82,10 +82,7 @@
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
 (ido-mode 1)
-
 (etags-regen-mode t)
-
-
 
 ;; Make a whole list of custom keymaps 
 ;; TODO -
@@ -205,7 +202,6 @@
   :init
   (marginalia-mode 1))
 
-
 (use-package emacs
   :custom
   (completion-cycle-threshold 3)
@@ -236,13 +232,13 @@
 ;;(load-theme ')
 
 ; ef-themes 
-(use-package ef-themes
-  :ensure t
-  :config
-  (modus-themes-load-theme 'ef-arbutus))
+;; (use-package ef-themes
+;;   :ensure t
+;;   :config
+;;   (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-; (load-theme 'gruber-darker)
+(load-theme 'leuven)
 
 
 (use-package exec-path-from-shell
@@ -272,10 +268,12 @@
 	 (js-ts-mode .eglot-ensure)
          (html-ts-mode . eglot-ensure)
          (LaTeX-mode  . eglot-ensure)   
+         (markdown-ts-mode  . eglot-ensure)   
          (latex-mode  . eglot-ensure) 
          (qml-ts-mode . eglot-ensure)
 	 (rust-mode . eglot-ensure)
 	 (rust-ts-mode . eglot-ensure)
+	 (yaml-ts-mode . eglot-ensure)
          (lua-ts-mode . eglot-ensure))
 
   
@@ -457,3 +455,11 @@
   (direnv-mode)
   )					
 
+; proxmox - /ssh:root@pve(can put ip)|pct:101:
+(with-eval-after-load 'tramp
+  (add-to-list 'tramp-methods
+    '("pct"
+      (tramp-login-program "pct")
+      (tramp-login-args (("exec") ("%h") ("--") ("%l")))
+      (tramp-remote-shell "/bin/sh")
+      (tramp-remote-shell-args ("-i" "-c")))))

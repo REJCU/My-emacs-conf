@@ -2,6 +2,11 @@
 
 ;; ----- ido-last-directory-list -----
 (
+ ("/home/rye/UNI/Information-Sec/assessment/Assessment 3 - Practical Portfolio (Learning Journal)/" . "latex/")
+ ("/ssh:root@192.168.0.126|pct:100:glance/" . "config/")
+ ("/ssh:root@192.168.0.126|pct:100:" . "glance/")
+ ("/home/rye/UNI/Des-Think-3/" . "Class/")
+ ("/ssh:root@192.168.0.143:/root/" . "komodo/")
  ("/usr/share/emacs/31.1/etc/" . "themes/")
  ("/usr/share/emacs/31.1/" . "etc/")
  ("/usr/share/emacs/" . "31.1/")
@@ -31,23 +36,32 @@
  ("/home/rye/UNI/Mobile_computing/" . "Assignment/")
  ("/home/rye/.emacs.d/" . "external/")
  ("/home/rye/UNI/OperatingSystems/" . "Exam/")
- ("/home/rye/UNI/" . "Information-Sec/")
- ("/home/rye/" . "org/")
+ ("/home/rye/UNI/" . "Des-Think-3/")
+ ("/home/rye/" . "UNI/")
 )
 
 ;; ----- ido-work-directory-list -----
 (
- "/home/rye/org/Home-Lab/"
+ "/home/rye/UNI/Des-Think-3/Class/"
  "/home/rye/UNI/Information-Sec/class/"
- "/home/rye/UNI/Information-Sec/"
  "/home/rye/UNI/Des-Think-3/"
- "/home/rye/.config/hypr/"
+ "/home/rye/UNI/Des-Think-3/Prac/"
  "/home/rye/.emacs.d/"
- "/usr/share/emacs/31.1/etc/themes/"
+ "/home/rye/.emacs.d/extend/"
+ "/home/rye/UNI/Programming-3/Prac/week2/"
  "/home/rye/UNI/Information-Sec/assessment/Assessment 3 - Practical Portfolio (Learning Journal)/"
+ "/home/rye/UNI/Information-Sec/"
+ "/home/rye/org/Home-Lab/"
+ "/ssh:root@192.168.0.126|pct:100:glance/config/"
+ "/ssh:root@192.168.0.126:pct:100:"
+ "/ssh:root@192.168.0.126:/root/"
+ "/ssh:root@192.168.0.143:/root/komodo/"
+ "/ssh:root@192.168.0.143:"
+ "/home/rye/org/"
+ "/home/rye/.config/hypr/"
+ "/usr/share/emacs/31.1/etc/themes/"
  "/home/rye/UNI/Information-Sec/prac/"
  "/home/rye/.emacs.d/external/"
- "/home/rye/.emacs.d/extend/"
  "/home/rye/UNI/Programming-3/Prac/week1/"
  "/home/rye/UNI/"
  "/home/rye/"
@@ -62,7 +76,6 @@
  "/home/rye/.config/"
  "/home/rye/nix-dev/"
  "/home/rye/git_Stuff/svg-line/"
- "/home/rye/org/"
  "/home/rye/org/Docker/"
  "/home/rye/git_Stuff/fuzzel/"
  "/home/rye/.config/fuzzel/fuzzel.ini/"
@@ -77,51 +90,63 @@
  "/home/rye/rustplayground/rusqlite/"
  "/home/rye/rustplayground/"
  "/home/rye/projects/Rss-Reader/src/"
- "/home/rye/UNI/Des-Think-3/Class/"
  "/home/rye/rustplayground/rewquestaround/src/"
  "/home/rye/rustplayground/rewquestaround/"
- "/home/rye/cpp_projects/Invaders/src/"
- "/home/rye/cpp_projects/Invaders/src/ecs/"
- "/home/rye/org/Projects/BulletHellGame/"
- "/home/rye/org/Projects/"
- "/home/rye/org/Projects/Gemini_Protocol/"
- "/home/rye/ryquick/taskbar/blocks/"
- "/home/rye/ryquick/"
 )
 
 ;; ----- ido-work-file-list -----
 (
+ "W3-endpoint-security.org"
+ "week2journal-values,empiricism,projectcontext.md"
+ "week2LearningJournal.md"
+ "home.yml"
+ "glance.yml"
+ "week2-values,empiricis-and-project-context.org"
  "What-I-Have-Added.org"
  "coalFire-rules-of-engagement.org"
  "W2-SecurityFundamentals.org"
  "newcomers-presets-theme.el"
- "LearningJournal.md"
- "week1journal.md"
- "ivyconf.el"
- "diredconf.el"
- "meowconf.el"
- "theme-switcher.el"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
- ("/home/rye/.config/" (27311 7481 711933 545000) "QtProject.conf" "mimeapps.list" "okularrc" "okularpartrc" "kwriterc" "katevirc" "kdeglobals" "dolphinrc" "mgba/" "kconf_updaterc" "wireshark/" "gwenviewrc" "starship.toml" "starship.toml~" "Kitware/" "trashrc" "katerc" "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "zsh/" "arkrc" "amfora/" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "kritarc" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "kritadisplayrc" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
+ ("/home/rye/UNI/Des-Think-3/Class/" (27320 41153 435024 141000) "week2-values,empiricis-and-project-context.docx" "week2-values,empiricis-and-project-context.org" "week1-Getting_Oriented_to_Scrum.org" "week2-values,empiricis-and-project-context.org~" "week1-Getting_Oriented_to_Scrum.org~" "data/" "week1.org~" "../" "./")
 
- ("/home/rye/.emacs.d/" (27311 12409 441139 304000) "ido.last" "ido.last~" "custom-vars.el" "extend/" ".mc-lists.el" ".mc-lists.el~" "tramp" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
+ ("/home/rye/.config/" (27320 26613 339645 835000) "mimeapps.list" "okularrc" "okularpartrc" "kritarc" "kritadisplayrc" "atuin/" "QtProject.conf" "kwriterc" "katevirc" "kdeglobals" "dolphinrc" "mgba/" "kconf_updaterc" "wireshark/" "gwenviewrc" "starship.toml" "starship.toml~" "Kitware/" "trashrc" "katerc" "lazydocker/" "systemmonitorrc" "haruna/" "azote/" "nwg-readme-browser/" "nwg-displays/" "fuzzel/" "user-dirs.dirs" "cagent/" "Docker Desktop/" "docker-secrets-engine/" "zsh/" "arkrc" "amfora/" "SuperCollider/" "helix/" "kaggle/" "kdenliverc" "spectaclerc" "kiorc" "LM Studio/" "LM-Studio/" "graf/" "obsidian/" "Android Open Source Project/" "lazygit/" "kded5rc" "assets/" "nwg-look/" "niri/" "nix/" "procps/" "Google/" "vlc/" "vimb/" "enchant/" "nvim/" "obs-studio/" "kded6rc" "ksmserverrc" "Trolltech.conf" "gtkrc-2.0" "gtkrc" "plasma-org.kde.plasma.desktop-appletsrc" "kwinrc" "kglobalshortcutsrc" "plasmashellrc" "mpd/" "systemd/" "zellij/" "qutebrowser/" "tmux/" "ncspot/" "rpcs3/" "balenaEtcher/" "kactivitymanagerdrc" "kate/" "KDE/" "plasma-workspace/" "bluedevilglobalrc" "powermanagementprofilesrc" "powerdevilrc" "libaccounts-glib/" "ktimezonedrc" "kwinoutputconfig.json" "plasma-localerc" "gamescope/" "user-dirs.locale" "matugen/" "spotify/" "matplotlib/" "glow/" "quickshell/" "QtProject/" "vesktop/" "VirtualBox/" "libreoffice/" "Zettlr/" "openttd/" "Necesse/" "cataclysm-dda/" "ytsurf/" "unity3d/" "uv/" "spicetify/" "StardewValley/" "ibus/" "glib-2.0/" "cachyos/" "htop/" "yay/" "go/" "zed/" "flameshot/" "mpv/" "cava/" "kfontinstuirc" "omf/" "fastfetch/" "OpenRGB/" "yazi/" "waybar/" "octopi/" "btop/" "konsolerc" "wofi/" "baloofileinformationrc" "gh/" "kdeconnect/" "session/" "nvim.bak/" "pavucontrol.ini" "pulse/" "mozilla/" "kitty/" "hypr/" "fish/" "xsettingsd/" "libinput-gestures.conf" "kdedefaults/" "kcminputrc" "gtk-4.0/" "gtk-3.0/" "dconf/" "baloofilerc" "micro/" "autostart/" "deckscale" "alacritty/" "../" "./")
 
- ("/home/rye/UNI/Information-Sec/class/" (27311 8739 696620 729000) "coalFire-rules-of-engagement.org" "coalFire-rules-of-engagement.org~" "images/" "#W2-SecurityFundamentals.org#" ".#W2-SecurityFundamentals.org" "W2-SecurityFundamentals.org" "W2-SecurityFundamentals.org~" "W1-SecurityFundamentals.org" "W1-SecurityFundamentals.org~" "../" "./")
+ ("/home/rye/" (27320 22473 143511 493000) ".gtkrc-2.0" ".zsh_history" "debian-ct.tail0000c4.ts.net.key" "debian-ct.tail0000c4.ts.net.crt" ".viminfo" "home-lab/" ".atuin/" ".ssh/" ".t-engine/" ".steampid" ".steampath" ".aspell.en.pws" ".aspell.en.prepl" "docker-compose.yaml" "histfile" ".nix-defexpr/" ".python_history" ".zshrc" ".zshrc~" ".viminfo~" "nix-dev/" "wmenu" "fuzzel" ".password-store/" ".sigstore/" ".docker/" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile/" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
 
- ("/home/rye/" (27311 8746 16683 320000) ".zsh_history" ".gtkrc-2.0" ".ssh/" ".t-engine/" ".steampid" ".steampath" ".viminfo" ".aspell.en.pws" ".aspell.en.prepl" "docker-compose.yaml" "histfile" ".nix-defexpr/" ".python_history" ".zshrc" ".zshrc~" ".viminfo~" "nix-dev/" "wmenu" "fuzzel" ".password-store/" ".sigstore/" ".docker/" "alias/" ".zsh_plugins.zsh" ".zsh_plugins.txt" ".zsh_plugins.txt~" ".zcompdump-Ally-5.9.2.zwc" ".zcompdump-Ally-5.9.2" ".zshrc.omz-uninstalled-2026-09-02_19-14-44" "*message*-20260320-192202" "*message*-20260320-192202~" ".antidote/" "data/" "rustplayground/" "proglanguage/" ".zshenv" ".profile" ".cargo/" ".rustup/" "go/" "#*message*-20260819-100323#" "*message*-20260817-191452" ".newsrc-dribble" "News/" ".notes" "ts_em/" "tree-sitter-qmljs/" "ryquick/" "superdirt/" "assignment-1-task-2-baseline-prediction.ipynb" "Own-C-Implementation/" ".kaggle/" "kaggle/" "other/" "U" "#*message*-20260709-142902#" ".zcompdump-Ally-5.9.1.zwc" ".zcompdump-Ally-5.9.1" ".thunderbird/" "thunderbird/" "AIII/" "koboldcpp" ".lmstudio/" ".lmstudio-home-pointer" "lmstudio/" "ownprojects/" "myfile.txt" "oldfile" "02-Prac-Log.txt" "typescript" ".emulator_console_auth_token" "starwars/" ".zcompdump-Ally-5.9" ".zcompdump-Ally-5.9.lock/" ".nix-profile/" ".bash_history" ".fastai/" "cpp_projects/" "fig-files/" ".zcompdump-Ally-5.9.zwc" "PDFfiles/" ".medmnist/" ".jdks/" ".gradle/" "AndroidStudioProjects/" "Android/" ".android/" "git_Stuff/" "rust_hub/" "c_projects/" "nvim_backup/" "figurations/" "#*message*-20260320-193338#" "*message*-20260320-192154" ".npmrc" ".npm-global/" "org/" ".emacs.d/" "UFC/" "xaa" ".tmux/" ".texlive/" "etcher/" "package-lock.json" "main_quickshell/" ".var/" "Videos/" "Pictures/" "Music/" "Documents/" "Public/" "Templates/" "qmldir" "notes/" "codeberg/" "quick/" ".designer/" ".jupyter/" ".ipython/" ".condarc" "miniconda3/" "UNI/" ".anaconda/" ".conda/" "anaconda3/" ".fonts/" ".java/" ".gemini/" ".npm/" "IA/" "games/" ".spicetify/" "install.log" "cpp_learn/" "Languages/" "media/" "Scripts/" ".factorio/" ".pki/" ".pulse-cookie" ".steam/" ".zcompdump-ZB09304-host-5.9.zwc" ".zcompdump-ZB09304-host-5.9" ".zcompdump-ZB13238-host-5.9.zwc" ".zcompdump-ZB13238-host-5.9" "zsh-bench/" ".p10k.zsh" "yay/" "projects/" ".zcompdump-Ally-5.9.Ally.14741" ".gnupg/" ".fonts.conf" ".gitconfig" "Learning-Resources-Programming-/" "Picture/" ".zen/" "paru/" "Downloads/" ".mozilla/" ".cache/" ".local/" ".bashrc" ".bash_profile" ".bash_logout" "Desktop/" ".config/" "../" "./")
+ ("/home/rye/.emacs.d/extend/" (27319 22601 591554 272000) "diredconf.el" "diredconf.el~" "theme-switcher.el" "theme-switcher.el~" "indentation.el" "indentation.el~" "eww-conf.el" "eww-conf.el~" "flyspell.el" "flyspell.el~" "org-mode.el" "org-mode.el~" "../" "./")
 
- ("/home/rye/org/" (27308 64505 461760 841000) "README.md" ".gitignore" ".git/" "emacsstuff.org" "emacsstuff.org~" "Docker-Podman/" "Home-Lab/" "Projects/" "uni/" "docs/" ".orgids" "todo.org" "../" "./")
+ ("/home/rye/.emacs.d/" (27320 28367 252228 126000) "ido.last" "ido.last~" "projectile-frecency.eld" "custom-vars.el" "#init.el#" "extend/" ".mc-lists.el" ".mc-lists.el~" "tramp" "external/" ".org-id-locations" "bookmarks.eld" "bookmarks.eld~" "emms/" "elfeed/" "custom-vars.el~" "init.el" "init.el~" "early-init.el" "early-init.el~" "projectile-bookmarks.eld" "eww-bookmarks" "url/" "splash/" "#ido.last#" "site-lisp/" ".git/" ".gitignore" "transient/" "tutorial/" "eshell/" "projects" "tree-sitter/" "recentf" "places" "history" "elpa/" "eln-cache/" "auto-save-list/" "../" "./")
 
- ("/home/rye/org/Home-Lab/" (27307 42280 836588 50000) "#Security.org#" "home-lab.org" "home-lab.org~" "../" "./")
+ ("/home/rye/UNI/Des-Think-3/Prac/" (27320 20596 188982 219000) "week2journal-values,empiricism,projectcontext.docx" "week2journal-values,empiricism,projectcontext.md" "week2journal-values,empiricism,projectcontext.md~" "week1journal.odt" "../" "./")
 
- ("/home/rye/UNI/Information-Sec/prac/" (27306 26868 363987 826000) "week1prac.odt" ".~lock.week1prac.odt#" "week1journal.md" "../" "./")
+ ("/home/rye/UNI/Information-Sec/prac/" (27318 6167 395809 370000) "week2journal.md" "week1prac.odt" "week1journal.md" "../" "./")
 
- ("/home/rye/UNI/Information-Sec/assessment/Assessment 3 - Practical Portfolio (Learning Journal)/" (27306 23519 150039 483000) "week1LearningJournal.md" "week1LearningJournal.md~" "week1LearningJournal.fls" "week1LearningJournal.pdf" "week1LearningJournal.log" "week1LearningJournal.fdb_latexmk" "week1LearningJournal.aux" "week1LearningJournal.tex" "LearningJournal.fls" "LearningJournal.toc" "LearningJournal.pdf" "LearningJournal.log" "LearningJournal.fdb_latexmk" "LearningJournal.aux" "LearningJournal.tex~" "LearningJournal.md~" "images/" "../" "./")
+ ("/home/rye/UNI/Information-Sec/assessment/Assessment 3 - Practical Portfolio (Learning Journal)/" (27318 16657 701561 238000) "week2LearningJournal.md" "week2LearningJournal.md~" "week1.odt" "week1.docx" "images/" "latex/" "week1LearningJournal.md" "week1LearningJournal.md~" "../" "./")
 
- ("/home/rye/.config/hypr/" (27309 49054 418175 152000) "workspaces.conf" "monitors.conf" "#hyprland.lua#" ".git/" "autostart.lua" "oldConfig/" "scripts.lua" "hyprland.lua" "windowrule.lua" "layout.lua" "style.lua" "keybinds.lua" "../" "./")
+ ("/home/rye/UNI/Programming-3/Prac/week2/" (27319 22002 982603 549000) "exercise4" "week2" "oof.md" "cpac.md" "cpac.md~" "man.txt" "man.txt~" "foo.txt" "foo" "woman.txt" "week2pointersArraysDynamicMemory.cpp" "commanlineargs.cpp~" "commanlineargs.cpp" "week2pointersArraysDynamicMemory.cpp~" "exercise1_integer.cpp~" "exercise1_integer.cpp" "../" "./")
+
+ ("/home/rye/UNI/Information-Sec/class/" (27315 25961 889575 157000) "coalFire-rules-of-engagement.org" "W2-SecurityFundamentals.org" "coalFire-rules-of-engagement.org~" "images/" "W2-SecurityFundamentals.org~" "W1-SecurityFundamentals.org" "W1-SecurityFundamentals.org~" "../" "./")
+
+ ("/home/rye/.config/hypr/" (27316 25574 994343 969000) "workspaces.conf" "monitors.conf" "#hyprland.lua#" ".git/" "autostart.lua" "oldConfig/" "scripts.lua" "hyprland.lua" "windowrule.lua" "layout.lua" "style.lua" "keybinds.lua" "../" "./")
+
+ ("/home/rye/org/" (27317 42686 74876 954000) ".stfolder/" "README.md" ".gitignore" ".git/" "emacsstuff.org" "emacsstuff.org~" "Docker-Podman/" "Home-Lab/" "Projects/" "uni/" "docs/" ".orgids" "todo.org" "../" "./")
+
+ ("/home/rye/org/Home-Lab/" (27316 56386 9149 11000) "What-I-Have-Added.org" "What-I-Have-Added.org~" "#Security.org#" "home-lab.org" "home-lab.org~" "../" "./")
+
+ ("/home/rye/UNI/Information-Sec/assessment/Assessment 3 - Practical Portfolio (Learning Journal)/latex/" (27318 2180 604386 129000) "week1LearningJournal.tex" "week1LearningJournal.pdf" "week1LearningJournal.log" "week1LearningJournal.fls" "week1LearningJournal.fdb_latexmk" "week1LearningJournal.aux" "LearningJournal.toc" "LearningJournal.tex~" "LearningJournal.pdf" "LearningJournal.md~" "LearningJournal.log" "LearningJournal.fls" "LearningJournal.fdb_latexmk" "LearningJournal.aux" "images/" "../" "./")
+
+ ("/home/rye/UNI/Information-Sec/" (27315 25961 888575 162000) "TAGS" "Pracs/" "timetable.org~" "timetable.org" ".git/" "misc/" "prac/" "assessment/" "class/" "../" "./")
+
+ ("/home/rye/UNI/Programming-3/Class/" (27312 64300 67490 227000) "lecture2-pointers.org~" "lecture2-pointers.org" "code-with-me/" "book" "book.cpp" "book.cpp~" "lecture1-introduction.org" "lecture1-introduction.org~" "../" "./")
+
+ ("/home/rye/UNI/Programming-3/" (27315 17776 77478 92000) "flake.nix" ".idea/" ".direnv/" ".gitingnore" "flake.lock" ".envrc" ".git/" "Prac/" "Misc/" "Assignment/" "Class/" "../" "./")
+
+ ("/home/rye/UNI/Programming-3/Prac/week1/" (27315 17776 77478 92000) "week1programs" "week1questions.org~" "week1questions.org" "week1programs.cpp" ".cache/" "CMakeLists.txt" "CMakeLists.txt~" "week1programs.cpp~" "Printtext.cpp" "Printtext.cpp~" "build/" "StructureForaCar.cpp" "SalaryandSwitchStatement.cpp" "TypeCastingandIfStatement.cpp" "../" "./")
+
+ ("/home/rye/.ssh/" (27307 28990 159113 746000) "id_ed25519.pub" "id_ed25519" "known_hosts" "known_hosts.old" "../" "./")
 
  ("/usr/share/emacs/31.1/lisp/" (27282 7753 210033 855000) "yank-media.elc" "yank-media.el.gz" "xwidget.elc" "xwidget.el.gz" "xt-mouse.elc" "xt-mouse.el.gz" "xml.elc" "xml.el.gz" "xdg.elc" "xdg.el.gz" "x-dnd.elc" "x-dnd.el.gz" "woman.elc" "woman.el.gz" "winner.elc" "winner.el.gz" "window.elc" "window.el.gz" "window-x.elc" "window-x.el.gz" "window-tool-bar.elc" "window-tool-bar.el.gz" "windmove.elc" "windmove.el.gz" "widget.elc" "widget.el.gz" "wid-edit.elc" "wid-edit.el.gz" "wid-browse.elc" "wid-browse.el.gz" "whitespace.elc" "whitespace.el.gz" "which-key.elc" "which-key.el.gz" "wdired.elc" "wdired.el.gz" "w32-vars.elc" "w32-vars.el.gz" "w32-fns.elc" "w32-fns.el.gz" "visual-wrap.elc" "visual-wrap.el.gz" "view.elc" "view.el.gz" "version.elc" "version.el.gz" "vcursor.elc" "vcursor.el.gz" "userlock.elc" "userlock.el.gz" "uniquify.elc" "uniquify.el.gz" "type-break.elc" "type-break.el.gz" "tutorial.elc" "tutorial.el.gz" "tty-tip.elc" "tty-tip.el.gz" "treesit.elc" "treesit.el.gz" "treesit-x.elc" "treesit-x.el.gz" "tree-widget.elc" "tree-widget.el.gz" "transient.elc" "transient.el.gz" "touch-screen.elc" "touch-screen.el.gz" "tooltip.elc" "tooltip.el.gz" "tool-bar.elc" "tool-bar.el.gz" "tmm.elc" "tmm.el.gz" "timezone.elc" "timezone.el.gz" "time.elc" "time.el.gz" "time-stamp.elc" "time-stamp.el.gz" "thread.elc" "thread.el.gz" "thingatpt.elc" "thingatpt.el.gz" "theme-loaddefs.el" "term.elc" "term.el.gz" "tempo.elc" "tempo.el.gz" "tar-mode.elc" "tar-mode.el.gz" "talk.elc" "talk.el.gz" "tabify.elc" "tabify.el.gz" "tab-line.elc" "tab-line.el.gz" "tab-bar.elc" "tab-bar.el.gz" "t-mouse.elc" "t-mouse.el.gz" "system-taskbar.elc" "system-taskbar.el.gz" "system-sleep.elc" "system-sleep.el.gz" "svg.elc" "svg.el.gz" "subr.elc" "subr.el.gz" "subdirs.el" "strokes.elc" "strokes.el.gz" "startup.elc" "startup.el.gz" "sqlite.elc" "sqlite.el.gz" "sqlite-mode.elc" "sqlite-mode.el.gz" "speedbar.elc" "speedbar.el.gz" "soundex.elc" "soundex.el.gz" "sort.elc" "sort.el.gz" "so-long.elc" "so-long.el.gz" "skeleton.elc" "skeleton.el.gz" "simple.elc" "simple.el.gz" "shell.elc" "shell.el.gz" "shadowfile.elc" "shadowfile.el.gz" "ses.elc" "ses.el.gz" "server.elc" "server.el.gz" "send-to.elc" "send-to.el.gz" "select.elc" "select.el.gz" "scroll-lock.elc" "scroll-lock.el.gz" "scroll-bar.elc" "scroll-bar.el.gz" "scroll-all.elc" "scroll-all.el.gz" "saveplace.elc" "saveplace.el.gz" "savehist.elc" "savehist.el.gz" "ruler-mode.elc" "ruler-mode.el.gz" "rtree.elc" "rtree.el.gz" "rot13.elc" "rot13.el.gz" "ring-bell-fns.elc" "ring-bell-fns.el.gz" "rfn-eshadow.elc" "rfn-eshadow.el.gz" "reveal.elc" "reveal.el.gz" "reposition.elc" "reposition.el.gz" "replace.elc" "replace.el.gz" "repeat.elc" "repeat.el.gz" "registry.elc" "registry.el.gz" "register.elc" "register.el.gz" "rect.elc" "rect.el.gz" "recentf.elc" "recentf.el.gz" "pulse.elc" "pulse.el.gz" "ps-samp.elc" "ps-samp.el.gz" "ps-print.elc" "ps-print.el.gz" "ps-print-loaddefs.elc" "ps-print-loaddefs.el.gz" "ps-mule.elc" "ps-mule.el.gz" "ps-bdf.elc" "ps-bdf.el.gz" "profiler.elc" "profiler.el.gz" "proced.elc" "proced.el.gz" "printing.elc" "printing.el.gz" "plstore.elc" "plstore.el.gz" "pixel-scroll.elc" "pixel-scroll.el.gz" "pgtk-dnd.elc" "pgtk-dnd.el.gz" "pcomplete.elc" "pcomplete.el.gz" "pcmpl-x.elc" "pcmpl-x.el.gz" "pcmpl-unix.elc" "pcmpl-unix.el.gz" "pcmpl-rpm.elc" "pcmpl-rpm.el.gz" "pcmpl-linux.elc" "pcmpl-linux.el.gz" "pcmpl-gnu.elc" "pcmpl-gnu.el.gz" "pcmpl-git.elc" "pcmpl-git.el.gz" "pcmpl-cvs.elc" "pcmpl-cvs.el.gz" "password-cache.elc" "password-cache.el.gz" "paren.elc" "paren.el.gz" "outline.elc" "outline.el.gz" "obarray.elc" "obarray.el.gz" "novice.elc" "novice.el.gz" "notifications.elc" "notifications.el.gz" "newcomment.elc" "newcomment.el.gz" "mwheel.elc" "mwheel.el.gz" "msb.elc" "msb.el.gz" "mpc.elc" "mpc.el.gz" "mouse.elc" "mouse.el.gz" "mouse-drag.elc" "mouse-drag.el.gz" "mouse-copy.elc" "mouse-copy.el.gz" "misearch.elc" "misearch.el.gz" "misc.elc" "misc.el.gz" "minibuffer.elc" "minibuffer.el.gz" "minibuf-eldef.elc" "minibuf-eldef.el.gz" "midnight.elc" "midnight.el.gz" "menu-bar.elc" "menu-bar.el.gz" "md4.elc" "md4.el.gz" "mb-depth.elc" "mb-depth.el.gz" "master.elc" "master.el.gz" "man.elc" "man.el.gz" "macros.elc" "macros.el.gz" "ls-lisp.elc" "ls-lisp.el.gz" "lpr.elc" "lpr.el.gz" "locate.elc" "locate.el.gz" "loadup.el" "loadhist.elc" "loadhist.el.gz" "loaddefs.elc" "loaddefs.el.gz" "ldefs-boot.el" "kmacro.elc" "kmacro.el.gz" "keymap.elc" "keymap.el.gz" "jsonrpc.elc" "jsonrpc.el.gz" "json.elc" "json.el.gz" "jka-compr.elc" "jka-compr.el.gz" "jka-cmpr-hook.elc" "jka-cmpr-hook.el.gz" "jit-lock.elc" "jit-lock.el.gz" "isearchb.elc" "isearchb.el.gz" "isearch.elc" "isearch.el.gz" "informat.elc" "informat.el.gz" "info.elc" "info.el.gz" "info-xref.elc" "info-xref.el.gz" "info-look.elc" "info-look.el.gz" "indent.elc" "indent.el.gz" "indent-aux.elc" "indent-aux.el.gz" "imenu.elc" "imenu.el.gz" "image.elc" "image.el.gz" "image-mode.elc" "image-mode.el.gz" "image-file.elc" "image-file.el.gz" "iimage.elc" "iimage.el.gz" "ielm.elc" "ielm.el.gz" "ido.elc" "ido.el.gz" "icomplete.elc" "icomplete.el.gz" "ibuffer.elc" "ibuffer.el.gz" "ibuffer-loaddefs.elc" "ibuffer-loaddefs.el.gz" "ibuf-macs.elc" "ibuf-macs.el.gz" "ibuf-ext.elc" "ibuf-ext.el.gz" "htmlfontify.elc" "htmlfontify.el.gz" "hl-line.elc" "hl-line.el.gz" "hippie-exp.elc" "hippie-exp.el.gz" "hilit-chg.elc" "hilit-chg.el.gz" "hi-lock.elc" "hi-lock.el.gz" "hfy-cmap.elc" "hfy-cmap.el.gz" "hexl.elc" "hexl.el.gz" "hex-util.elc" "hex-util.el.gz" "help.elc" "help.el.gz" "help-mode.elc" "help-mode.el.gz" "help-macro.elc" "help-macro.el.gz" "help-fns.elc" "help-fns.el.gz" "help-at-pt.elc" "help-at-pt.el.gz" "generic-x.elc" "generic-x.el.gz" "fringe.elc" "fringe.el.gz" "frameset.elc" "frameset.el.gz" "frame.elc" "frame.el.gz" "forms.elc" "forms.el.gz" "format.elc" "format.el.gz" "format-spec.elc" "format-spec.el.gz" "font-lock.elc" "font-lock.el.gz" "font-core.elc" "font-core.el.gz" "follow.elc" "follow.el.gz" "foldout.elc" "foldout.el.gz" "flow-ctrl.elc" "flow-ctrl.el.gz" "finder.elc" "finder.el.gz" "finder-inf.el" "find-lisp.elc" "find-lisp.el.gz" "find-file.elc" "find-file.el.gz" "find-dired.elc" "find-dired.el.gz" "find-cmd.elc" "find-cmd.el.gz" "filesets.elc" "filesets.el.gz" "files.elc" "files.el.gz" "files-x.elc" "files-x.el.gz" "filenotify.elc" "filenotify.el.gz" "fileloop.elc" "fileloop.el.gz" "filecache.elc" "filecache.el.gz" "ffap.elc" "ffap.el.gz" "faces.elc" "faces.el.gz" "facemenu.elc" "facemenu.el.gz" "face-remap.elc" "face-remap.el.gz" "ezimage.elc" "ezimage.el.gz" "external-completion.elc" "external-completion.el.gz" "expand.elc" "expand.el.gz" "epg.elc" "epg.el.gz" "epg-config.elc" "epg-config.el.gz" "epa.elc" "epa.el.gz" "epa-mail.elc" "epa-mail.el.gz" "epa-ks.elc" "epa-ks.el.gz" "epa-hook.elc" "epa-hook.el.gz" "epa-file.elc" "epa-file.el.gz" "epa-dired.elc" "epa-dired.el.gz" "env.elc" "env.el.gz" "emacs-lock.elc" "emacs-lock.el.gz" "elide-head.elc" "elide-head.el.gz" "electric.elc" "electric.el.gz" "elec-pair.elc" "elec-pair.el.gz" "ehelp.elc" "ehelp.el.gz" "edmacro.elc" "edmacro.el.gz" "editorconfig.elc" "editorconfig.el.gz" "editorconfig-tools.elc" "editorconfig-tools.el.gz" "editorconfig-fnmatch.elc" "editorconfig-fnmatch.el.gz" "editorconfig-core.elc" "editorconfig-core.el.gz" "editorconfig-core-handle.elc" "editorconfig-core-handle.el.gz" "editorconfig-conf-mode.elc" "editorconfig-conf-mode.el.gz" "ecomplete.elc" "ecomplete.el.gz" "ebuff-menu.elc" "ebuff-menu.el.gz" "dynamic-setting.elc" "dynamic-setting.el.gz" "double.elc" "double.el.gz" "dos-w32.elc" "dos-w32.el.gz" "dos-vars.elc" "dos-vars.el.gz" "dos-fns.elc" "dos-fns.el.gz" "dom.elc" "dom.el.gz" "doc-view.elc" "doc-view.el.gz" "dnd.elc" "dnd.el.gz" "display-line-numbers.elc" "display-line-numbers.el.gz" "display-fill-column-indicator.elc" "display-fill-column-indicator.el.gz" "disp-table.elc" "disp-table.el.gz" "dirtrack.elc" "dirtrack.el.gz" "dired.elc" "dired.el.gz" "dired-x.elc" "dired-x.el.gz" "dired-loaddefs.elc" "dired-loaddefs.el.gz" "dired-aux.elc" "dired-aux.el.gz" "dframe.elc" "dframe.el.gz" "desktop.elc" "desktop.el.gz" "descr-text.elc" "descr-text.el.gz" "delsel.elc" "delsel.el.gz" "delim-col.elc" "delim-col.el.gz" "dabbrev.elc" "dabbrev.el.gz" "custom.elc" "custom.el.gz" "cus-theme.elc" "cus-theme.el.gz" "cus-start.elc" "cus-start.el.gz" "cus-load.el" "cus-face.elc" "cus-face.el.gz" "cus-edit.elc" "cus-edit.el.gz" "cus-dep.elc" "cus-dep.el.gz" "composite.elc" "composite.el.gz" "completion.elc" "completion.el.gz" "completion-preview.elc" "completion-preview.el.gz" "comint.elc" "comint.el.gz" "color.elc" "color.el.gz" "cmuscheme.elc" "cmuscheme.el.gz" "chistory.elc" "chistory.el.gz" "char-fold.elc" "char-fold.el.gz" "case-table.elc" "case-table.el.gz" "calculator.elc" "calculator.el.gz" "button.elc" "button.el.gz" "buff-menu.elc" "buff-menu.el.gz" "bs.elc" "bs.el.gz" "bookmark.elc" "bookmark.el.gz" "bindings.elc" "bindings.el.gz" "bind-key.elc" "bind-key.el.gz" "battery.elc" "battery.el.gz" "avoid.elc" "avoid.el.gz" "autorevert.elc" "autorevert.el.gz" "autoinsert.elc" "autoinsert.el.gz" "auth-source.elc" "auth-source.el.gz" "auth-source-pass.elc" "auth-source-pass.el.gz" "array.elc" "array.el.gz" "arc-mode.elc" "arc-mode.el.gz" "apropos.elc" "apropos.el.gz" "ansi-osc.elc" "ansi-osc.el.gz" "ansi-color.elc" "ansi-color.el.gz" "allout.elc" "allout.el.gz" "allout-widgets.elc" "allout-widgets.el.gz" "align.elc" "align.el.gz" "abbrev.elc" "abbrev.el.gz" "README" "COPYING" "vc/" "use-package/" "url/" "textmodes/" "term/" "progmodes/" "play/" "org/" "obsolete/" "nxml/" "net/" "mh-e/" "mail/" "leim/" "language/" "international/" "image/" "gnus/" "eshell/" "erc/" "emulation/" "emacs-lisp/" "cedet/" "calendar/" "calc/" "../" "./")
 
@@ -143,17 +168,7 @@
 
  ("/usr/share/info/" (27302 6546 413545 3000) "dir" "gcrypt.info.gz" "gcrypt.info-2.gz" "gcrypt.info-1.gz" "mikmod.info.gz" "aspell.info.gz" "aspell-dev.info.gz" "pkcs11-vision.png" "gnutls.info-7" "gnutls.info-6" "gnutls.info-5" "gnutls.info-4" "gnutls.info-3" "gnutls.info-2" "gnutls.info-1" "gnutls.info" "gnutls-x509.png" "gnutls-modauth.png" "gnutls-logo.png" "gnutls-layers.png" "gnutls-internals.png" "gnutls-handshake-state.png" "gnutls-handshake-sequence.png" "gnutls-crypto-layers.png" "gnutls-client-server-use-case.png" "gpgme.info.gz" "gpgme.info-2.gz" "gpgme.info-1.gz" "gnat_ugn.info.gz" "gnat_rm.info.gz" "gnat-style.info.gz" "libcdio.info.gz" "ksba.info.gz" "woman.info.gz" "wisent.info.gz" "widget.info.gz" "vtable.info.gz" "viper.info.gz" "vhdl-mode.info.gz" "use-package.info.gz" "url.info.gz" "transient.info.gz" "tramp.info.gz" "todo-mode.info.gz" "srecode.info.gz" "speedbar.info.gz" "smtpmail.info.gz" "sieve.info.gz" "ses.info.gz" "semantic.info.gz" "sc.info.gz" "sasl.info.gz" "remember.info.gz" "reftex.info.gz" "rcirc.info.gz" "pgg.info.gz" "pcl-cvs.info.gz" "org.info.gz" "octave-mode.info.gz" "nxml-mode.info.gz" "newsticker.info.gz" "modus-themes.info.gz" "mh-e.info.gz" "message.info.gz" "mairix-el.info.gz" "lambda-3.png.gz" "lambda-2.png.gz" "lambda-1.png.gz" "info.info.gz" "ido.info.gz" "idlwave.info.gz" "htmlfontify.info.gz" "gnus.info.gz" "forms.info.gz" "flymake.info.gz" "eww.info.gz" "eudc.info.gz" "eshell.info.gz" "ert.info.gz" "erc.info.gz" "epa.info.gz" "emacs.info.gz" "emacs-mime.info.gz" "emacs-gnutls.info.gz" "elisp_type_hierarchy.jpg.gz" "elisp.info.gz" "eintr.info.gz" "eieio.info.gz" "eglot.info.gz" "efaq.info.gz" "edt.info.gz" "ediff.info.gz" "ede.info.gz" "ebrowse.info.gz" "drawers.png.gz" "dired-x.info.gz" "dbus.info.gz" "cons-5.png.gz" "cons-4.png.gz" "cons-3.png.gz" "cons-2a.png.gz" "cons-2.png.gz" "cons-1.png.gz" "cl.info.gz" "ccmode.info.gz" "calc.info.gz" "bovine.info.gz" "autotype.info.gz" "auth.info.gz" "tar.info.gz" "tar.info-3.gz" "tar.info-2.gz" "tar.info-1.gz" "source-highlight.info.gz" "source-highlight-lib.info.gz" "nano.info.gz" "libgccjit.info.gz" "gccint.info.gz" "gccinstall.info.gz" "gcc.info.gz" "cppinternals.info.gz" "cpp.info.gz" "gnupg.info.gz" "gnupg.info-3.gz" "gnupg.info-2.gz" "gnupg.info-1.gz" "sed.info.gz" "sframe-spec.info.gz" "ldint.info.gz" "ld.info.gz" "gprofng.info.gz" "gprof.info.gz" "ctf-spec.info.gz" "binutils.info.gz" "bfd.info.gz" "as.info.gz" "libquadmath.info.gz" "libgomp.info.gz" "libffi.info.gz" "libc.info.gz" "libc.info-9.gz" "libc.info-8.gz" "libc.info-7.gz" "libc.info-6.gz" "libc.info-5.gz" "libc.info-4.gz" "libc.info-3.gz" "libc.info-20.gz" "libc.info-2.gz" "libc.info-19.gz" "libc.info-18.gz" "libc.info-17.gz" "libc.info-16.gz" "libc.info-15.gz" "libc.info-14.gz" "libc.info-13.gz" "libc.info-12.gz" "libc.info-11.gz" "libc.info-10.gz" "libc.info-1.gz" "libtool.info.gz" "libtool.info-2.gz" "libtool.info-1.gz" "wget.info.gz" "coreutils.info.gz" "dc.info.gz" "bc.info.gz" "find.info.gz" "find-maint.info.gz" "pm-gawk.info.gz" "gawkworkflow.info.gz" "gawknotes.info.gz" "gawkinet.info.gz" "gawk_statist.jpg.gz" "gawk_process-flow.png.gz" "gawk_general-program.png.gz" "gawk_array-elements.png.gz" "gawk_api-figure3.png.gz" "gawk_api-figure2.png.gz" "gawk_api-figure1.png.gz" "gawk.info.gz" "pinentry.info.gz" "bash.info.gz" "libidn.info.gz" "libidn-components.png.gz" "which.info.gz" "libunistring.info.gz" "stabs.info.gz" "gdb.info.gz" "gdb.info-9.gz" "gdb.info-8.gz" "gdb.info-7.gz" "gdb.info-6.gz" "gdb.info-5.gz" "gdb.info-4.gz" "gdb.info-3.gz" "gdb.info-2.gz" "gdb.info-1.gz" "annotate.info.gz" "cpio.info.gz" "nettle.info.gz" "gpgrt.info.gz" "inetutils.info.gz" "fftw3.info.gz" "fftw3.info-2.gz" "fftw3.info-1.gz" "gsl-ref.info.gz" "libmpc.info.gz" "texinfo.info.gz" "texinfo.info-4.gz" "texinfo.info-3.gz" "texinfo.info-2.gz" "texinfo.info-1.gz" "texi2any_internals.info.gz" "texi2any_internals.info-2.gz" "texi2any_internals.info-1.gz" "texi2any_api.info.gz" "info-stnd.info.gz" "flex.info.gz" "flex.info-2.gz" "flex.info-1.gz" "make.info.gz" "make.info-3.gz" "make.info-2.gz" "make.info-1.gz" "parted.info.gz" "autoconf.info.gz" "m4.info.gz" "m4.info-2.gz" "m4.info-1.gz" "mjpeg-howto.info.gz" "groff.info.gz" "groff.info-3.gz" "groff.info-2.gz" "groff.info-1.gz" "libext2fs.info.gz" "gmp.info.gz" "gmp.info-2.gz" "gmp.info-1.gz" "libtextstyle.info.gz" "gettext.info.gz" "autosprintf.info.gz" "ssip.info.gz" "speech-dispatcher.info.gz" "speech-dispatcher-cs.info.gz" "spd-say.info.gz" "libtasn1.info.gz" "gdbm.info.gz" "mtools.info.gz" "aalib.info.gz" "aalib.info-3.gz" "aalib.info-2.gz" "aalib.info-1.gz" "r5rs.info.gz" "guile.info.gz" "guile.info-9.gz" "guile.info-8.gz" "guile.info-7.gz" "guile.info-6.gz" "guile.info-5.gz" "guile.info-4.gz" "guile.info-3.gz" "guile.info-2.gz" "guile.info-11.gz" "guile.info-10.gz" "guile.info-1.gz" "gpm.info.gz" "assuan.info.gz" "mpfr.info.gz" "gzip.info.gz" "grep.info.gz" "libidn2.info.gz" "rluserman.info.gz" "readline.info.gz" "history.info.gz" "bison.info.gz" "automake.info.gz" "automake.info-2.gz" "automake.info-1.gz" "automake-history.info.gz" "diffutils.info.gz" "../" "./")
 
- ("/home/rye/UNI/Information-Sec/" (27306 6942 624286 534000) "timetable.org~" "timetable.org" ".git/" "misc/" "prac/" "assessment/" "class/" "../" "./")
-
  ("/home/rye/cpp_projects/Invaders/src/ecs/" (27305 3030 541894 696000) "entity.hpp" "entity.hpp~" "../" "./")
-
- ("/home/rye/UNI/Programming-3/Class/" (27305 553 349689 527000) "code-with-me/" "book" "book.cpp" "book.cpp~" "lecture1-introduction.org" "lecture1-introduction.org~" "../" "./")
-
- ("/home/rye/UNI/Programming-3/" (27305 553 349135 954000) ".idea/" ".direnv/" ".gitingnore" "flake.lock" "flake.nix" ".envrc" ".git/" "Prac/" "Misc/" "Assignment/" "Class/" "../" "./")
-
- ("/home/rye/UNI/Programming-3/Prac/week1/" (27304 37929 643882 798000) ".cache/" "CMakeLists.txt" "CMakeLists.txt~" "week1programs.cpp" "week1programs.cpp~" "Printtext.cpp" "Printtext.cpp~" "build/" "StructureForaCar.cpp" "SalaryandSwitchStatement.cpp" "TypeCastingandIfStatement.cpp" "../" "./")
-
- ("/home/rye/.emacs.d/extend/" (27303 49306 442976 183000) "diredconf.el" "diredconf.el~" "theme-switcher.el" "theme-switcher.el~" "indentation.el" "indentation.el~" "eww-conf.el" "eww-conf.el~" "flyspell.el" "flyspell.el~" "org-mode.el" "org-mode.el~" "../" "./")
 
  ("/home/rye/UNI/Des-Think-3/" (27293 64720 368795 724000) "Prac/" "Misc/" ".git/" "Assessment/" "Class/" "../" "./")
 
@@ -216,8 +231,6 @@
  ("/usr/share/cachyos-zsh-config/" (26992 29436 176220 981000) "cachyos-config.zsh" "../" "./")
 
  ("/home/rye/rustplayground/rusqlite/" (27287 44583 936931 920000) "Cargo.toml" "Cargo.toml~" "Cargo.lock" "target/" "src/" ".gitignore" ".git/" "../" "./")
-
- ("/home/rye/UNI/Des-Think-3/Class/" (27286 29334 479323 653000) "week1-Getting_Oriented_to_Scrum.org" "week1-Getting_Oriented_to_Scrum.org~" "data/" "week1.org~" "../" "./")
 
  ("/home/rye/rustplayground/rewquestaround/" (27283 61586 815823 262000) "Cargo.toml" "Cargo.toml~" "Cargo.lock" "target/" "src/" ".gitignore" ".git/" "../" "./")
 
@@ -292,18 +305,6 @@
  ("/home/rye/c_projects/" (27157 5909 415156 961000) "ryshell/" "fastai-cpp-inference/" "Cloom/" "simpleShaders/" "3d_render/" "spinning_asci_art/" "Pong/" "spinning_cube/" "../" "./")
 
  ("/home/rye/.config/wofi/" (27261 22501 597331 294000) "style.css" "style.css~" "../" "./")
-
- ("/home/rye/Android/Sdk/" (27150 45855 989203 638000) "system-images/" ".downloadIntermediates/" "skins/" "icons/" "fonts/" ".knownPackages" "emulator/" "platform-tools/" "platforms/" "build-tools/" ".temp/" "sources/" "licenses/" "../" "./")
-
- ("/home/rye/Android/Sdk/build-tools/" (27105 32442 192013 71000) "35.0.0/" "34.0.0/" "36.0.0/" "37.0.0/" "36.1.0/" "../" "./")
-
- ("/home/rye/Android/Sdk/build-tools/34.0.0/" (27105 31621 884170 946000) "package.xml" "renderscript/" "lld-bin/" "lib64/" "lib/" "zipalign" "x86_64-linux-android-ld" "split-select" "source.properties" "runtime.properties" "mipsel-linux-android-ld" "llvm-rs-cc" "lld" "i686-linux-android-ld" "dexdump" "d8" "core-lambda-stubs.jar" "bcc_compat" "arm-linux-androideabi-ld" "apksigner" "aidl" "aarch64-linux-android-ld" "aapt2" "aapt" "NOTICE.txt" "../" "./")
-
- ("/home/rye/Android/Sdk/build-tools/34.0.0/lib/" (27105 31621 103108 115000) "d8.jar" "apksigner.jar" "../" "./")
-
- ("/home/rye/Android/" (27105 29598 702835 275000) "Sdk/" "../" "./")
-
- ("/home/rye/UNI/DeepLearning/Assignment/" (27214 60413 683487 528000) "DeepLearningAssignment.fls" "DeepLearningAssignment.pdf" "DeepLearningAssignment.out" "DeepLearningAssignment.log" "DeepLearningAssignment.fdb_latexmk" "DeepLearningAssignment.aux" "DeepLearningAssignment.tex" "exam1.md" ".ipynb_checkpoints/" "benchmark.ipynb" "CP3501_rubric_v250619b.docx" "../" "./")
 )
 
 ;; ----- ido-unc-hosts-cache -----
