@@ -44,7 +44,7 @@
 (setopt delete-selection-mode t)
 (editorconfig-mode t ) ;relevant for group work and 
 (indent-tabs-mode nil)
-(tab-bar-mode nil)
+
 
 ;; auto closing brackets
 (electric-pair-mode t)
