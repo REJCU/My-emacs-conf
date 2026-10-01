@@ -27,12 +27,11 @@
 ; (load custom-file)
 
 ;; debated on whether or not to activate it 
-;;(setq custom-file "~/.emacs.d/external/meowconf.el")
-;;(load custom-file)
+(setq custom-file "~/.emacs.d/external/meowconf.el")
+(load custom-file)
 
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file '
-      noerror 'nomessage)
+;(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+;(load custom-file 'noerror 'nomessage)
 
 ;; QOL - Gathered from newcomers preset
 (global-display-line-numbers-mode 1)
@@ -83,6 +82,7 @@
 (setq ido-everywhere t)
 (ido-mode 1)
 (etags-regen-mode t)
+(setq next-line-add-newlines t)
 
 ;; Make a whole list of custom keymaps 
 ;; TODO -
@@ -239,6 +239,7 @@
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
 (load-theme 'leuven)
+;(load-theme 'gruber-darker)
 
 
 (use-package exec-path-from-shell
