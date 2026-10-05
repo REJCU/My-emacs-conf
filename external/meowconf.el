@@ -86,3 +86,33 @@
 ;;(require 'meow)				
 ;;(meow-setup)
 ;;(meow-global-mode t)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("8bbe58320d4e14ee7946c139ed595a5fea0fe3d5ad65086f6050a6ba408371bd"
+     "de8f2d8b64627535871495d6fe65b7d0070c4a1eb51550ce258cd240ff9394b0"
+     "1781e8bccbd8869472c09b744899ff4174d23e4f7517b8a6c721100288311fa5"
+     default))
+ '(package-selected-packages
+   '(anti-zenburn-theme avy cape cmake-mode company consult corfu counsel
+			dashboard direnv docker doom-modeline
+			doom-themes eat ef-themes elfeed elpher embark
+			emms eradio evil exec-path-from-shell flycheck
+			gruber-darker-theme hima-theme kanagawa-themes
+			magit marginalia markdown-mode
+			markdown-ts-mode melpa-upstream-visit meow
+			moe-theme multiple-cursors nano-theme
+			nerd-icons-completion nerd-icons-corfu
+			nerd-icons-dired nix-mode nix-ts-mode
+			orderless pet projectile radio
+			rainbow-delimiters rg-themes ripgrep rust-mode
+			treesit-auto vertico-posframe zenburn-theme)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

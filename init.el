@@ -93,7 +93,9 @@
   (keymap-set global-map "C-q r" #'recompile)
   (keymap-set global-map "C-q c" #'compile)
   (keymap-set global-map "C-q n" #'next-error)
-  (keymap-set global-map "C-q e" #'eval-buffer))
+  (keymap-set global-map "C-q e" #'eval-buffer)
+  (keymap-set global-map "C-q f" #'ffap)
+  )
 
 ;; commenting region
   (global-set-key [f9] 'comment-region)
@@ -238,9 +240,13 @@
 ;;   (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-(load-theme 'leuven)
+;(load-theme 'hima)
 ;(load-theme 'gruber-darker)
 
+(use-package hima-theme
+  :ensure t
+  :config
+  (load-theme 'hima))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -401,7 +407,7 @@
 
 
 ;; elfeed
-(keymap-global-set "C-x w" #'elfeed)
+; (keymap-global-set "C-x w" #'elfeed)
 
 (setq elfeed-feeds
       '("https://nullprogram.com/feed/"
@@ -464,3 +470,5 @@
       (tramp-login-args (("exec") ("%h") ("--") ("%l")))
       (tramp-remote-shell "/bin/sh")
       (tramp-remote-shell-args ("-i" "-c")))))
+
+

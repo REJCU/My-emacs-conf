@@ -4,6 +4,19 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+	eval-buffer
+	meow-append
+	meow-back-word
+	meow-block
+	meow-change
+	meow-expand-2
+	meow-insert-exit
+	meow-left
+	meow-next
+	meow-next-word
+	meow-prev
+	meow-right
+	meow-undo
 	org-ctrl-c-ctrl-c
 	org-self-insert-command
 	))
@@ -12,6 +25,7 @@
       '(
 	corfu-quit
 	markdown-outdent-or-delete
+	meow-insert
 	term-send-backspace
 	term-send-raw
 	))
