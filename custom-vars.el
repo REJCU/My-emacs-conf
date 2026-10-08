@@ -5,7 +5,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("d12b1d9b0498280f60e5ec92e5ecec4b5db5370d05e787bc7cc49eae6fb07bc0"
+   '("0cc70543214e5133e0eb479a01e57128a4f3e62195ca9073dffe90c8a57519e1"
+     "2f8af2a3a2fae6b6ea254e7aab6f3a8b5c936428b67869cef647c5f8e7985877"
+     "d12b1d9b0498280f60e5ec92e5ecec4b5db5370d05e787bc7cc49eae6fb07bc0"
      "e1df746a4fa8ab920aafb96c39cd0ab0f1bac558eff34532f453bd32c687b9d6"
      "01a9797244146bbae39b18ef37e6f2ca5bebded90d9fe3a2f342a9e863aaa4fd"
      "0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
@@ -42,21 +44,23 @@
    '("https://www.radleylewis.com/feed.xml"
      "https://nullprogram.com/feed/"
      "https://planet.emacslife.com/atom.xml"
-     "https://www.abc.net.au/news/feed/1948/rss.xml"))
+     "https://www.abc.net.au/news/feed/1948/rss.xml") t)
  '(global-display-line-numbers-mode t)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(anti-zenburn-theme avy cape cmake-mode company consult corfu counsel
-			dashboard direnv docker doom-modeline
-			doom-themes eat ef-themes elfeed elpher emms
-			eradio evil exec-path-from-shell flycheck
+   '(anti-zenburn-theme avy cape catppuccin-theme cmake-mode company
+			consult corfu counsel dashboard denote direnv
+			docker doom-modeline doom-themes eat ef-themes
+			elfeed elpher embark-consult emms eradio evil
+			exec-path-from-shell flycheck
 			gruber-darker-theme ivy kanagawa-themes magit
 			marginalia markdown-mode markdown-ts-mode
 			melpa-upstream-visit meow moe-theme
 			multiple-cursors nerd-icons-completion
 			nerd-icons-corfu nerd-icons-dired nix-mode
 			nix-ts-mode orderless pet projectile radio
-			ripgrep rust-mode swiper treesit-auto
+			ripgrep rust-mode solarized-theme
+			solo-jazz-theme swiper treesit-auto
 			vertico-posframe zenburn-theme))
  '(safe-local-variable-values '((lexical . t)))
  '(tool-bar-mode nil)
@@ -67,3 +71,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+
+
+

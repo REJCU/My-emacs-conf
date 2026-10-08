@@ -22,6 +22,9 @@
 (setq custom-file "~/.emacs.d/extend/diredconf.el")
 (load custom-file ':noerror)
 
+(setq custom-file "~/.emacs.d/external/denote.el")
+(load custom-file ':noerror)
+
 ;; i already use vertico and i kinda like it 
 ; (setq custom-file "~/.emacs.d/external/ivyconf.el")
 ; (load custom-file)
@@ -30,8 +33,8 @@
 (setq custom-file "~/.emacs.d/external/meowconf.el")
 (load custom-file)
 
-;(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-;(load custom-file 'noerror 'nomessage)
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
 
 ;; QOL - Gathered from newcomers preset
 (global-display-line-numbers-mode 1)
@@ -229,7 +232,7 @@
 ;; (use-package kanagawa-themes
 ;;   :ensure t
 ;;   :config
-;;   (load-theme 'kanagawa-wave))
+;;   (load-theme 'kanagawa-wave
 
 ;;(load-theme ')
 
@@ -240,13 +243,13 @@
 ;;   (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-;(load-theme 'hima)
+(load-theme 'solo-jazz)
 ;(load-theme 'gruber-darker)
 
-(use-package hima-theme
-  :ensure t
-  :config
-  (load-theme 'hima))
+;; (use-package hima-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'hima))
 
 (use-package exec-path-from-shell
   :ensure t

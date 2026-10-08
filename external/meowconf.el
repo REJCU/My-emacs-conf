@@ -92,7 +92,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("8bbe58320d4e14ee7946c139ed595a5fea0fe3d5ad65086f6050a6ba408371bd"
+   '("2f8af2a3a2fae6b6ea254e7aab6f3a8b5c936428b67869cef647c5f8e7985877"
+     "e7820b899036ae7e966dcaaec29fd6b87aef253748b7de09e74fdc54407a7a02"
+     "8bbe58320d4e14ee7946c139ed595a5fea0fe3d5ad65086f6050a6ba408371bd"
      "de8f2d8b64627535871495d6fe65b7d0070c4a1eb51550ce258cd240ff9394b0"
      "1781e8bccbd8869472c09b744899ff4174d23e4f7517b8a6c721100288311fa5"
      default))
