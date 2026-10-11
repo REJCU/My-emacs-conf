@@ -1,4 +1,5 @@
-;     (info "(denote) Sample configuration")
+;;; ...  -*- lexical-binding: t -*-
+
 (use-package denote
   :ensure t
   :hook (dired-mode . denote-dired-mode)
@@ -8,6 +9,7 @@
    ("C-c n l" . denote-link)
    ("C-c n b" . denote-backlinks)
    ("C-c n d" . denote-dired)
+   ("C-c n o" . denote-open-or-create)
    ("C-c n g" . denote-grep))
   :config
   (setq denote-directory (expand-file-name "~/Documents/notes/"))

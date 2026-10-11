@@ -243,7 +243,7 @@
 ;;   (modus-themes-load-theme 'ef-arbutus))
 
 ;; when applying theme, disable previous ones, as it affects the loaded one
-(load-theme 'solo-jazz)
+(load-theme 'doom-homage-white)
 ;(load-theme 'gruber-darker)
 
 ;; (use-package hima-theme
@@ -361,13 +361,14 @@
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (setq projectile-project-search-path '("~/UNI/" "~/c_projects/" "~/cpp_projects/" "~/UNI/DeepLearning/" "~/.config/home-manager/" "~/rococo/"))
 				       
-(use-package avy
+(use-package avy			
   :ensure t
   :bind
   ;; changed from defualt because of pc issues of C-; not working - maybe terminal
-  ("C-z" . avy-goto-char-timer)
+  ("M-j" . avy-goto-char-timer)		
   ("M-g g" . avy-goto-line)
   ("M-g w" . avy-goto-word-1)
+
   :config
   (setq avy-all-windows t)
   
