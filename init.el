@@ -33,6 +33,10 @@
 (setq custom-file "~/.emacs.d/external/meowconf.el")
 (load custom-file)
 
+;; my own changes to Emacs func's 
+(setq custom-file "~/.emacs.d/extend/emacsconf.el")
+(load custom-file ':noerror)
+
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
 (load custom-file 'noerror 'nomessage)
 
