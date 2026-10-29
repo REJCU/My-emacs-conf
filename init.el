@@ -281,7 +281,8 @@
 	 (tsx-ts-mode . eglot-ensure)
 	 (js-ts-mode .eglot-ensure)
          (html-ts-mode . eglot-ensure)
-         (LaTeX-mode  . eglot-ensure)   
+         (LaTeX-mode  . eglot-ensure)
+ 	 (typst-ts-mode . eglot-ensure)
          (markdown-ts-mode  . eglot-ensure)   
          (latex-mode  . eglot-ensure) 
          (qml-ts-mode . eglot-ensure)
@@ -313,6 +314,16 @@
                                              (:checkOnSave (:command "clippy")
                                               :cargo (:buildScripts (:enable t)))))))
 
+(use-package typst-ts-mode
+  :ensure
+  :custom
+  (typst-ts-watch-options "--open")
+  (typst-ts-mode-grammar-location (expand-file-name "tree-sitter/libtree-sitter-typst.so" user-emacs-directory))
+  (typst-ts-mode-enable-raw-blocks-highlight t)
+  :config  
+  (keymap-set typst-ts-mode-map "C-c C-c" #'typst-ts-tmenu))
+
+
 
 (use-package treesit-auto
   :ensure t
@@ -321,6 +332,8 @@
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
+
+
 
 ;; nixd 
 (add-hook 'prog-mode-hook
